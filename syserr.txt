@@ -1,0 +1,3 @@
+1208 21:59:14735 :: CANNOT_FIND_FILE [d:\ymir work\ui\atlas\maps\181_tochas_red\atlas.sub]
+1208 21:59:15174 :: CANNOT_FIND_FILE [d:\ymir work\item\weapon\00060.gr2]
+1208 21:59:15215 :: Unknown Server Command update_guerra 0 REINOS 10 100 5 0 1 1:0 5 22:0 0 | update_guerra

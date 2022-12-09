@@ -1,0 +1,106 @@
+1	Sequência de Golpes	1	0	-( 1.1*atk + (0.5*atk +  1.5 * str)*k)	40+100*k			12	0
+2	Vórtice	1	0	-(3*atk + (0.8*atk + str*5 + dex*3 +con)*k)	50+130*k			15	0
+3	Fúria	1	0	50*k	50+140*k	60+90*k		63+10*k	0
+4	Lâmina Espiritual	1	0	(100 + str + lv * 3)*k	100+200*k	30+50*k		30+10*k	0
+5	Investida Rápida	1	0	-(2*atk + (atk + dex*3 + str*7 + con)*k)	60+120*k			12	0
+6	Força Vital	1	0	-(3*atk+(atk+1.5*str)*k)*1.07	300+150*k			60	0
+16	Técnica Cortante	1	0	-(2.3*atk + (4*atk  + str*4 + con)*k)	60+120*k			15	0
+17	Impacto Terrestre	1	0	-(2.3*atk + (3*atk + str*4 + con*3)*k)	60+150*k			15	0
+18	Tremor	1	0	-(2*atk + (2*atk + 2*dex + 2*con + str*4)*k)	50+140*k			25	0
+19	Defesa	1	0	(200 + str*0.2 + con*0.5 ) *k	80+220*k	60+90*k		63+10*k	0
+20	Disparo de Energia	1	0	-(2*atk + (atk + dex*3 + str*5 + con)*k)	40+120*k			20	1200
+21	Espada Celeste	1	0	-(2*atk+(2*atk+2*dex+2*con+str*4)*k)*1.1	300+180*k			60	0
+31	Punhalada Surpresa	1	0	-(atk + (1.2 * atk + number(500, 700) + dex*4+ str*4 )*k)	40+160*k			15	0
+32	Avanço Ágil	1	0	-(atk + (1.6* atk + number(200,300) + dex*7 + str*7)*k)	40+160*k			20	800
+33	Acrobacia	1	0	-(2*atk + (0.5*atk + dex*9 + str*7)*k)	50+140*k			25	0
+34	Esconder	1	0		30+60*k	15+30*k		60	0
+35	Veneno de Serpente	1	0	-(lv*2+(atk + str*3 + dex*18)*k)	40+130*k			25	800
+36	Veneno Traiçoeiro	1	0	-((lv*2+(atk+str*3+dex*18)*k)*1.1)	300+180*k			60	800
+46	Tiro Concentrado	1	0	-(atk + 0.3*atk*floor(2+k*6)+ (0.8*atk+dex*8*ar) *k)	40+130*k			15	2500
+47	Chuva de Flechas	1	0	-(atk + (1.9*atk + dex*2+ str*2)*k)	30+130*k			12	2500
+48	Flecha de Fogo	1	0	-(1.5*atk + (2.8*atk + number(100, 300))*k)	50+130*k			25	2500
+49	Passos Leves	1	0	60*k	30+40*k	15+30*k		30+30*k	0
+50	Flecha Venenosa	1	0	-(atk + (1.5*atk + number(100, 200)+dex*6+str*2)*k)	40+160*k			25	2500
+51	Faísca	1	0	-((atk+(1.2*atk+number(100,200)+dex*6+str*2)*k)*1.1)	200+200*k			60	0
+61	Palmo de Energia	1	0	-(atk + 2*lv + iq*2 + ( 2*atk + str*4 + iq*14) * k)	30+140*k			10	0
+62	Ciclone	1	0	-(1.1 * atk + 2*lv + iq*2+(1.5*atk + str + iq*12) * k)	50+150*k			15	0
+63	Lâmina Sombria	1	0	(3 * iq + 2 * lv)*k	20+240*k	50+100*k	2+23*k	0	0
+64	Medo	1	0	1 + 29 * k	60+120*k	60+100*k		100	0
+65	Aura Negra	1	0	(iq+30)*k	70+170*k	30+120*k		33+140*k	0
+66	Dissipar Magia	1	0	-(40 +5*lv + 2*iq+(10*iq + 7*mwep + number(50,100) )*ar*k)	30+120*k			12	1800
+76	Esfera Espiritual	1	0	-(40 +5*lv + 2*iq +(13*iq + 6*mwep + number(50,100) )*ar*k)	30+140*k			7	1500
+77	Fogo das Sombras	1	0	-(5*lv + 2*iq+(10*iq + 6*mwep + str*4 + con*2 + number(180,200) )*k)	60+140*k			12	0
+78	Evocar Elemental	1	0	-(30+ 2*lv + 2*iq+(7*iq + 6*mwep + number(200,500))*ar*k)	20+30*k	40+30*k	5+40*k	43+30*k	800
+79	Proteção Sobrenatural	1	0	(0.5*iq+15)*k	20+30*k	60+120*k	5+10*k	63+10*k	0
+80	Magia Negra	1	0	-(40 + 2* lv + 2*iq +(2 * con + 2 * dex + 13*iq + 6*mwep + number(180, 200))*ar*k)	40+120*k			12	1200
+81	Espiral da Escuridão	1	0	-(120 + 6*lv + (5 * con + 5 * dex + 29*iq + 9*mwep)*ar*k)	80+220*k			24	1500
+91	Energia Concentrada	1	0	-(70 + 4*lv + (20*iq+5*mwep+50)*ar*k)	30+160*k			7	1800
+92	Dragão Veloz	1	0	-(60 + 5*lv + (18*iq + 6*mwep + 120)*ar*k)	50+160*k			8	0
+93	Rugido do Dragão	1	0	-(80 + 6*lv + (20*iq+14*mwep+120)*ar*k)	50+160*k			20	0
+94	Escudo de Dragão	1	0	(iq*0.3+5)*(2*k+0.5)/(k+1.5)	40+160*k	60+200*k		10	800
+95	Escudo Espelhado	1	0	5+(iq*0.3 + 5)*k	40+160*k	60+200*k		10	1000
+96	Olhos de Dragão	1	0	(iq*0.3+5)*(2*k+0.5)/(k+1.5)	40+160*k	60+100*k		10	1000
+106	Lança Elétrica	1	0	-(60 + 4*lv + (7*iq+8*mwep+number(iq*5,iq*15))*ar*k)	30+150*k			7	1800
+107	Campo Estático	1	0	-(40 + 4*lv + (13*iq+7*mwep+number(iq*5,iq*16))*ar*k)	50+150*k			15	1500
+108	Corrente Elétrica	1	0	-(50 + 5*lv + (6*iq+6*mwep+number(1,800))*ar*k) * (1-chain*0.13)	40+180*k			10	2500
+109	Curar Ferimentos	1	0	200+7*lv+(30*iq+6*mwep+600)*k	40+200*k			10	1000
+110	Passos de Pluma	1	0	5 + 35*k	60+120*k	60+100*k		10	1000
+111	Encantamentos Naturais	1	0	10+(iq*0.4 +20)*k	60+120*k	60+100*k		10	1000
+157	Desejo do Dragão	7	0	50*k	150+150*k	180		480	0
+156	Maldição do Dragão	7	0	50*k	150+150*k	180		480	0
+155	Vôo do Dragão	7	0	15*k	150+150*k	180		480	0
+154	Armadura do Dragão	7	0	odef*0.1*k	150+150*k	180		480	0
+121	Liderança	40	0						0
+122	Perseverança	2	0						0
+124	Mineração	40	0						0
+125	Forja	40	0			10+1000*k			1000
+153	Benção do Dragão	7	0	3000*k	150+150*k	300		600	0
+152	Sangue do Dragão	7	0	8000*k	150+150*k	300		600	0
+129	Transfiguração	40	0						0
+130	Montaria	1	0						0
+131	Evocar Montaria	10	0						0
+137	Ataque Montado	1	50	-(atk+(2*atk*k))	60+80*k			5-(4*k)	300
+138	Aproximação Violenta	1	52	-(2.4*(200+1.5*lv)+(3*200*k))	60+120*k			15	400
+139	Ataque Circular	1	55	-(2*(200+1.5*lv)+(3*200*k))	60+160*k			20	400
+159	°ø°£ÀÇ¹®	5	0						0
+158	±æµåÀÌµ¿	3	0						0
+151	¿ë¾È	7	0						0
+140	³­¹«(È°)	1	50	-(atk+(2*atk*k))	60+80*k			10	2500
+141	Passive Support 141	40	0	1333.3*k					0
+142	Passive Support 142	40	0	20*k					0
+160	°¡¼ÓÈ­	5	0	3*k	80-12*k	300			0
+161	°ø°£ÀÇ¹®	2	0		50				0
+162	°ø°£ÀÌµ¿	2	0		20				0
+256	AbilitÃ Schiaccia200	1	0	-5*k*atk				4	0
+257	AbilitÃ Generali350	1	0	-5*k*atk				6	0
+258	AbilitÃ Schiaccia300	1	0	-5*k*atk				8	0
+259	AbilitÃ Normali200	1	0	-5*k*atk				10	0
+260	AbilitÃ Schiaccia400	1	0	-5*k*atk				12	0
+261	AbilitÃ Veleno250	1	0	-5*k*atk				10	0
+262	AbilitÃ Rallenta300	1	0	-5*k*atk				14	0
+263	SLOW4000ìŠ¤í‚¬	1	0	-5*k*atk				12	2000
+264	THUNDERìŠ¤í‚¬	1	0	-maxhp*k				12	0
+265	HEAL4000ìŠ¤í‚¬	1	0					5	3000
+266	ATTACK_SLOW	1	0						0
+267	S1 Dragon Queen Meley	1	0	-2*k*atk				3	500
+268	S2 Dragon Queen Meley	1	0	-3*k*atk				6	600
+269	S3 Dragon Queen Meley	1	0	-3*k*atk				5	700
+7	 ±âÇ÷Aë¸í	1	0	-(0)	50+140*k			0	0
+221	ÆÈ¹æÇ³¿ìÆÄÇØ	1	0	24*k					1000
+222	¾Ï½ÀÆÄÇØ	1	0	24*k					1000
+223	¼â·ÉÁöÆÄÇØ	1	0	24*k					1000
+224	¿ëÆÄ»êÆÄÇØ	1	0	24*k					1000
+225	±â°øÂüÆÄÇØ	1	0	24*k					1000
+226	È­Á¶ÆÄÆÄÇØ	1	0	24*k					1000
+227	¸¶·ÉÆÄÇØ	1	0	24*k					1000
+228	º­¶ôÆÄÇØ	1	0	24*k					1000
+229	»ìÇ³ÆÄÇØ	1	0	24*k					1000
+236	ÆÈ¹æÇ³¿ì°­È­	1	0	16*k					1000
+237	¾Ï½À°­È­	1	0	16*k					1000
+238	¼â·ÉÁö°­È­	1	0	16*k					1000
+239	¿ëÆÄ»ê°­È­	1	0	16*k					1000
+240	±â°øÂü°­È­	1	0	16*k					1000
+241	È­Á¶ÆÄ°­È­	1	0	16*k					1000
+242	¸¶·É°­È­	1	0	16*k					1000
+243	º­¶ô°­È­	1	0	16*k					1000
+244	»ìÇ³°­È­	1	0	16*k					1000

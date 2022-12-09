@@ -1,0 +1,30 @@
+maps/001_shinsoo_yongan	409600	896000	4	5
+maps/003_shinsoo_yayang	307200	819200	4	4
+maps/021_chunjo_joan	0	102400	4	5
+maps/023_chunjo_bokjung	102400	204800	4	4
+maps/041_jinno_pyungmoo	921600	204800	4	5
+maps/042_jinno_bakra	819200	204800	4	4
+maps/081_casamento	819200	0	1	1
+maps/113_ox	870400	0	2	2
+maps/114_encruzilhada_normal	921600	0	2	2
+maps/115_encruzilhada_deserto	1228800	0	4	4
+maps/116_encruzilhada_gelo	1152000	0	3	3
+maps/117_encruzilhada_milgyo	1331200	0	3	3
+maps/181_tochas_red	972800	102400	2	2
+maps/182_tochas_yellow	921600	153600	2	2
+maps/183_tochas_blue	972800	153600	2	2
+maps/270_insignias	6600000	6600000	1	1
+maps/271_mapa_pvm	588800	768000	3	6
+maps/metin2_map_t1	0	25600	3	3
+maps/metin2_map_t2	6400	0	1	1
+maps/metin2_map_t3	32000	0	1	1
+maps/metin2_map_t4	57600	0	1	1
+
+
+
+maps/metin2_map_duel	844800	0	1	1
+maps/metin2_map_pvp_arena	844800	25600	1	1
+maps/metin2_map_skipia_dungeon_boss	819200	1049600	2	2
+maps/metin2_map_skipia_dungeon_boss	819200	1100800	2	2
+maps/metin2_map_skipia_dungeon_boss2	819200	1152000	2	2
+maps/metin2_map_skipia_dungeon_boss	819200	1203200	2	2

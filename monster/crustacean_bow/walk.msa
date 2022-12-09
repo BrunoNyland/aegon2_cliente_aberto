@@ -1,0 +1,5 @@
+ScriptType               MotionData
+
+MotionFileName           "d:\ymir work\monster\crustacean_bow\walk.gr2"
+MotionDuration           1.000000
+Accumulation	0.0000 -186.1000 0.0000

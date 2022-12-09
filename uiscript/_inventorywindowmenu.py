@@ -1,0 +1,122 @@
+width = 122
+height = 153 + 28 + 5
+
+window = {
+	"name":"InventoryWindow",
+	"x":0,
+	"y":0,
+	"style":("movable", "float",),
+	"width":width,
+	"height":height,
+	"children":
+	(
+		{
+			"name":"board",
+			"type":"new_board",
+			"style":("attach",),
+			"x":0,
+			"y":0,
+			"width":width,
+			"height":height,
+			"children":
+			(
+				{
+					"name":"Inventory_Tab_01",
+					"type":"redbutton",
+					"width":26,
+					"text":"I",
+					"x":7,
+					"y":7,
+				},
+				{
+					"name":"Inventory_Tab_02",
+					"type":"redbutton",
+					"width":26,
+					"text":"II",
+					"x":7,
+					"y":7+28*1,
+				},
+				{
+					"name":"Inventory_Tab_03",
+					"type":"redbutton",
+					"width":26,
+					"text":"III",
+					"x":7,
+					"y":7+28*2,
+				},
+				{
+					"name":"Inventory_Tab_04",
+					"type":"redbutton",
+					"width":26,
+					"text":"IV",
+					"x":7,
+					"y":7+28*3,
+				},
+				{
+					"name":"Rent",
+					"type":"redbutton",
+					"width":26,
+					"text":"$",
+					"x":7,
+					"y":7+28*4+5,
+				},
+				{
+					"name":"Trash",
+					"type":"image",
+					"image":"interface/controls/special/inventory/trash_normal.tga",
+					"x":7,
+					"y":7+28*5+5,
+				},
+### RIGHT SIDE ### RIGHT SIDE ### RIGHT SIDE ### RIGHT SIDE ### RIGHT SIDE ### RIGHT SIDE ### RIGHT SIDE ###
+				{
+					"name":"Inventory_Tab_01_R",
+					"type":"redbutton",
+					"width":26,
+					"text":"I",
+					"x":width - 7 - 26,
+					"y":7,
+				},
+				{
+					"name":"Inventory_Tab_02_R",
+					"type":"redbutton",
+					"width":26,
+					"text":"II",
+					"x":width - 7 - 26,
+					"y":7+28*1,
+				},
+				{
+					"name":"Inventory_Tab_03_R",
+					"type":"redbutton",
+					"width":26,
+					"text":"III",
+					"x":width - 7 - 26,
+					"y":7+28*2,
+				},
+				{
+					"name":"Inventory_Tab_04_R",
+					"type":"redbutton",
+					"width":26,
+					"text":"IV",
+					"x":width - 7 - 26,
+					"y":7+28*3,
+				},
+				{
+					"name":"Rent_R",
+					"type":"button",
+					"type":"redbutton",
+					"width":26,
+					"text":"$",
+					"x":width - 7 - 26,
+					"y":7+28*4+5,
+				},
+				{
+					"name":"Trash_R",
+					"type":"image",
+					"image":"interface/controls/special/inventory/trash_normal.tga",
+					"x":width - 7 - 26,
+					"y":7+28*5+5,
+				},
+			),
+		},
+	),
+}

@@ -1,0 +1,5 @@
+ScriptType               MotionData
+
+MotionFileName           "d:\ymir work\monster\ogre_boss\run.gr2"
+MotionDuration           1.000000
+Accumulation	0.0000 -332.0000 0.0000

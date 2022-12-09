@@ -1,0 +1,44 @@
+ScriptType               MotionData
+
+MotionFileName           "d:/ymir work/monster/cyclops_magic/normal_attack1.gr2"
+MotionDuration           1.333333
+Accumulation           0.00	0.00	0.00
+
+Group MotionEventData
+{
+    MotionEventDataCount     3
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         0.467153
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "equip"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster/poison_redblack.mse"
+        EffectPosition       0.000000 -50.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         0.626115
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip01 HeadNub"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster/fire_red1.mse"
+        EffectPosition       -10.000000 -10.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      6
+        StartingTime         0.785077
+        
+        AttachingEnable      1
+        AttachingBoneName    "equip"
+        FlyFileName       "d:/ymir work/effect/monster/fire_boom1.msf"
+        FlyPosition       0.000000 0.000000 0.000000
+    }
+}
