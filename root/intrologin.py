@@ -25,7 +25,7 @@ LOAD_DATA = 0
 ALLOW_LOGIN = 0
 
 def GetServerInfo(name):
-	info = {"IP":"154.53.37.209", "CH1":30011, "AUTH":30001}
+	info = {"IP":"189.127.164.174", "CH1":30011, "AUTH":30001}
 	# info = {"IP":"192.168.56.101", "CH1":30011, "AUTH":30001}
 	return info[name]
 
