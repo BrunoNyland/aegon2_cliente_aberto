@@ -1,28 +1,24 @@
-1212 06:57:34625 :: CANNOT_FIND_FILE [d:\ymir work\item\weapon\00060.gr2]
-1212 06:57:34651 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
-1212 06:57:34651 :: CPythonCharacterManager::CreateInstance VID[56] Race[20087]
-1212 06:57:34878 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
-1212 06:57:34878 :: CPythonCharacterManager::CreateInstance VID[54] Race[20094]
-1212 06:57:35228 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
-1212 06:57:35228 :: CPythonCharacterManager::CreateInstance VID[51] Race[20087]
-1212 06:57:35441 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20091
-1212 06:57:35441 :: CPythonCharacterManager::CreateInstance VID[47] Race[20091]
-1212 06:57:35495 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20095
-1212 06:57:35495 :: CPythonCharacterManager::CreateInstance VID[53] Race[20095]
-1212 06:57:35495 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
-1212 06:57:35495 :: CPythonCharacterManager::CreateInstance VID[45] Race[20094]
-1212 06:57:35504 :: Unknown Server Command update_guerra 0 REINOS 10 100 5 0 1 1:0 5 22:0 0 | update_guerra
-1212 06:57:45233 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20095
-1212 06:57:45233 :: CPythonCharacterManager::CreateInstance VID[53] Race[20095]
-1212 06:57:45233 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
-1212 06:57:45233 :: CPythonCharacterManager::CreateInstance VID[45] Race[20094]
-1212 06:57:45277 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
-1212 06:57:45277 :: CPythonCharacterManager::CreateInstance VID[56] Race[20087]
-1212 06:57:45279 :: Unknown Server Command update_guerra 0 REINOS 10 100 5 0 1 1:0 5 22:0 0 | update_guerra
-1212 06:57:00349 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20095
-1212 06:57:00349 :: CPythonCharacterManager::CreateInstance VID[53] Race[20095]
-1212 06:57:00349 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
-1212 06:57:00349 :: CPythonCharacterManager::CreateInstance VID[45] Race[20094]
-1212 06:57:00349 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
-1212 06:57:00349 :: CPythonCharacterManager::CreateInstance VID[56] Race[20087]
-1212 06:57:00365 :: Unknown Server Command update_guerra 0 REINOS 10 100 5 0 1 1:0 5 22:0 0 | update_guerra
+1213 00:38:32098 :: CANNOT_FIND_FILE [d:\ymir work\item\weapon\00060.gr2]
+1213 00:38:32182 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20095
+1213 00:38:32182 :: CPythonCharacterManager::CreateInstance VID[53] Race[20095]
+1213 00:38:32182 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
+1213 00:38:32182 :: CPythonCharacterManager::CreateInstance VID[45] Race[20094]
+1213 00:38:32227 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
+1213 00:38:32227 :: CPythonCharacterManager::CreateInstance VID[56] Race[20087]
+1213 00:38:32590 :: Unknown Server Command update_guerra 0 REINOS 10 100 5 0 1 1:0 5 22:0 0 | update_guerra
+1213 00:38:50862 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
+1213 00:38:50862 :: CPythonCharacterManager::CreateInstance VID[54] Race[20094]
+1213 00:38:56004 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20091
+1213 00:38:56004 :: CPythonCharacterManager::CreateInstance VID[47] Race[20091]
+1213 00:38:56191 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
+1213 00:38:56191 :: CPythonCharacterManager::CreateInstance VID[51] Race[20087]
+1213 00:39:33123 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20090
+1213 00:39:33123 :: CPythonCharacterManager::CreateInstance VID[44] Race[20090]
+1213 00:39:35673 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
+1213 00:39:35673 :: CPythonCharacterManager::CreateInstance VID[51] Race[20087]
+1213 00:39:38227 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20091
+1213 00:39:38227 :: CPythonCharacterManager::CreateInstance VID[47] Race[20091]
+1213 00:39:43351 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20087
+1213 00:39:43351 :: CPythonCharacterManager::CreateInstance VID[56] Race[20087]
+1213 00:39:43351 :: CRaceManager::GetRaceDataPointer: cannot load data by dwRaceIndex 20094
+1213 00:39:43351 :: CPythonCharacterManager::CreateInstance VID[54] Race[20094]
