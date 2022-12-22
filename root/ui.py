@@ -5618,7 +5618,7 @@ class PythonScriptLoader(object):
 			import builtins as bt
 			for idx in tpl2Main:
 				tmpVal = self.ScriptDictionary[idx]
-				exec("bt.%s = tmpVal" % idx , globals(), locals())
+				exec("bt.%s = tmpVal" % idx, globals(), locals())
 
 		try:
 			if __USE_EXTRA_CYTHON__ and IsInUiPath(FileName) and uiscriptlib.isExist(modname):

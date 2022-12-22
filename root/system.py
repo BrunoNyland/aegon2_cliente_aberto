@@ -1,51 +1,48 @@
-#favor manter essa linha
+# -*- coding: cp1252 -*-
+
+# from client binary
 import enszxc3467hc3kokdueq as app
-import os
-import sys
+import xoFVEO7sP3AEkPgBSpnZ as pack
 import dbg
 
+# from dll
+import sys
+import builtins
+import marshal
 
-# sys.path = []
-# sys.path.append("lib")
+# import from lib folder
+import importlib
+import os
+from typing import TextIO
+from io import IOBase
 
-class TraceFile:
-	def write(self, msg):
+###########################################
+# Definições dos arquivos de logs e erros #
+###########################################
+class TraceFile(TextIO):
+	def write(self, msg:str) -> None:
 		dbg.Trace(msg)
 
-class TraceErrorFile:
-	def write(self, msg):
+	def flush(self) -> None:
+		pass
+
+class TraceErrorFile(TextIO):
+	def write(self, msg:str) -> None:
 		dbg.TraceError(msg)
 		dbg.RegisterExceptionString(msg)
 
-class LogBoxFile:
-	def __init__(self):
-		self.stderrSave = sys.stderr
-		self.msg = ""
-
-	def __del__(self):
-		self.restore()
-
-	def restore(self):
-		sys.stderr = self.stderrSave
-
-	def write(self, msg):
-		self.msg = self.msg + msg
-
-	def show(self):
-		dbg.LogBox(self.msg, "Error")
+	def flush(self) -> None:
+		pass
 
 sys.stdout = TraceFile()
 sys.stderr = TraceErrorFile()
 
-import marshal
-import imp
-import xoFVEO7sP3AEkPgBSpnZ as pack
-
-class pack_file_iterator(object):
-	def __init__(self, packfile):
+# Definição das funções de abrir arquivos: open e pack
+class pack_file_iterator(IOBase):
+	def __init__(self, packfile:IOBase) -> None:
 		self.pack_file = packfile
 
-	def next(self):
+	def __next__(self) -> str:
 		tmp = self.pack_file.readline()
 		if tmp:
 			return tmp
@@ -53,12 +50,15 @@ class pack_file_iterator(object):
 
 _chr = builtins.chr
 
-class pack_file(object):
-	def __init__(self, filename, mode = 'rb'):
-		assert mode in ('r', 'rb')
+class pack_file(IOBase):
+	def __init__(self, filename:str, mode:str='rb'):
+		if not mode in ('r', 'rb'):
+			raise(IOError, 'system.py:pack_file: Invalid mode: %s' % (mode))
 		if not pack.Exist(filename):
-			raise(IOError, 'No file or directory')
+			raise(IOError, 'system.py:pack_file: No file or directory [%s]' % (filename))
+
 		self.data = pack.Get(filename)
+
 		if mode == 'r':
 			self.data = _chr(10).join(self.data.split(_chr(13) + _chr(10)))
 
@@ -83,183 +83,180 @@ class pack_file(object):
 	def readlines(self):
 		return [x for x in self]
 
+# dbg.LogBox('Testando o system.py >> Resultado OK', 'Teste do Cliente')
+
 old_open = open
-def open(filename, mode = 'rb'):
-	if pack.Exist(filename) and mode in ('r', 'rb'):
-		return pack_file(filename, mode)
-	else:
-		return old_open(filename, mode)
+def open_modified(filename:str, mode:str='rb'):
+	dbg.TraceError('Testando essa merda')
 
-builtins.open = open
-builtins.old_open = old_open
-builtins.new_open = open
-builtins.pack_open = open
-_ModuleType = type(sys)
+	# if not mode in ('r', 'rb'):
+	# 	raise(IOError, 'system.py:open: Invalid mode: %s' % (mode))
 
-old_import = __import__
-def _process_result(code, fqname):
-	is_module = isinstance(code, _ModuleType)
+	# if pack.Exist(filename):
+	# 	return pack_file(filename, mode)
+	# else:
+	# 	return old_open(filename, mode)
+builtins.open = open_modified
 
-	if is_module:
-		module = code
-	else:
-		module = imp.new_module(fqname)
+file = open('npclist.txt')
+# dbg.TraceError(str(file.readline()))
 
-	sys.modules[fqname] = module
+# _ModuleType = type(sys)
 
-	if not is_module:
-		exec(code , module.__dict__)
+# old_import = __import__
+# def _process_result(code, fqname):
+# 	is_module = isinstance(code, _ModuleType)
 
-	module = sys.modules[fqname]
-	module.__name__ = fqname
-	return module
+# 	if is_module:
+# 		module = code
+# 	else:
+# 		module = imp.new_module(fqname)
 
-module_do = lambda x:None
+# 	sys.modules[fqname] = module
 
-if __USE_CYTHON__:
-	import rootlib
+# 	if not is_module:
+# 		exec(code, module.__dict__)
 
-if app.BLOCK_CHANGE_NAME_BIN:
-	if str(sys.executable)[-14:] != "mt2supremo.bin":
-		try:
-			os.Execute("start Mt2Supremo.exe")
-		except BaseException:
-			pass
+# 	module = sys.modules[fqname]
+# 	module.__name__ = fqname
+# 	return module
 
-		app.Abort()
+# module_do = lambda x:None
 
-def __hybrid_import(name, globals = None, locals = None, fromlist = None, level = -1):
-	if __USE_CYTHON__ and rootlib.isExist(name):
-		if name in sys.modules:
-			dbg.Tracen('importing from sys.modules %s' % name)
-			return sys.modules[name]
-		dbg.Tracen('importing from rootlib %s' % name)
-		newmodule = rootlib.moduleImport(name)
-		module_do(newmodule)
-		sys.modules[name] = newmodule
-		return newmodule
-	else:
-		filename = 'root/' + name + '.py'
-		if not __USE_CYTHON__ and pack.Exist(filename):
-			if name in sys.modules:
-				dbg.Tracen('importing from sys.modules %s' % name)
-				return sys.modules[name]
+# if __USE_CYTHON__:
+# 	import rootlib
 
-			dbg.Tracen('importing from pack %s' % name)
-			newmodule = _process_result(compile(pack_file(filename,'r').read(), filename, 'exec'), name)
-			module_do(newmodule)
-			return newmodule
-		else:
-			dbg.Tracen('importing from lib %s' % name)
-			return old_import(name, globals, locals, fromlist)
+# if app.BLOCK_CHANGE_NAME_BIN:
+# 	if str(sys.executable)[-14:] != "mt2supremo.bin":
+# 		try:
+# 			os.Execute("start Mt2Supremo.exe")
+# 		except BaseException:
+# 			pass
 
-def splitext(p):
-	root, ext = '', ''
-	for c in p:
-		if c in ['/']:
-			root, ext = root + ext + c, ''
-		elif c == '.':
-			if ext:
-				root, ext = root + ext, c
-			else:
-				ext = c
-		elif ext:
-			ext = ext + c
-		else:
-			root = root + c
-	return root, ext
+# 		app.Abort()
 
-def __IsCompiledFile__(sFileName):
-	sBase, sExt = splitext(sFileName)
-	sExt = sExt.lower()
-	if sExt == ".pyc" or sExt == ".pyo":
-		return 1
-	else:
-		return 0
+# def __hybrid_import(name, globals = None, locals = None, fromlist = None, level = -1):
+# 	if __USE_CYTHON__ and rootlib.isExist(name):
+# 		if name in sys.modules:
+# 			dbg.Tracen('importing from sys.modules %s' % name)
+# 			return sys.modules[name]
+# 		dbg.Tracen('importing from rootlib %s' % name)
+# 		newmodule = rootlib.moduleImport(name)
+# 		module_do(newmodule)
+# 		sys.modules[name] = newmodule
+# 		return newmodule
+# 	else:
+# 		filename = 'root/' + name + '.py'
+# 		if not __USE_CYTHON__ and pack.Exist(filename):
+# 			if name in sys.modules:
+# 				dbg.Tracen('importing from sys.modules %s' % name)
+# 				return sys.modules[name]
 
-def __LoadTextFile__(sFileName):
-	sText = open(sFileName,'r').read()
-	return compile(sText, sFileName, "exec")
+# 			dbg.Tracen('importing from pack %s' % name)
+# 			newmodule = _process_result(compile(pack_file(filename,'r').read(), filename, 'exec'), name)
+# 			module_do(newmodule)
+# 			return newmodule
+# 		else:
+# 			dbg.Tracen('importing from lib %s' % name)
+# 			return old_import(name, globals, locals, fromlist)
 
-def __LoadCompiledFile__(sFileName):
-	kFile = open(sFileName)
-	if kFile.read(4) != imp.get_magic():
-		raise
+# def splitext(p):
+# 	root, ext = '', ''
+# 	for c in p:
+# 		if c in ['/']:
+# 			root, ext = root + ext + c, ''
+# 		elif c == '.':
+# 			if ext:
+# 				root, ext = root + ext, c
+# 			else:
+# 				ext = c
+# 		elif ext:
+# 			ext = ext + c
+# 		else:
+# 			root = root + c
+# 	return root, ext
 
-	kFile.read(4)
+# def __IsCompiledFile__(sFileName):
+# 	sBase, sExt = splitext(sFileName)
+# 	sExt = sExt.lower()
+# 	if sExt == ".pyc" or sExt == ".pyo":
+# 		return 1
+# 	else:
+# 		return 0
 
-	kData = kFile.read()
-	return marshal.loads(kData)
+# def __LoadTextFile__(sFileName):
+# 	sText = open(sFileName,'r').read()
+# 	return compile(sText, sFileName, "exec")
 
-def execfile(fileName, dict):
-	if __IsCompiledFile__(fileName):
-		code = __LoadCompiledFile__(fileName)
-	else:
-		code = __LoadTextFile__(fileName)
-		exec(code , dict)
+# def __LoadCompiledFile__(sFileName):
+# 	kFile = open(sFileName)
+# 	if kFile.read(4) != imp.get_magic():
+# 		raise
 
-__import__ = __hybrid_import
-# builtins.old_execfile = builtins.execfile
-# builtins.execfile = execfile
+# 	kFile.read(4)
 
-def GetExceptionString(excTitle):
-	(excType, excMsg, excTraceBack) = sys.exc_info()
-	excText = ""
-	excText += _chr(10)
+# 	kData = kFile.read()
+# 	return marshal.loads(kData)
 
-	import traceback
-	traceLineList = traceback.extract_tb(excTraceBack)
+# def execfile(fileName, dict):
+# 	if __IsCompiledFile__(fileName):
+# 		code = __LoadCompiledFile__(fileName)
+# 	else:
+# 		code = __LoadTextFile__(fileName)
+# 		exec(code, dict)
 
-	for traceLine in traceLineList:
-		if traceLine[3]:
-			excText += "%s(line:%d) %s - %s" % (traceLine[0], traceLine[1], traceLine[2], traceLine[3])
-		else:
-			excText += "%s(line:%d) %s" % (traceLine[0], traceLine[1], traceLine[2])
-		excText += _chr(10)
+# __import__ = __hybrid_import
+# builtins.__import__ = __hybrid_import
+# # builtins.old_execfile = builtins.execfile
+# # builtins.execfile = execfile
 
-	excText += _chr(10)
-	excText += "%s - %s:%s" % (excTitle, excType, excMsg)
-	excText += _chr(10)
+# def GetExceptionString(excTitle):
+# 	(excType, excMsg, excTraceBack) = sys.exc_info()
+# 	excText = ""
+# 	excText += _chr(10)
 
-	return excText
+# 	import traceback
+# 	traceLineList = traceback.extract_tb(excTraceBack)
+
+# 	for traceLine in traceLineList:
+# 		if traceLine[3]:
+# 			excText += "%s(line:%d) %s - %s" % (traceLine[0], traceLine[1], traceLine[2], traceLine[3])
+# 		else:
+# 			excText += "%s(line:%d) %s" % (traceLine[0], traceLine[1], traceLine[2])
+# 		excText += _chr(10)
+
+# 	excText += _chr(10)
+# 	excText += "%s - %s:%s" % (excTitle, excType, excMsg)
+# 	excText += _chr(10)
+
+# 	return excText
+
+# def RunMainScript(name):
+# 	# try:
+# 	execfile(name, __main__.__dict__)
+# 	# except RuntimeError as msg:
+# 		# msg = str(msg)
+
+# 		# import localeinfo
+# 		# if localeinfo.error:
+# 			# msg = localeinfo.error.get(msg, msg)
+
+# 		# dbg.LogBox(msg)
+# 		# app.Abort()
+
+# 	# except BaseException:
+# 		# msg = GetExceptionString("Run")
+# 		# dbg.LogBox(msg)
+# 		# app.Abort()
+
+# import debuginfo
+# debuginfo.SetDebugMode(__DEBUG__)
 
 
-def ShowException(excTitle):
-	excText = GetExceptionString(excTitle)
-	dbg.TraceError(excText)
-	app.Abort()
-	return 0
 
-def RunMainScript(name):
-	# try:
-	execfile(name, __main__.__dict__)
-	# except RuntimeError as msg:
-		# msg = str(msg)
-
-		# import localeinfo
-		# if localeinfo.error:
-			# msg = localeinfo.error.get(msg, msg)
-
-		# dbg.LogBox(msg)
-		# app.Abort()
-
-	# except BaseException:
-		# msg = GetExceptionString("Run")
-		# dbg.LogBox(msg)
-		# app.Abort()
-
-import debuginfo
-debuginfo.SetDebugMode(__DEBUG__)
-dbg.TraceError("passei aqui fora do if")
-
-loginMark = "-cs"
-
-if __USE_CYTHON__:
-	dbg.TraceError("passei aqui")
-	import __main__
-	__hybrid_import('Prototype', __main__.__dict__)
-else:
-	dbg.TraceError("passei aqui")
-	RunMainScript("root/prototype.py")
-dbg.TraceError("passei aqui depois do if")
+# if __USE_CYTHON__:
+# 	import __main__
+# 	__hybrid_import('Prototype', __main__.__dict__)
+# else:
+# 	RunMainScript("root/prototype.py")
 	
