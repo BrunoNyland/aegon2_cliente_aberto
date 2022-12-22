@@ -34,7 +34,7 @@ def positive_address(a):
     # View the bits in `a` as unsigned instead.
     import struct
     num_bits = struct.calcsize("P") * 8 # num bits in native machine address
-    a += 1L << num_bits
+    a += 1 << num_bits
     assert a >= 0
     return a
 
@@ -58,7 +58,7 @@ class CharPointersTestCase(unittest.TestCase):
 
         try:
             func()
-        except TypeError, details:
+        except TypeError as details:
             self.assertEqual(str(details), "required argument 'input' missing")
         else:
             self.fail("TypeError not raised")
@@ -69,7 +69,10 @@ class CharPointersTestCase(unittest.TestCase):
 
     def test_int_pointer_arg(self):
         func = testdll._testfunc_p_p
-        func.restype = c_long
+        if sizeof(c_longlong) == sizeof(c_void_p):
+            func.restype = c_longlong
+        else:
+            func.restype = c_long
         self.assertEqual(0, func(0))
 
         ci = c_int(0)
@@ -93,14 +96,14 @@ class CharPointersTestCase(unittest.TestCase):
         func.argtypes = POINTER(c_char),
 
         self.assertEqual(None, func(None))
-        self.assertEqual("123", func("123"))
+        self.assertEqual(b"123", func(b"123"))
         self.assertEqual(None, func(c_char_p(None)))
-        self.assertEqual("123", func(c_char_p("123")))
+        self.assertEqual(b"123", func(c_char_p(b"123")))
 
-        self.assertEqual("123", func(c_buffer("123")))
-        ca = c_char("a")
-        self.assertEqual("a", func(pointer(ca))[0])
-        self.assertEqual("a", func(byref(ca))[0])
+        self.assertEqual(b"123", func(c_buffer(b"123")))
+        ca = c_char(b"a")
+        self.assertEqual(ord(b"a"), func(pointer(ca))[0])
+        self.assertEqual(ord(b"a"), func(byref(ca))[0])
 
     def test_c_char_p_arg(self):
         func = testdll._testfunc_p_p
@@ -108,14 +111,14 @@ class CharPointersTestCase(unittest.TestCase):
         func.argtypes = c_char_p,
 
         self.assertEqual(None, func(None))
-        self.assertEqual("123", func("123"))
+        self.assertEqual(b"123", func(b"123"))
         self.assertEqual(None, func(c_char_p(None)))
-        self.assertEqual("123", func(c_char_p("123")))
+        self.assertEqual(b"123", func(c_char_p(b"123")))
 
-        self.assertEqual("123", func(c_buffer("123")))
-        ca = c_char("a")
-        self.assertEqual("a", func(pointer(ca))[0])
-        self.assertEqual("a", func(byref(ca))[0])
+        self.assertEqual(b"123", func(c_buffer(b"123")))
+        ca = c_char(b"a")
+        self.assertEqual(ord(b"a"), func(pointer(ca))[0])
+        self.assertEqual(ord(b"a"), func(byref(ca))[0])
 
     def test_c_void_p_arg(self):
         func = testdll._testfunc_p_p
@@ -123,14 +126,14 @@ class CharPointersTestCase(unittest.TestCase):
         func.argtypes = c_void_p,
 
         self.assertEqual(None, func(None))
-        self.assertEqual("123", func("123"))
-        self.assertEqual("123", func(c_char_p("123")))
+        self.assertEqual(b"123", func(b"123"))
+        self.assertEqual(b"123", func(c_char_p(b"123")))
         self.assertEqual(None, func(c_char_p(None)))
 
-        self.assertEqual("123", func(c_buffer("123")))
-        ca = c_char("a")
-        self.assertEqual("a", func(pointer(ca))[0])
-        self.assertEqual("a", func(byref(ca))[0])
+        self.assertEqual(b"123", func(c_buffer(b"123")))
+        ca = c_char(b"a")
+        self.assertEqual(ord(b"a"), func(pointer(ca))[0])
+        self.assertEqual(ord(b"a"), func(byref(ca))[0])
 
         func(byref(c_int()))
         func(pointer(c_int()))
@@ -143,7 +146,7 @@ class CharPointersTestCase(unittest.TestCase):
         func.argtypes = c_void_p,
 
         self.assertEqual(None, func(c_wchar_p(None)))
-        self.assertEqual(u"123", func(c_wchar_p(u"123")))
+        self.assertEqual("123", func(c_wchar_p("123")))
 
     def test_instance(self):
         func = testdll._testfunc_p_p
@@ -173,24 +176,24 @@ class WCharPointersTestCase(unittest.TestCase):
         func.argtypes = POINTER(c_wchar),
 
         self.assertEqual(None, func(None))
-        self.assertEqual(u"123", func(u"123"))
+        self.assertEqual("123", func("123"))
         self.assertEqual(None, func(c_wchar_p(None)))
-        self.assertEqual(u"123", func(c_wchar_p(u"123")))
+        self.assertEqual("123", func(c_wchar_p("123")))
 
-        self.assertEqual(u"123", func(c_wbuffer(u"123")))
+        self.assertEqual("123", func(c_wbuffer("123")))
         ca = c_wchar("a")
-        self.assertEqual(u"a", func(pointer(ca))[0])
-        self.assertEqual(u"a", func(byref(ca))[0])
+        self.assertEqual("a", func(pointer(ca))[0])
+        self.assertEqual("a", func(byref(ca))[0])
 
     def test_c_wchar_p_arg(self):
         func = testdll._testfunc_p_p
         func.restype = c_wchar_p
         func.argtypes = c_wchar_p,
 
-        c_wchar_p.from_param(u"123")
+        c_wchar_p.from_param("123")
 
         self.assertEqual(None, func(None))
-        self.assertEqual("123", func(u"123"))
+        self.assertEqual("123", func("123"))
         self.assertEqual(None, func(c_wchar_p(None)))
         self.assertEqual("123", func(c_wchar_p("123")))
 

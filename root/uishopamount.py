@@ -16,7 +16,7 @@ class ShopAmountDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/shopamountdialog.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ShopAmountDialog.LoadDialog.LoadScript")
 
@@ -27,7 +27,7 @@ class ShopAmountDialog(ui.ScriptWindow):
 			self.cancelButton = self.GetChild("cancel_button")
 			self.artiButton = self.GetChild("Plus")
 			self.eksiButton = self.GetChild("Minus")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ShopAmountDialog.LoadDialog.BindObject")
 

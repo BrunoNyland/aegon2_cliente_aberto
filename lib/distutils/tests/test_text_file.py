@@ -3,7 +3,7 @@ import os
 import unittest
 from distutils.text_file import TextFile
 from distutils.tests import support
-from test.test_support import run_unittest
+from test.support import run_unittest
 
 TEST_DATA = """# test file
 
@@ -101,7 +101,7 @@ class TextFileTestCase(support.TempdirManager, unittest.TestCase):
             in_file.close()
 
 def test_suite():
-    return unittest.makeSuite(TextFileTestCase)
+    return unittest.TestLoader().loadTestsFromTestCase(TextFileTestCase)
 
 if __name__ == "__main__":
     run_unittest(test_suite())

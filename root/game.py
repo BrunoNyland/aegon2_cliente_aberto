@@ -152,7 +152,7 @@ class GameWindow(ui.ScriptWindow):
 		net.SendEnterGamePacket()
 		try:
 			self.StartGame()
-		except:
+		except BaseException:
 			exception.Abort("GameWindow.Open")
 
 	def Close(self):
@@ -342,7 +342,7 @@ class GameWindow(ui.ScriptWindow):
 				net.SendChatPacket("/unmount")
 			else:
 				if not uiprivateshopbuilder.IsBuildingPrivateShop() or not uiofflineshopbuilder.IsBuildingOfflineShop():
-					for i in xrange(player.INVENTORY_PAGE_SIZE):
+					for i in range(player.INVENTORY_PAGE_SIZE):
 						if player.GetItemIndex(i) in (71114, 71116, 71118, 71120):
 							net.SendItemUsePacket(i)
 							break
@@ -740,12 +740,12 @@ class GameWindow(ui.ScriptWindow):
 		if mode == chat.WHISPER_TYPE_GM:
 			self.interface.RegisterGameMasterName(name)
 
-		if not self.interface.FindWhisperButton(name) and constinfo.WHISPER_MESSAGES.has_key(name) and not self.interface.whisperDialogDict.has_key(name):
+		if not self.interface.FindWhisperButton(name) and constinfo.WHISPER_MESSAGES.__contains__(name) and not self.interface.whisperDialogDict.__contains__(name):
 			self.interface.RecvWhisper(mode, name, line, True)
 		else:
 			self.interface.RecvWhisper(mode, name, line, False)
 
-		if not constinfo.WHISPER_MESSAGES.has_key(name):
+		if not constinfo.WHISPER_MESSAGES.__contains__(name):
 			constinfo.WHISPER_MESSAGES.update({name : [(mode, line)]})
 		else:
 			constinfo.WHISPER_MESSAGES[name].append((mode, line))
@@ -757,7 +757,7 @@ class GameWindow(ui.ScriptWindow):
 		self.interface.RecvWhisper(mode, name, line, False)
 
 	def OnRecvWhisperError(self, mode, name, line):
-		if localeinfo.WHISPER_ERROR.has_key(mode):
+		if localeinfo.WHISPER_ERROR.__contains__(mode):
 			chat.AppendWhisper(chat.WHISPER_TYPE_SYSTEM, name, localeinfo.WHISPER_ERROR[mode](name))
 		else:
 			chat.AppendWhisper(chat.WHISPER_TYPE_SYSTEM, name, "Whisper Unknown Error(mode=%d, name=%s)" % (mode, name))
@@ -1035,7 +1035,7 @@ class GameWindow(ui.ScriptWindow):
 			self.onPressKeyDict[key]()
 		except KeyError:
 			pass
-		except:
+		except BaseException:
 			raise
 
 		return True
@@ -1045,7 +1045,7 @@ class GameWindow(ui.ScriptWindow):
 			self.onClickKeyDict[key]()
 		except KeyError:
 			pass
-		except:
+		except BaseException:
 			raise
 
 		return True
@@ -1799,7 +1799,7 @@ class GameWindow(ui.ScriptWindow):
 		boomCount = self.BOOM_DATA_LIST[self.indexXMasBoom][1]
 		if app.GetTime() - self.startTimeXMasBoom > boomTime:
 			self.indexXMasBoom += 1
-			for i in xrange(boomCount):
+			for i in range(boomCount):
 				self.__XMasBoom_Boom()
 
 	def __XMasBoom_Boom(self):
@@ -1885,19 +1885,19 @@ class GameWindow(ui.ScriptWindow):
 
 			for curItem in curList:
 				if isUpgradeable:
-					if curItem.has_key("vnum_list") and curItem["vnum_list"][0] / 10 * 10 == itemVnum / 10 * 10:
+					if curItem.__contains__("vnum_list") and curItem["vnum_list"][0] / 10 * 10 == itemVnum / 10 * 10:
 						if not (itemVnum in curItem["vnum_list"]):
 							curItem["vnum_list"].append(itemVnum)
 						return
 				elif isMetin:
-					if curItem.has_key("vnum_list"):
+					if curItem.__contains__("vnum_list"):
 						baseVnum = curItem["vnum_list"][0]
-					if curItem.has_key("vnum_list") and (baseVnum - baseVnum%1000) == (itemVnum - itemVnum%1000):
+					if curItem.__contains__("vnum_list") and (baseVnum - baseVnum%1000) == (itemVnum - itemVnum%1000):
 						if not (itemVnum in curItem["vnum_list"]):
 							curItem["vnum_list"].append(itemVnum)
 						return
 				else:
-					if curItem.has_key("vnum") and curItem["vnum"] == itemVnum and curItem["count"] == itemCount:
+					if curItem.__contains__("vnum") and curItem["vnum"] == itemVnum and curItem["count"] == itemCount:
 						return
 
 			if isUpgradeable or isMetin:
@@ -1960,16 +1960,16 @@ class GameWindow(ui.ScriptWindow):
 
 	if app.ENABLE_DROP_COFRE:
 		def BINARY_AddChestDropInfo(self, chestVnum, pageIndex, slotIndex, itemVnum, itemCount):
-			if not constinfo.CHEST_DROP_INFO_DATA.has_key(chestVnum):
+			if not constinfo.CHEST_DROP_INFO_DATA.__contains__(chestVnum):
 				constinfo.CHEST_DROP_INFO_DATA[chestVnum] = {}
 
-			if not constinfo.CHEST_DROP_INFO_DATA[chestVnum].has_key(pageIndex):
+			if not constinfo.CHEST_DROP_INFO_DATA[chestVnum].__contains__(pageIndex):
 				constinfo.CHEST_DROP_INFO_DATA[chestVnum][pageIndex] = {}
 
 			curList = constinfo.CHEST_DROP_INFO_DATA[chestVnum]
 
-			if curList.has_key(pageIndex):
-				if curList[pageIndex].has_key(slotIndex):
+			if curList.__contains__(pageIndex):
+				if curList[pageIndex].__contains__(slotIndex):
 					if curList[pageIndex][slotIndex][0] == itemVnum and curList[pageIndex][slotIndex][1] == itemCount:
 						return
 

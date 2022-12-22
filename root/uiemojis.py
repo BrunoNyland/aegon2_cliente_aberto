@@ -1670,7 +1670,7 @@ class EmojisBoard(ui.Window):
 		## Botões do menu emojis
 		self.btnEmojis = []
 		pos = 50
-		for i in xrange(len(EMOJIS_CATEGORIAS_LISTA)):
+		for i in range(len(EMOJIS_CATEGORIAS_LISTA)):
 			btn = ui.RadioButton()
 			btn.SetParent(self)
 			btn.SetUpVisual("d:/ymir work/ui/emoji/%s_norm.png" % i)
@@ -1746,7 +1746,7 @@ class EmojisListBoard(ui.Window):
 		self.EmojisRecentesList = []
 
 		## Textos Categorias
-		for i in xrange(len(EMOJIS_CATEGORIAS_LISTA)):
+		for i in range(len(EMOJIS_CATEGORIAS_LISTA)):
 			textoCategoria = ui.TextLine()
 			textoCategoria.SetParent(self)
 			textoCategoria.SetPosition(25, 6)
@@ -1840,7 +1840,7 @@ class EmojisListBoard(ui.Window):
 					btnListaEmojis.SetToolTipWindow(self.toolTip)
 					self.btnListaEmojis.append(btnListaEmojis)
 		else:
-			for i in xrange(len(EMOJIS_CODIGOS_TEXTOS_LISTA[categoria])):
+			for i in range(len(EMOJIS_CODIGOS_TEXTOS_LISTA[categoria])):
 				codetext = EMOJIS_CODIGOS_TEXTOS_LISTA[categoria][i][1]
 				main = codetext
 				main = main.replace("|E", "")
@@ -1896,7 +1896,7 @@ class EmojisListBoard(ui.Window):
 		x = 16
 		y = 38
 		count = 0
-		for i in xrange(len(self.btnListaEmojis)):
+		for i in range(len(self.btnListaEmojis)):
 			if i >= pos and count < self.EmojisCountMax:
 				if count >= 0 and count <= 15:
 					self.btnListaEmojis[i].SetPosition(x + (count * self.EmojiStep), y)
@@ -1921,7 +1921,7 @@ class EmojisListBoard(ui.Window):
 
 		if newBtn > 0:
 			pos = 170
-			for x in xrange(6):
+			for x in range(6):
 				main = EMOJIS_CODIGOS_TEXTOS_LISTA[categoria][codigo][x+1]
 				main = main.replace("|E", "")
 				main = main.replace("|e", "")

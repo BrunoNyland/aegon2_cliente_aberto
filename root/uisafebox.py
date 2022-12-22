@@ -27,7 +27,7 @@ class PasswordDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/passworddialog.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PasswordDialog.__LoadDialog.LoadObject")
 
@@ -36,7 +36,7 @@ class PasswordDialog(ui.ScriptWindow):
 			self.acceptButton = self.GetChild("accept_button")
 			self.cancelButton = self.GetChild("cancel_button")
 			self.GetChild("board").SetCloseEvent(self.CloseDialog)
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PasswordDialog.__LoadDialog.BindObject")
 
@@ -105,7 +105,7 @@ class ChangePasswordDialog(ui.ScriptWindow):
 			pyScrLoader.LoadScriptFile(self.dlgMessage, "uiscript/popupdialog.py")
 			self.dlgMessage.GetChild("message").SetText(localeinfo.SAFEBOX_WRONG_PASSWORD)
 			self.dlgMessage.GetChild("accept").SetEvent(self.OnCloseMessageDialog)
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("SafeboxWindow.__LoadDialog.LoadObject")
 
@@ -113,7 +113,7 @@ class ChangePasswordDialog(ui.ScriptWindow):
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/changepassworddialog.py")
 
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ChangePasswordDialog.LoadDialog.LoadObject")
 
@@ -124,7 +124,7 @@ class ChangePasswordDialog(ui.ScriptWindow):
 			oldPassword = self.GetChild("old_password_value")
 			newPassword = self.GetChild("new_password_value")
 			newPasswordCheck = self.GetChild("new_password_check_value")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ChangePasswordDialog.LoadDialog.BindObject")
 
@@ -296,7 +296,7 @@ class SafeboxWindow(ui.ScriptWindow):
 
 		text = "I"
 		pos = -int(float(pageCount-1)/2 * 35)
-		for i in xrange(pageCount):
+		for i in range(pageCount):
 			button = ui.RedButton()
 			button.SetParent(self)
 			button.SetWidth(27)
@@ -344,7 +344,7 @@ class SafeboxWindow(ui.ScriptWindow):
 		getItemCount=safebox.GetItemCount
 		setItemID=self.wndItem.SetItemSlot
 
-		for i in xrange(safebox.SAFEBOX_PAGE_SIZE):
+		for i in range(safebox.SAFEBOX_PAGE_SIZE):
 			slotIndex = self.__LocalPosToGlobalPos(i)
 			itemCount = getItemCount(slotIndex)
 			if itemCount <= 1:
@@ -535,7 +535,7 @@ class MallWindow(ui.ScriptWindow):
 		getItemCount=safebox.GetMallItemCount
 		setItemID=self.wndItem.SetItemSlot
 
-		for i in xrange(safebox.GetMallSize()):
+		for i in range(safebox.GetMallSize()):
 			itemID = getItemID(i)
 			itemCount = getItemCount(i)
 			if itemCount <= 1:

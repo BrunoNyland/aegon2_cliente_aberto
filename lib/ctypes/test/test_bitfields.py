@@ -1,9 +1,9 @@
 from ctypes import *
 from ctypes.test import need_symbol
+from test import support
 import unittest
 import os
 
-import ctypes
 import _ctypes_test
 
 class BITS(Structure):
@@ -38,14 +38,20 @@ class C_Test(unittest.TestCase):
             for name in "ABCDEFGHI":
                 b = BITS()
                 setattr(b, name, i)
-                self.assertEqual((name, i, getattr(b, name)), (name, i, func(byref(b), name)))
+                self.assertEqual(getattr(b, name), func(byref(b), name.encode('ascii')))
 
+    # bpo-46913: _ctypes/cfield.c h_get() has an undefined behavior
+    @support.skip_if_sanitizer(ub=True)
     def test_shorts(self):
+        b = BITS()
+        name = "M"
+        if func(byref(b), name.encode('ascii')) == 999:
+            self.skipTest("Compiler does not support signed short bitfields")
         for i in range(256):
             for name in "MNOPQRS":
                 b = BITS()
                 setattr(b, name, i)
-                self.assertEqual((name, i, getattr(b, name)), (name, i, func(byref(b), name)))
+                self.assertEqual(getattr(b, name), func(byref(b), name.encode('ascii')))
 
 signed_int_types = (c_byte, c_short, c_int, c_long, c_longlong)
 unsigned_int_types = (c_ubyte, c_ushort, c_uint, c_ulong, c_ulonglong)
@@ -190,14 +196,14 @@ class BitFieldTest(unittest.TestCase):
     def get_except(self, func, *args, **kw):
         try:
             func(*args, **kw)
-        except Exception, detail:
+        except Exception as detail:
             return detail.__class__, str(detail)
 
     def test_mixed_1(self):
         class X(Structure):
             _fields_ = [("a", c_byte, 4),
                         ("b", c_int, 4)]
-        if os.name in ("nt", "ce"):
+        if os.name == "nt":
             self.assertEqual(sizeof(X), sizeof(c_int)*2)
         else:
             self.assertEqual(sizeof(X), sizeof(c_int))
@@ -225,7 +231,7 @@ class BitFieldTest(unittest.TestCase):
         # MSVC does NOT combine c_short and c_int into one field, GCC
         # does (unless GCC is run with '-mms-bitfields' which
         # produces code compatible with MSVC).
-        if os.name in ("nt", "ce"):
+        if os.name == "nt":
             self.assertEqual(sizeof(X), sizeof(c_int) * 4)
         else:
             self.assertEqual(sizeof(X), sizeof(c_int) * 2)

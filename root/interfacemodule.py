@@ -362,7 +362,7 @@ class Interface(object):
 			self.dlgWhisperWithoutTarget.Destroy()
 			del self.dlgWhisperWithoutTarget
 
-		if uiquest.QuestDialog.__dict__.has_key("QuestCurtain"):
+		if uiquest.QuestDialog.__dict__.__contains__("QuestCurtain"):
 			uiquest.QuestDialog.QuestCurtain.Close()
 
 		if self.wndQuestWindow:
@@ -464,11 +464,11 @@ class Interface(object):
 			btn.SetEvent(0)
 		for btn in self.whisperButtonList:
 			btn.SetEvent(0)
-		for dlg in self.whisperDialogDict.itervalues():
+		for dlg in self.whisperDialogDict.values():
 			dlg.Destroy()
-		for brd in self.guildScoreBoardDict.itervalues():
+		for brd in self.guildScoreBoardDict.values():
 			brd.Destroy()
-		for dlg in self.equipmentDialogDict.itervalues():
+		for dlg in self.equipmentDialogDict.values():
 			dlg.Destroy()
 
 		del self.wndGuild
@@ -766,7 +766,7 @@ class Interface(object):
 
 	def OnStartGuildWar(self, guildSelf, guildOpp):
 		key = uiguild.GetGVGKey(guildSelf, guildOpp)
-		if self.guildScoreBoardDict.has_key(key):
+		if self.guildScoreBoardDict.__contains__(key):
 			self.guildScoreBoardDict[key].Hide()
 
 		self.wndGuild.OnStartGuildWar(guildSelf, guildOpp)
@@ -780,7 +780,7 @@ class Interface(object):
 
 		key = uiguild.GetGVGKey(guildSelf, guildOpp)
 
-		if not self.guildScoreBoardDict.has_key(key):
+		if not self.guildScoreBoardDict.__contains__(key):
 			return
 
 		self.guildScoreBoardDict[key].Destroy()
@@ -789,14 +789,14 @@ class Interface(object):
 	def UpdateMemberCount(self, gulidID1, memberCount1, guildID2, memberCount2):
 		key = uiguild.GetGVGKey(gulidID1, guildID2)
 
-		if not self.guildScoreBoardDict.has_key(key):
+		if not self.guildScoreBoardDict.__contains__(key):
 			return
 
 		self.guildScoreBoardDict[key].UpdateMemberCount(gulidID1, memberCount1, guildID2, memberCount2)
 
 	def OnRecvGuildWarPoint(self, gainGuildID, opponentGuildID, point):
 		key = uiguild.GetGVGKey(gainGuildID, opponentGuildID)
-		if not self.guildScoreBoardDict.has_key(key):
+		if not self.guildScoreBoardDict.__contains__(key):
 			return
 
 		guildBoard = self.guildScoreBoardDict[key]
@@ -1061,7 +1061,7 @@ class Interface(object):
 		self.privateShopAdvertisementBoardDict[vid] = board
 
 	def DisappearPrivateShop(self, vid):
-		if not self.privateShopAdvertisementBoardDict.has_key(vid):
+		if not self.privateShopAdvertisementBoardDict.__contains__(vid):
 			return
 		del self.privateShopAdvertisementBoardDict[vid]
 		uiprivateshopbuilder.DeleteADBoard(vid)
@@ -1094,7 +1094,7 @@ class Interface(object):
 		self.offlineShopAdvertisementBoardDict[vid] = board
 
 	def DisappearOfflineShop(self, vid):
-		if (not self.offlineShopAdvertisementBoardDict.has_key(vid)):
+		if (not self.offlineShopAdvertisementBoardDict.__contains__(vid)):
 			return
 		del self.offlineShopAdvertisementBoardDict[vid]
 		uiofflineshopbuilder.DeleteADBoard(vid)
@@ -1245,7 +1245,7 @@ class Interface(object):
 		if 0 != btn:
 			self.__DestroyWhisperButton(btn)
 
-		elif self.whisperDialogDict.has_key(name):
+		elif self.whisperDialogDict.__contains__(name):
 			oldDialog = self.whisperDialogDict[name]
 			oldDialog.Destroy()
 			del self.whisperDialogDict[name]
@@ -1256,7 +1256,7 @@ class Interface(object):
 		self.__CheckGameMaster(name)
 
 	def OpenWhisperDialog(self, name):
-		if not self.whisperDialogDict.has_key(name):
+		if not self.whisperDialogDict.__contains__(name):
 			dlg = self.__MakeWhisperDialog(name)
 			dlg.OpenWithTarget(name, True)
 			dlg.chatLine.SetFocus()
@@ -1272,7 +1272,7 @@ class Interface(object):
 			for text in constinfo.WHISPER_MESSAGES[name]:
 				chat.AppendWhisper(text[0], name, text[1])
 
-		if not self.whisperDialogDict.has_key(name):
+		if not self.whisperDialogDict.__contains__(name):
 			btn = self.FindWhisperButton(name)
 			if 0 == btn:
 				btn = self.__MakeWhisperButton(name)
@@ -1297,7 +1297,7 @@ class Interface(object):
 			dlgWhisper.OpenWithTarget(btn.name)
 			dlgWhisper.Show()
 			self.__CheckGameMaster(btn.name)
-		except:
+		except BaseException:
 			import dbg
 			dbg.TraceError("interface.ShowWhisperDialog - Failed to find key")
 		self.__DestroyWhisperButton(btn)
@@ -1322,7 +1322,7 @@ class Interface(object):
 			dlgWhisper = self.whisperDialogDict[name]
 			dlgWhisper.Destroy()
 			del self.whisperDialogDict[name]
-		except:
+		except BaseException:
 			import dbg
 			dbg.TraceError("interface.CloseWhisperDialog - Failed to find key")
 
@@ -1389,19 +1389,19 @@ class Interface(object):
 			btn.Show()
 
 	def __CheckGameMaster(self, name):
-		if not self.listGMName.has_key(name):
+		if not self.listGMName.__contains__(name):
 			return
-		if self.whisperDialogDict.has_key(name):
+		if self.whisperDialogDict.__contains__(name):
 			dlg = self.whisperDialogDict[name]
 			dlg.SetGameMasterLook()
 
 	def RegisterGameMasterName(self, name):
-		if self.listGMName.has_key(name):
+		if self.listGMName.__contains__(name):
 			return
 		self.listGMName[name] = "GM"
 
 	def IsGameMasterName(self, name):
-		if self.listGMName.has_key(name):
+		if self.listGMName.__contains__(name):
 			return True
 		else:
 			return False

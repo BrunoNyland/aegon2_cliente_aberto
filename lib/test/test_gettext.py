@@ -1,10 +1,10 @@
 import os
 import base64
-import shutil
 import gettext
 import unittest
 
-from test import test_support
+from test import support
+from test.support import os_helper
 
 
 # TODO:
@@ -13,8 +13,36 @@ from test import test_support
 #    has no sense, it would have if we were testing a parser (i.e. pygettext)
 #  - Tests should have only one assert.
 
-GNU_MO_DATA = '''\
-3hIElQAAAAAGAAAAHAAAAEwAAAALAAAAfAAAAAAAAACoAAAAFQAAAKkAAAAjAAAAvwAAAKEAAADj
+GNU_MO_DATA = b'''\
+3hIElQAAAAAJAAAAHAAAAGQAAAAAAAAArAAAAAAAAACsAAAAFQAAAK0AAAAjAAAAwwAAAKEAAADn
+AAAAMAAAAIkBAAAHAAAAugEAABYAAADCAQAAHAAAANkBAAALAAAA9gEAAEIBAAACAgAAFgAAAEUD
+AAAeAAAAXAMAAKEAAAB7AwAAMgAAAB0EAAAFAAAAUAQAABsAAABWBAAAIQAAAHIEAAAJAAAAlAQA
+AABSYXltb25kIEx1eHVyeSBZYWNoLXQAVGhlcmUgaXMgJXMgZmlsZQBUaGVyZSBhcmUgJXMgZmls
+ZXMAVGhpcyBtb2R1bGUgcHJvdmlkZXMgaW50ZXJuYXRpb25hbGl6YXRpb24gYW5kIGxvY2FsaXph
+dGlvbgpzdXBwb3J0IGZvciB5b3VyIFB5dGhvbiBwcm9ncmFtcyBieSBwcm92aWRpbmcgYW4gaW50
+ZXJmYWNlIHRvIHRoZSBHTlUKZ2V0dGV4dCBtZXNzYWdlIGNhdGFsb2cgbGlicmFyeS4AV2l0aCBj
+b250ZXh0BFRoZXJlIGlzICVzIGZpbGUAVGhlcmUgYXJlICVzIGZpbGVzAG11bGx1c2sAbXkgY29u
+dGV4dARudWRnZSBudWRnZQBteSBvdGhlciBjb250ZXh0BG51ZGdlIG51ZGdlAG51ZGdlIG51ZGdl
+AFByb2plY3QtSWQtVmVyc2lvbjogMi4wClBPLVJldmlzaW9uLURhdGU6IDIwMDMtMDQtMTEgMTQ6
+MzItMDQwMApMYXN0LVRyYW5zbGF0b3I6IEouIERhdmlkIEliYW5leiA8ai1kYXZpZEBub29zLmZy
+PgpMYW5ndWFnZS1UZWFtOiBYWCA8cHl0aG9uLWRldkBweXRob24ub3JnPgpNSU1FLVZlcnNpb246
+IDEuMApDb250ZW50LVR5cGU6IHRleHQvcGxhaW47IGNoYXJzZXQ9aXNvLTg4NTktMQpDb250ZW50
+LVRyYW5zZmVyLUVuY29kaW5nOiA4Yml0CkdlbmVyYXRlZC1CeTogcHlnZXR0ZXh0LnB5IDEuMQpQ
+bHVyYWwtRm9ybXM6IG5wbHVyYWxzPTI7IHBsdXJhbD1uIT0xOwoAVGhyb2F0d29iYmxlciBNYW5n
+cm92ZQBIYXkgJXMgZmljaGVybwBIYXkgJXMgZmljaGVyb3MAR3V2ZiB6YnFoeXIgY2ViaXZxcmYg
+dmFncmVhbmd2YmFueXZtbmd2YmEgbmFxIHlicG55dm1uZ3ZiYQpmaGNjYmVnIHNiZSBsYmhlIENs
+Z3ViYSBjZWJ0ZW56ZiBvbCBjZWJpdnF2YXQgbmEgdmFncmVzbnByIGdiIGd1ciBUQUgKdHJnZ3Jr
+ZyB6cmZmbnRyIHBuZ255YnQgeXZvZW5lbC4ASGF5ICVzIGZpY2hlcm8gKGNvbnRleHQpAEhheSAl
+cyBmaWNoZXJvcyAoY29udGV4dCkAYmFjb24Ad2luayB3aW5rIChpbiAibXkgY29udGV4dCIpAHdp
+bmsgd2luayAoaW4gIm15IG90aGVyIGNvbnRleHQiKQB3aW5rIHdpbmsA
+'''
+
+# This data contains an invalid major version number (5)
+# An unexpected major version number should be treated as an error when
+# parsing a .mo file
+
+GNU_MO_DATA_BAD_MAJOR_VERSION = b'''\
+3hIElQAABQAGAAAAHAAAAEwAAAALAAAAfAAAAAAAAACoAAAAFQAAAKkAAAAjAAAAvwAAAKEAAADj
 AAAABwAAAIUBAAALAAAAjQEAAEUBAACZAQAAFgAAAN8CAAAeAAAA9gIAAKEAAAAVAwAABQAAALcD
 AAAJAAAAvQMAAAEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABQAAAAYAAAACAAAAAFJh
 eW1vbmQgTHV4dXJ5IFlhY2gtdABUaGVyZSBpcyAlcyBmaWxlAFRoZXJlIGFyZSAlcyBmaWxlcwBU
@@ -33,17 +61,42 @@ IHNiZSBsYmhlIENsZ3ViYSBjZWJ0ZW56ZiBvbCBjZWJpdnF2YXQgbmEgdmFncmVzbnByIGdiIGd1
 ciBUQUgKdHJnZ3JrZyB6cmZmbnRyIHBuZ255YnQgeXZvZW5lbC4AYmFjb24Ad2luayB3aW5rAA==
 '''
 
-UMO_DATA = '''\
-3hIElQAAAAACAAAAHAAAACwAAAAFAAAAPAAAAAAAAABQAAAABAAAAFEAAAAPAQAAVgAAAAQAAABm
-AQAAAQAAAAIAAAAAAAAAAAAAAAAAAAAAYWLDngBQcm9qZWN0LUlkLVZlcnNpb246IDIuMApQTy1S
-ZXZpc2lvbi1EYXRlOiAyMDAzLTA0LTExIDEyOjQyLTA0MDAKTGFzdC1UcmFuc2xhdG9yOiBCYXJy
-eSBBLiBXQXJzYXcgPGJhcnJ5QHB5dGhvbi5vcmc+Ckxhbmd1YWdlLVRlYW06IFhYIDxweXRob24t
-ZGV2QHB5dGhvbi5vcmc+Ck1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFp
-bjsgY2hhcnNldD11dGYtOApDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiA3Yml0CkdlbmVyYXRl
-ZC1CeTogbWFudWFsbHkKAMKkeXoA
+# This data contains an invalid minor version number (7)
+# An unexpected minor version number only indicates that some of the file's
+# contents may not be able to be read. It does not indicate an error.
+
+GNU_MO_DATA_BAD_MINOR_VERSION = b'''\
+3hIElQcAAAAGAAAAHAAAAEwAAAALAAAAfAAAAAAAAACoAAAAFQAAAKkAAAAjAAAAvwAAAKEAAADj
+AAAABwAAAIUBAAALAAAAjQEAAEUBAACZAQAAFgAAAN8CAAAeAAAA9gIAAKEAAAAVAwAABQAAALcD
+AAAJAAAAvQMAAAEAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABQAAAAYAAAACAAAAAFJh
+eW1vbmQgTHV4dXJ5IFlhY2gtdABUaGVyZSBpcyAlcyBmaWxlAFRoZXJlIGFyZSAlcyBmaWxlcwBU
+aGlzIG1vZHVsZSBwcm92aWRlcyBpbnRlcm5hdGlvbmFsaXphdGlvbiBhbmQgbG9jYWxpemF0aW9u
+CnN1cHBvcnQgZm9yIHlvdXIgUHl0aG9uIHByb2dyYW1zIGJ5IHByb3ZpZGluZyBhbiBpbnRlcmZh
+Y2UgdG8gdGhlIEdOVQpnZXR0ZXh0IG1lc3NhZ2UgY2F0YWxvZyBsaWJyYXJ5LgBtdWxsdXNrAG51
+ZGdlIG51ZGdlAFByb2plY3QtSWQtVmVyc2lvbjogMi4wClBPLVJldmlzaW9uLURhdGU6IDIwMDAt
+MDgtMjkgMTI6MTktMDQ6MDAKTGFzdC1UcmFuc2xhdG9yOiBKLiBEYXZpZCBJYsOhw7FleiA8ai1k
+YXZpZEBub29zLmZyPgpMYW5ndWFnZS1UZWFtOiBYWCA8cHl0aG9uLWRldkBweXRob24ub3JnPgpN
+SU1FLVZlcnNpb246IDEuMApDb250ZW50LVR5cGU6IHRleHQvcGxhaW47IGNoYXJzZXQ9aXNvLTg4
+NTktMQpDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiBub25lCkdlbmVyYXRlZC1CeTogcHlnZXR0
+ZXh0LnB5IDEuMQpQbHVyYWwtRm9ybXM6IG5wbHVyYWxzPTI7IHBsdXJhbD1uIT0xOwoAVGhyb2F0
+d29iYmxlciBNYW5ncm92ZQBIYXkgJXMgZmljaGVybwBIYXkgJXMgZmljaGVyb3MAR3V2ZiB6YnFo
+eXIgY2ViaXZxcmYgdmFncmVhbmd2YmFueXZtbmd2YmEgbmFxIHlicG55dm1uZ3ZiYQpmaGNjYmVn
+IHNiZSBsYmhlIENsZ3ViYSBjZWJ0ZW56ZiBvbCBjZWJpdnF2YXQgbmEgdmFncmVzbnByIGdiIGd1
+ciBUQUgKdHJnZ3JrZyB6cmZmbnRyIHBuZ255YnQgeXZvZW5lbC4AYmFjb24Ad2luayB3aW5rAA==
 '''
 
-MMO_DATA = '''\
+
+UMO_DATA = b'''\
+3hIElQAAAAADAAAAHAAAADQAAAAAAAAAAAAAAAAAAABMAAAABAAAAE0AAAAQAAAAUgAAAA8BAABj
+AAAABAAAAHMBAAAWAAAAeAEAAABhYsOeAG15Y29udGV4dMOeBGFiw54AUHJvamVjdC1JZC1WZXJz
+aW9uOiAyLjAKUE8tUmV2aXNpb24tRGF0ZTogMjAwMy0wNC0xMSAxMjo0Mi0wNDAwCkxhc3QtVHJh
+bnNsYXRvcjogQmFycnkgQS4gV0Fyc2F3IDxiYXJyeUBweXRob24ub3JnPgpMYW5ndWFnZS1UZWFt
+OiBYWCA8cHl0aG9uLWRldkBweXRob24ub3JnPgpNSU1FLVZlcnNpb246IDEuMApDb250ZW50LVR5
+cGU6IHRleHQvcGxhaW47IGNoYXJzZXQ9dXRmLTgKQ29udGVudC1UcmFuc2Zlci1FbmNvZGluZzog
+N2JpdApHZW5lcmF0ZWQtQnk6IG1hbnVhbGx5CgDCpHl6AMKkeXogKGNvbnRleHQgdmVyc2lvbikA
+'''
+
+MMO_DATA = b'''\
 3hIElQAAAAABAAAAHAAAACQAAAADAAAALAAAAAAAAAA4AAAAeAEAADkAAAABAAAAAAAAAAAAAAAA
 UHJvamVjdC1JZC1WZXJzaW9uOiBObyBQcm9qZWN0IDAuMApQT1QtQ3JlYXRpb24tRGF0ZTogV2Vk
 IERlYyAxMSAwNzo0NDoxNSAyMDAyClBPLVJldmlzaW9uLURhdGU6IDIwMDItMDgtMTQgMDE6MTg6
@@ -56,29 +109,31 @@ bGUKR2VuZXJhdGVkLUJ5OiBweWdldHRleHQucHkgMS4zCgA=
 
 LOCALEDIR = os.path.join('xx', 'LC_MESSAGES')
 MOFILE = os.path.join(LOCALEDIR, 'gettext.mo')
+MOFILE_BAD_MAJOR_VERSION = os.path.join(LOCALEDIR, 'gettext_bad_major_version.mo')
+MOFILE_BAD_MINOR_VERSION = os.path.join(LOCALEDIR, 'gettext_bad_minor_version.mo')
 UMOFILE = os.path.join(LOCALEDIR, 'ugettext.mo')
 MMOFILE = os.path.join(LOCALEDIR, 'metadata.mo')
 
 
 class GettextBaseTest(unittest.TestCase):
     def setUp(self):
+        self.addCleanup(os_helper.rmtree, os.path.split(LOCALEDIR)[0])
         if not os.path.isdir(LOCALEDIR):
             os.makedirs(LOCALEDIR)
         with open(MOFILE, 'wb') as fp:
-            fp.write(base64.decodestring(GNU_MO_DATA))
+            fp.write(base64.decodebytes(GNU_MO_DATA))
+        with open(MOFILE_BAD_MAJOR_VERSION, 'wb') as fp:
+            fp.write(base64.decodebytes(GNU_MO_DATA_BAD_MAJOR_VERSION))
+        with open(MOFILE_BAD_MINOR_VERSION, 'wb') as fp:
+            fp.write(base64.decodebytes(GNU_MO_DATA_BAD_MINOR_VERSION))
         with open(UMOFILE, 'wb') as fp:
-            fp.write(base64.decodestring(UMO_DATA))
+            fp.write(base64.decodebytes(UMO_DATA))
         with open(MMOFILE, 'wb') as fp:
-            fp.write(base64.decodestring(MMO_DATA))
-
-        self.env = test_support.EnvironmentVarGuard()
+            fp.write(base64.decodebytes(MMO_DATA))
+        self.env = self.enterContext(os_helper.EnvironmentVarGuard())
         self.env['LANGUAGE'] = 'xx'
         gettext._translations.clear()
 
-    def tearDown(self):
-        self.env.__exit__()
-        del self.env
-        shutil.rmtree(os.path.split(LOCALEDIR)[0])
 
 GNU_MO_DATA_ISSUE_17898 = b'''\
 3hIElQAAAAABAAAAHAAAACQAAAAAAAAAAAAAAAAAAAAsAAAAggAAAC0AAAAAUGx1cmFsLUZvcm1z
@@ -92,39 +147,46 @@ class GettextTestCase1(GettextBaseTest):
         GettextBaseTest.setUp(self)
         self.localedir = os.curdir
         self.mofile = MOFILE
-        gettext.install('gettext', self.localedir)
+        gettext.install('gettext', self.localedir, names=['pgettext'])
 
     def test_some_translations(self):
         eq = self.assertEqual
         # test some translations
         eq(_('albatross'), 'albatross')
-        eq(_(u'mullusk'), 'bacon')
+        eq(_('mullusk'), 'bacon')
         eq(_(r'Raymond Luxury Yach-t'), 'Throatwobbler Mangrove')
-        eq(_(ur'nudge nudge'), 'wink wink')
+        eq(_(r'nudge nudge'), 'wink wink')
+
+    def test_some_translations_with_context(self):
+        eq = self.assertEqual
+        eq(pgettext('my context', 'nudge nudge'),
+           'wink wink (in "my context")')
+        eq(pgettext('my other context', 'nudge nudge'),
+           'wink wink (in "my other context")')
 
     def test_double_quotes(self):
         eq = self.assertEqual
         # double quotes
         eq(_("albatross"), 'albatross')
-        eq(_(u"mullusk"), 'bacon')
+        eq(_("mullusk"), 'bacon')
         eq(_(r"Raymond Luxury Yach-t"), 'Throatwobbler Mangrove')
-        eq(_(ur"nudge nudge"), 'wink wink')
+        eq(_(r"nudge nudge"), 'wink wink')
 
     def test_triple_single_quotes(self):
         eq = self.assertEqual
         # triple single quotes
         eq(_('''albatross'''), 'albatross')
-        eq(_(u'''mullusk'''), 'bacon')
+        eq(_('''mullusk'''), 'bacon')
         eq(_(r'''Raymond Luxury Yach-t'''), 'Throatwobbler Mangrove')
-        eq(_(ur'''nudge nudge'''), 'wink wink')
+        eq(_(r'''nudge nudge'''), 'wink wink')
 
     def test_triple_double_quotes(self):
         eq = self.assertEqual
         # triple double quotes
         eq(_("""albatross"""), 'albatross')
-        eq(_(u"""mullusk"""), 'bacon')
+        eq(_("""mullusk"""), 'bacon')
         eq(_(r"""Raymond Luxury Yach-t"""), 'Throatwobbler Mangrove')
-        eq(_(ur"""nudge nudge"""), 'wink wink')
+        eq(_(r"""nudge nudge"""), 'wink wink')
 
     def test_multiline_strings(self):
         eq = self.assertEqual
@@ -138,6 +200,7 @@ trggrkg zrffntr pngnybt yvoenel.''')
 
     def test_the_alternative_interface(self):
         eq = self.assertEqual
+        neq = self.assertNotEqual
         # test the alternative interface
         with open(self.mofile, 'rb') as fp:
             t = gettext.GNUTranslations(fp)
@@ -145,16 +208,17 @@ trggrkg zrffntr pngnybt yvoenel.''')
         t.install()
         eq(_('nudge nudge'), 'wink wink')
         # Try unicode return type
-        t.install(unicode=True)
+        t.install()
         eq(_('mullusk'), 'bacon')
         # Test installation of other methods
-        import __builtin__
-        t.install(unicode=True, names=["gettext", "lgettext"])
-        eq(_, t.ugettext)
-        eq(__builtin__.gettext, t.ugettext)
-        eq(lgettext, t.lgettext)
-        del __builtin__.gettext
-        del __builtin__.lgettext
+        import builtins
+        t.install(names=["gettext", "ngettext"])
+        eq(_, t.gettext)
+        eq(builtins.gettext, t.gettext)
+        eq(ngettext, t.ngettext)
+        neq(pgettext, t.pgettext)
+        del builtins.gettext
+        del builtins.ngettext
 
 
 class GettextTestCase2(GettextBaseTest):
@@ -173,37 +237,66 @@ class GettextTestCase2(GettextBaseTest):
     def test_textdomain(self):
         self.assertEqual(gettext.textdomain(), 'gettext')
 
+    def test_bad_major_version(self):
+        with open(MOFILE_BAD_MAJOR_VERSION, 'rb') as fp:
+            with self.assertRaises(OSError) as cm:
+                gettext.GNUTranslations(fp)
+
+            exception = cm.exception
+            self.assertEqual(exception.errno, 0)
+            self.assertEqual(exception.strerror, "Bad version number 5")
+            self.assertEqual(exception.filename, MOFILE_BAD_MAJOR_VERSION)
+
+    def test_bad_minor_version(self):
+        with open(MOFILE_BAD_MINOR_VERSION, 'rb') as fp:
+            # Check that no error is thrown with a bad minor version number
+            gettext.GNUTranslations(fp)
+
     def test_some_translations(self):
         eq = self.assertEqual
         # test some translations
         eq(self._('albatross'), 'albatross')
-        eq(self._(u'mullusk'), 'bacon')
+        eq(self._('mullusk'), 'bacon')
         eq(self._(r'Raymond Luxury Yach-t'), 'Throatwobbler Mangrove')
-        eq(self._(ur'nudge nudge'), 'wink wink')
+        eq(self._(r'nudge nudge'), 'wink wink')
+
+    def test_some_translations_with_context(self):
+        eq = self.assertEqual
+        eq(gettext.pgettext('my context', 'nudge nudge'),
+           'wink wink (in "my context")')
+        eq(gettext.pgettext('my other context', 'nudge nudge'),
+           'wink wink (in "my other context")')
+
+    def test_some_translations_with_context_and_domain(self):
+        eq = self.assertEqual
+        eq(gettext.dpgettext('gettext', 'my context', 'nudge nudge'),
+           'wink wink (in "my context")')
+        eq(gettext.dpgettext('gettext', 'my other context', 'nudge nudge'),
+           'wink wink (in "my other context")')
 
     def test_double_quotes(self):
         eq = self.assertEqual
         # double quotes
         eq(self._("albatross"), 'albatross')
-        eq(self._(u"mullusk"), 'bacon')
+        eq(self._("mullusk"), 'bacon')
         eq(self._(r"Raymond Luxury Yach-t"), 'Throatwobbler Mangrove')
-        eq(self._(ur"nudge nudge"), 'wink wink')
+        eq(self._(r"nudge nudge"), 'wink wink')
 
     def test_triple_single_quotes(self):
         eq = self.assertEqual
         # triple single quotes
         eq(self._('''albatross'''), 'albatross')
-        eq(self._(u'''mullusk'''), 'bacon')
+        eq(self._('''mullusk'''), 'bacon')
         eq(self._(r'''Raymond Luxury Yach-t'''), 'Throatwobbler Mangrove')
-        eq(self._(ur'''nudge nudge'''), 'wink wink')
+        eq(self._(r'''nudge nudge'''), 'wink wink')
 
     def test_triple_double_quotes(self):
         eq = self.assertEqual
         # triple double quotes
         eq(self._("""albatross"""), 'albatross')
-        eq(self._(u"""mullusk"""), 'bacon')
+        eq(self._("""mullusk"""), 'bacon')
         eq(self._(r"""Raymond Luxury Yach-t"""), 'Throatwobbler Mangrove')
-        eq(self._(ur"""nudge nudge"""), 'wink wink')
+        eq(self._(r"""nudge nudge"""), 'wink wink')
 
     def test_multiline_strings(self):
         eq = self.assertEqual
@@ -228,6 +321,15 @@ class PluralFormsTestCase(GettextBaseTest):
         x = gettext.ngettext('There is %s file', 'There are %s files', 2)
         eq(x, 'Hay %s ficheros')
 
+    def test_plural_context_forms1(self):
+        eq = self.assertEqual
+        x = gettext.npgettext('With context',
+                              'There is %s file', 'There are %s files', 1)
+        eq(x, 'Hay %s fichero (context)')
+        x = gettext.npgettext('With context',
+                              'There is %s file', 'There are %s files', 2)
+        eq(x, 'Hay %s ficheros (context)')
+
     def test_plural_forms2(self):
         eq = self.assertEqual
         with open(self.mofile, 'rb') as fp:
@@ -236,6 +338,17 @@ class PluralFormsTestCase(GettextBaseTest):
         eq(x, 'Hay %s fichero')
         x = t.ngettext('There is %s file', 'There are %s files', 2)
         eq(x, 'Hay %s ficheros')
+
+    def test_plural_context_forms2(self):
+        eq = self.assertEqual
+        with open(self.mofile, 'rb') as fp:
+            t = gettext.GNUTranslations(fp)
+        x = t.npgettext('With context',
+                        'There is %s file', 'There are %s files', 1)
+        eq(x, 'Hay %s fichero (context)')
+        x = t.npgettext('With context',
+                        'There is %s file', 'There are %s files', 2)
+        eq(x, 'Hay %s ficheros (context)')
 
     # Examples from http://www.gnu.org/software/gettext/manual/gettext.html
 
@@ -375,9 +488,12 @@ class PluralFormsTestCase(GettextBaseTest):
         f = gettext.c2py('n != 1')
         self.assertEqual(f(1), 0)
         self.assertEqual(f(2), 1)
-        self.assertEqual(f(1.0), 0)
-        self.assertEqual(f(2.0), 1)
-        self.assertEqual(f(1.1), 1)
+        with self.assertWarns(DeprecationWarning):
+            self.assertEqual(f(1.0), 0)
+        with self.assertWarns(DeprecationWarning):
+            self.assertEqual(f(2.0), 1)
+        with self.assertWarns(DeprecationWarning):
+            self.assertEqual(f(1.1), 1)
         self.assertRaises(TypeError, f, '2')
         self.assertRaises(TypeError, f, b'2')
         self.assertRaises(TypeError, f, [])
@@ -387,10 +503,23 @@ class PluralFormsTestCase(GettextBaseTest):
 class GNUTranslationParsingTest(GettextBaseTest):
     def test_plural_form_error_issue17898(self):
         with open(MOFILE, 'wb') as fp:
-            fp.write(base64.decodestring(GNU_MO_DATA_ISSUE_17898))
+            fp.write(base64.decodebytes(GNU_MO_DATA_ISSUE_17898))
         with open(MOFILE, 'rb') as fp:
             # If this runs cleanly, the bug is fixed.
             t = gettext.GNUTranslations(fp)
+
+    def test_ignore_comments_in_headers_issue36239(self):
+        """Checks that comments like:
+
+            #-#-#-#-#  messages.po (EdX Studio)  #-#-#-#-#
+
+        are ignored.
+        """
+        with open(MOFILE, 'wb') as fp:
+            fp.write(base64.decodebytes(GNU_MO_DATA_ISSUE_17898))
+        with open(MOFILE, 'rb') as fp:
+            t = gettext.GNUTranslations(fp)
+            self.assertEqual(t.info()["plural-forms"], "nplurals=2; plural=(n != 1);")
 
 
 class UnicodeTranslationsTest(GettextBaseTest):
@@ -398,16 +527,61 @@ class UnicodeTranslationsTest(GettextBaseTest):
         GettextBaseTest.setUp(self)
         with open(UMOFILE, 'rb') as fp:
             self.t = gettext.GNUTranslations(fp)
-        self._ = self.t.ugettext
+        self._ = self.t.gettext
+        self.pgettext = self.t.pgettext
+
+    def test_unicode_msgid(self):
+        self.assertIsInstance(self._(''), str)
+
+    def test_unicode_msgstr(self):
+        self.assertEqual(self._('ab\xde'), '\xa4yz')
+
+    def test_unicode_context_msgstr(self):
+        t = self.pgettext('mycontext\xde', 'ab\xde')
+        self.assertTrue(isinstance(t, str))
+        self.assertEqual(t, '\xa4yz (context version)')
+
+
+class UnicodeTranslationsPluralTest(GettextBaseTest):
+    def setUp(self):
+        GettextBaseTest.setUp(self)
+        with open(MOFILE, 'rb') as fp:
+            self.t = gettext.GNUTranslations(fp)
+        self.ngettext = self.t.ngettext
+        self.npgettext = self.t.npgettext
 
     def test_unicode_msgid(self):
         unless = self.assertTrue
-        unless(isinstance(self._(''), unicode))
-        unless(isinstance(self._(u''), unicode))
+        unless(isinstance(self.ngettext('', '', 1), str))
+        unless(isinstance(self.ngettext('', '', 2), str))
+
+    def test_unicode_context_msgid(self):
+        unless = self.assertTrue
+        unless(isinstance(self.npgettext('', '', '', 1), str))
+        unless(isinstance(self.npgettext('', '', '', 2), str))
 
     def test_unicode_msgstr(self):
         eq = self.assertEqual
-        eq(self._(u'ab\xde'), u'\xa4yz')
+        unless = self.assertTrue
+        t = self.ngettext("There is %s file", "There are %s files", 1)
+        unless(isinstance(t, str))
+        eq(t, "Hay %s fichero")
+        unless(isinstance(t, str))
+        t = self.ngettext("There is %s file", "There are %s files", 5)
+        unless(isinstance(t, str))
+        eq(t, "Hay %s ficheros")
+
+    def test_unicode_msgstr_with_context(self):
+        eq = self.assertEqual
+        unless = self.assertTrue
+        t = self.npgettext("With context",
+                           "There is %s file", "There are %s files", 1)
+        unless(isinstance(t, str))
+        eq(t, "Hay %s fichero (context)")
+        t = self.npgettext("With context",
+                           "There is %s file", "There are %s files", 5)
+        unless(isinstance(t, str))
+        eq(t, "Hay %s ficheros (context)")
 
 
 class WeirdMetadataTest(GettextBaseTest):
@@ -422,6 +596,7 @@ class WeirdMetadataTest(GettextBaseTest):
 
     def test_weird_metadata(self):
         info = self.t.info()
+        self.assertEqual(len(info), 9)
         self.assertEqual(info['last-translator'],
            'John Doe <jdoe@example.com>\nJane Foobar <jfoobar@example.com>')
 
@@ -457,11 +632,14 @@ class GettextCacheTestCase(GettextBaseTest):
         self.assertEqual(t.__class__, DummyGNUTranslations)
 
 
-def test_main():
-    test_support.run_unittest(__name__)
+class MiscTestCase(unittest.TestCase):
+    def test__all__(self):
+        support.check__all__(self, gettext,
+                             not_exported={'c2py', 'ENOENT'})
+
 
 if __name__ == '__main__':
-    test_main()
+    unittest.main()
 
 
 # For reference, here's the .po file used to created the GNU_MO_DATA above.
@@ -469,7 +647,7 @@ if __name__ == '__main__':
 # The original version was automatically generated from the sources with
 # pygettext. Later it was manually modified to add plural forms support.
 
-'''
+b'''
 # Dummy translation for the Python test_gettext.py module.
 # Copyright (C) 2001 Python Software Foundation
 # Barry Warsaw <barry@python.org>, 2000.
@@ -491,6 +669,14 @@ msgstr ""
 #: test_gettext.py:98
 msgid "nudge nudge"
 msgstr "wink wink"
+
+msgctxt "my context"
+msgid "nudge nudge"
+msgstr "wink wink (in \"my context\")"
+
+msgctxt "my other context"
+msgid "nudge nudge"
+msgstr "wink wink (in \"my other context\")"
 
 #: test_gettext.py:16 test_gettext.py:22 test_gettext.py:28 test_gettext.py:34
 #: test_gettext.py:77 test_gettext.py:83 test_gettext.py:89 test_gettext.py:95
@@ -524,12 +710,20 @@ msgid "There is %s file"
 msgid_plural "There are %s files"
 msgstr[0] "Hay %s fichero"
 msgstr[1] "Hay %s ficheros"
+
+# Manually added, as neither pygettext nor xgettext support plural forms
+# and context in Python.
+msgctxt "With context"
+msgid "There is %s file"
+msgid_plural "There are %s files"
+msgstr[0] "Hay %s fichero (context)"
+msgstr[1] "Hay %s ficheros (context)"
 '''
 
 # Here's the second example po file example, used to generate the UMO_DATA
 # containing utf-8 encoded Unicode strings
 
-'''
+b'''
 # Dummy translation for the Python test_gettext.py module.
 # Copyright (C) 2001 Python Software Foundation
 # Barry Warsaw <barry@python.org>, 2000.
@@ -548,11 +742,16 @@ msgstr ""
 #: nofile:0
 msgid "ab\xc3\x9e"
 msgstr "\xc2\xa4yz"
+
+#: nofile:1
+msgctxt "mycontext\xc3\x9e"
+msgid "ab\xc3\x9e"
+msgstr "\xc2\xa4yz (context version)"
 '''
 
 # Here's the third example po file, used to generate MMO_DATA
 
-'''
+b'''
 msgid ""
 msgstr ""
 "Project-Id-Version: No Project 0.0\n"
@@ -571,7 +770,7 @@ msgstr ""
 # messages.po, used for bug 17898
 #
 
-'''
+b'''
 # test file for http://bugs.python.org/issue17898
 msgid ""
 msgstr ""

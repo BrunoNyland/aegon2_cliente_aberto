@@ -1,13 +1,20 @@
-from test import test_support
+from test import support
+from test.support import import_helper
 import unittest
+import warnings
 
-nis = test_support.import_module('nis')
+
+# Skip test if nis module does not exist.
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    nis = import_helper.import_module('nis')
+
 
 class NisTests(unittest.TestCase):
     def test_maps(self):
         try:
             maps = nis.maps()
-        except nis.error, msg:
+        except nis.error as msg:
             # NIS is probably not active, so this test isn't useful
             self.skipTest(str(msg))
         try:
@@ -33,8 +40,5 @@ class NisTests(unittest.TestCase):
             if done:
                 break
 
-def test_main():
-    test_support.run_unittest(NisTests)
-
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

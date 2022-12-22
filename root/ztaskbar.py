@@ -323,7 +323,7 @@ class TaskBar(ui.ScriptWindow):
 
 		startNumber = 0
 		for slot in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				slotNumber = i+startNumber
 				(Type, Position) = player.GetLocalQuickSlot(slotNumber)
 				if player.SLOT_TYPE_NONE == Type:
@@ -337,7 +337,7 @@ class TaskBar(ui.ScriptWindow):
 						itemCount = 0
 
 					if constinfo.IS_AUTO_POTION(itemIndex):
-						metinSocket = [player.GetItemMetinSocket(Position, j) for j in xrange(player.METIN_SOCKET_MAX_NUM)]
+						metinSocket = [player.GetItemMetinSocket(Position, j) for j in range(player.METIN_SOCKET_MAX_NUM)]
 						if 0 != int(metinSocket[0]):
 							slot.ActivateSlot(slotNumber)
 						else:
@@ -434,7 +434,7 @@ class TaskBar(ui.ScriptWindow):
 			QUICK_SLOT_SLOT_COUNT = 4
 			slotIndex = 0
 			for slotWindow in self.quickslot:
-				for i in xrange(QUICK_SLOT_SLOT_COUNT):
+				for i in range(QUICK_SLOT_SLOT_COUNT):
 					(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 					if Type == player.SLOT_TYPE_SKILL:
 						if usedSlotIndex == Position:
@@ -447,7 +447,7 @@ class TaskBar(ui.ScriptWindow):
 		slotIndex = 0
 
 		for slotWindow in self.quickslot:
-			for i in xrange(QUICK_SLOT_SLOT_COUNT):
+			for i in range(QUICK_SLOT_SLOT_COUNT):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:
@@ -458,7 +458,7 @@ class TaskBar(ui.ScriptWindow):
 	def OnActivateSkill(self, usedSlotIndex):
 		slotIndex = 0
 		for slotWindow in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:
@@ -469,7 +469,7 @@ class TaskBar(ui.ScriptWindow):
 	def OnDeactivateSkill(self, usedSlotIndex):
 		slotIndex = 0
 		for slotWindow in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:

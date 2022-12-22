@@ -11,7 +11,7 @@ The compiler compiles a pattern to a pytree.*Pattern instance.
 __author__ = "Guido van Rossum <guido@python.org>"
 
 # Python imports
-import StringIO
+import io
 
 # Fairly local imports
 from .pgen2 import driver, literals, token, tokenize, parse, grammar
@@ -27,8 +27,8 @@ class PatternSyntaxError(Exception):
 
 def tokenize_wrapper(input):
     """Tokenizes a string suppressing significant whitespace."""
-    skip = set((token.NEWLINE, token.INDENT, token.DEDENT))
-    tokens = tokenize.generate_tokens(StringIO.StringIO(input).readline)
+    skip = {token.NEWLINE, token.INDENT, token.DEDENT}
+    tokens = tokenize.generate_tokens(io.StringIO(input).readline)
     for quintuple in tokens:
         type, value, start, end, line_text = quintuple
         if type not in skip:
@@ -58,7 +58,7 @@ class PatternCompiler(object):
         try:
             root = self.driver.parse_tokens(tokens, debug=debug)
         except parse.ParseError as e:
-            raise PatternSyntaxError(str(e))
+            raise PatternSyntaxError(str(e)) from None
         if with_tree:
             return self.compile_node(root), root
         else:
@@ -140,7 +140,7 @@ class PatternCompiler(object):
         assert len(nodes) >= 1
         node = nodes[0]
         if node.type == token.STRING:
-            value = unicode(literals.evalString(node.value))
+            value = str(literals.evalString(node.value))
             return pytree.LeafPattern(_type_of_literal(value), value)
         elif node.type == token.NAME:
             value = node.value

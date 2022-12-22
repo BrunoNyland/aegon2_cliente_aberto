@@ -113,7 +113,7 @@ class AcceptGuildWarDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/acceptguildwardialog.py")
-		except:
+		except BaseException:
 			exception.Abort("DeclareGuildWarWindow.__CreateDialog - LoadScript")
 
 		getObject = self.GetChild

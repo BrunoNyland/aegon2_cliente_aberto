@@ -1,7 +1,8 @@
 '''Define SearchEngine for search dialogs.'''
 import re
-from Tkinter import StringVar, BooleanVar, TclError
-import tkMessageBox
+
+from tkinter import StringVar, BooleanVar, TclError
+from tkinter import messagebox
 
 def get(root):
     '''Return the singleton SearchEngine instance for the process.
@@ -13,6 +14,7 @@ def get(root):
         root._searchengine = SearchEngine(root)
         # This creates a cycle that persists until root is deleted.
     return root._searchengine
+
 
 class SearchEngine:
     """Handles searching a text widget for Find, Replace, and Grep."""
@@ -57,7 +59,7 @@ class SearchEngine:
 
     def setcookedpat(self, pat):
         "Set pattern after escaping if re."
-        # called only in SearchDialog.py: 66
+        # called only in search.py: 66
         if self.isre():
             pat = re.escape(pat)
         self.setpat(pat)
@@ -82,22 +84,19 @@ class SearchEngine:
             flags = flags | re.IGNORECASE
         try:
             prog = re.compile(pat, flags)
-        except re.error as what:
-            args = what.args
-            msg = args[0]
-            col = args[1] if len(args) >= 2 else -1
-            self.report_error(pat, msg, col)
+        except re.error as e:
+            self.report_error(pat, e.msg, e.pos)
             return None
         return prog
 
-    def report_error(self, pat, msg, col=-1):
+    def report_error(self, pat, msg, col=None):
         # Derived class could override this with something fancier
         msg = "Error: " + str(msg)
         if pat:
             msg = msg + "\nPattern: " + str(pat)
-        if col >= 0:
+        if col is not None:
             msg = msg + "\nOffset: " + str(col)
-        tkMessageBox.showerror("Regular expression error",
+        messagebox.showerror("Regular expression error",
                                msg, master=self.root)
 
     def search_text(self, text, prog=None, ok=0):
@@ -166,7 +165,7 @@ class SearchEngine:
         wrapped = 0
         startline = line
         chars = text.get("%d.0" % line, "%d.0" % (line+1))
-        while 1:
+        while True:
             m = search_reverse(prog, chars[:-1], col)
             if m:
                 if ok or m.start() < col:
@@ -185,6 +184,7 @@ class SearchEngine:
             chars = text.get("%d.0" % line, "%d.0" % (line+1))
             col = len(chars) - 1
         return None
+
 
 def search_reverse(prog, chars, col):
     '''Search backwards and return an re match object or None.
@@ -228,6 +228,7 @@ def get_line_col(index):
     line, col = map(int, index.split(".")) # Fails on invalid index
     return line, col
 
+
 if __name__ == "__main__":
-    import unittest
-    unittest.main('idlelib.idle_test.test_searchengine', verbosity=2, exit=False)
+    from unittest import main
+    main('idlelib.idle_test.test_searchengine', verbosity=2)

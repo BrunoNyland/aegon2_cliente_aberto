@@ -1,72 +1,45 @@
 # Windows specific tests
 
 from ctypes import *
-from ctypes.test import requires
 import unittest, sys
-from test import test_support as support
+from test import support
 
 import _ctypes_test
-
-# Only windows 32-bit has different calling conventions.
-@unittest.skipUnless(sys.platform == "win32", 'Windows-specific test')
-@unittest.skipUnless(sizeof(c_void_p) == sizeof(c_int),
-                     "sizeof c_void_p and c_int differ")
-class WindowsTestCase(unittest.TestCase):
-    def test_callconv_1(self):
-        # Testing stdcall function
-
-        IsWindow = windll.user32.IsWindow
-        # ValueError: Procedure probably called with not enough arguments
-        # (4 bytes missing)
-        self.assertRaises(ValueError, IsWindow)
-
-        # This one should succeed...
-        self.assertEqual(0, IsWindow(0))
-
-        # ValueError: Procedure probably called with too many arguments
-        # (8 bytes in excess)
-        self.assertRaises(ValueError, IsWindow, 0, 0, 0)
-
-    def test_callconv_2(self):
-        # Calling stdcall function as cdecl
-
-        IsWindow = cdll.user32.IsWindow
-
-        # ValueError: Procedure called with not enough arguments
-        # (4 bytes missing) or wrong calling convention
-        self.assertRaises(ValueError, IsWindow, None)
 
 @unittest.skipUnless(sys.platform == "win32", 'Windows-specific test')
 class FunctionCallTestCase(unittest.TestCase):
     @unittest.skipUnless('MSC' in sys.version, "SEH only supported by MSC")
-    @unittest.skipIf(sys.executable.endswith('_d.exe'),
+    @unittest.skipIf(sys.executable.lower().endswith('_d.exe'),
                      "SEH not enabled in debug builds")
     def test_SEH(self):
-        requires("SEH")
-        # Call functions with invalid arguments, and make sure
-        # that access violations are trapped and raise an
-        # exception.
-        self.assertRaises(WindowsError, windll.kernel32.GetModuleHandleA, 32)
+        # Disable faulthandler to prevent logging the warning:
+        # "Windows fatal exception: access violation"
+        with support.disable_faulthandler():
+            # Call functions with invalid arguments, and make sure
+            # that access violations are trapped and raise an
+            # exception.
+            self.assertRaises(OSError, windll.kernel32.GetModuleHandleA, 32)
 
     def test_noargs(self):
         # This is a special case on win32 x64
         windll.user32.GetDesktopWindow()
+
 
 @unittest.skipUnless(sys.platform == "win32", 'Windows-specific test')
 class ReturnStructSizesTestCase(unittest.TestCase):
     def test_sizes(self):
         dll = CDLL(_ctypes_test.__file__)
         for i in range(1, 11):
-            fields = [ ("f%d" % f, c_char) for f in range(1, i + 1)]
+            fields = [ (f"f{f}", c_char) for f in range(1, i + 1)]
             class S(Structure):
                 _fields_ = fields
-            f = getattr(dll, "TestSize%d" % i)
+            f = getattr(dll, f"TestSize{i}")
             f.restype = S
             res = f()
             for i, f in enumerate(fields):
                 value = getattr(res, f[0])
-                expected = chr(ord('a') + i)
-                self.assertEquals(value, expected)
+                expected = bytes([ord('a') + i])
+                self.assertEqual(value, expected)
 
 
 
@@ -93,6 +66,29 @@ class TestWintypes(unittest.TestCase):
         self.assertEqual(ex.hresult, -1)
         self.assertEqual(ex.text, "text")
         self.assertEqual(ex.details, ("details",))
+
+@unittest.skipUnless(sys.platform == "win32", 'Windows-specific test')
+class TestWinError(unittest.TestCase):
+    def test_winerror(self):
+        # see Issue 16169
+        import errno
+        ERROR_INVALID_PARAMETER = 87
+        msg = FormatError(ERROR_INVALID_PARAMETER).strip()
+        args = (errno.EINVAL, msg, None, ERROR_INVALID_PARAMETER)
+
+        e = WinError(ERROR_INVALID_PARAMETER)
+        self.assertEqual(e.args, args)
+        self.assertEqual(e.errno, errno.EINVAL)
+        self.assertEqual(e.winerror, ERROR_INVALID_PARAMETER)
+
+        windll.kernel32.SetLastError(ERROR_INVALID_PARAMETER)
+        try:
+            raise WinError()
+        except OSError as exc:
+            e = exc
+        self.assertEqual(e.args, args)
+        self.assertEqual(e.errno, errno.EINVAL)
+        self.assertEqual(e.winerror, ERROR_INVALID_PARAMETER)
 
 class Structures(unittest.TestCase):
     def test_struct_by_value(self):

@@ -218,12 +218,12 @@ class TargetBoard(ui.ThinBoard):
 
 				mainrace = ""
 				subrace = ""
-				for i in xrange(17):
+				for i in range(17):
 					curFlag = 1 << i
 					if HAS_FLAG(dwRaceFlag, curFlag):
-						if self.RACE_FLAG_TO_NAME.has_key(curFlag):
+						if self.RACE_FLAG_TO_NAME.__contains__(curFlag):
 							mainrace += self.RACE_FLAG_TO_NAME[curFlag] + ", "
-						elif self.SUB_RACE_FLAG_TO_NAME.has_key(curFlag):
+						elif self.SUB_RACE_FLAG_TO_NAME.__contains__(curFlag):
 							subrace += self.SUB_RACE_FLAG_TO_NAME[curFlag] + ", "
 				if nonplayer.IsMonsterStone(race):
 					mainrace += localeinfo.TARGET_INFO_RACE_METIN + ", "
@@ -250,7 +250,7 @@ class TargetBoard(ui.ThinBoard):
 						itemListBox.SetSize(self.GetWidth() - 15 * 2 - ui.ScrollBar.SCROLLBAR_WIDTH, (32 + 5) * self.MAX_ITEM_COUNT)
 						height = 0
 						for curItem in constinfo.MONSTER_INFO_DATA[race]["items"]:
-							if curItem.has_key("vnum_list"):
+							if curItem.__contains__("vnum_list"):
 								height += self.AppendItem(itemListBox, curItem["vnum_list"], curItem["count"])
 							else:
 								height += self.AppendItem(itemListBox, curItem["vnum"], curItem["count"])
@@ -661,7 +661,7 @@ class TargetBoard(ui.ThinBoard):
 		nameFront = ""
 		if -1 != level:
 			nameFront += "Lv." + str(level) + " "
-		if self.GRADE_NAME.has_key(grade):
+		if self.GRADE_NAME.__contains__(grade):
 			nameFront += "(" + self.GRADE_NAME[grade] + ") "
 
 		self.SetTargetName(nameFront + name)
@@ -720,14 +720,14 @@ class TargetBoard(ui.ThinBoard):
 		self.nameBoard.Hide()
 
 	def __ShowButton(self, name):
-		if not self.buttonDict.has_key(name):
+		if not self.buttonDict.__contains__(name):
 			return
 
 		self.buttonDict[name].Show()
 		self.showingButtonList.append(self.buttonDict[name])
 
 	def __HideButton(self, name):
-		if not self.buttonDict.has_key(name):
+		if not self.buttonDict.__contains__(name):
 			return
 
 		button = self.buttonDict[name]

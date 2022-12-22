@@ -1,21 +1,20 @@
-import os
-from test import test_support
+import unittest
+from test import support
+from test.support import import_helper
+from test.support import check_sanitizer
 
-# Skip test if _tkinter wasn't built or gui resource is not available.
-test_support.import_module('_tkinter')
-test_support.requires('gui')
+if check_sanitizer(address=True, memory=True):
+    raise unittest.SkipTest("Tests involvin libX11 can SEGFAULT on ASAN/MSAN builds")
 
-this_dir = os.path.dirname(os.path.abspath(__file__))
-lib_tk_test = os.path.abspath(os.path.join(this_dir, os.path.pardir,
-    'lib-tk', 'test'))
+# Skip test if _tkinter wasn't built.
+import_helper.import_module('_tkinter')
 
-with test_support.DirsOnSysPath(lib_tk_test):
-    import runtktests
+# Skip test if tk cannot be initialized.
+support.requires('gui')
 
-def test_main():
-    with test_support.DirsOnSysPath(lib_tk_test):
-        test_support.run_unittest(
-            *runtktests.get_tests(text=False, packages=['test_tkinter']))
+def load_tests(loader, tests, pattern):
+    return loader.discover('tkinter.test.test_tkinter')
+
 
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

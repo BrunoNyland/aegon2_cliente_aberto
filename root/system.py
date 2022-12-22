@@ -4,6 +4,7 @@ import os
 import sys
 import dbg
 
+
 # sys.path = []
 # sys.path.append("lib")
 
@@ -50,7 +51,7 @@ class pack_file_iterator(object):
 			return tmp
 		raise StopIteration
 
-_chr = __builtins__.chr
+_chr = builtins.chr
 
 class pack_file(object):
 	def __init__(self, filename, mode = 'rb'):
@@ -89,10 +90,10 @@ def open(filename, mode = 'rb'):
 	else:
 		return old_open(filename, mode)
 
-__builtins__.open = open
-__builtins__.old_open = old_open
-__builtins__.new_open = open
-__builtins__.pack_open = open
+builtins.open = open
+builtins.old_open = old_open
+builtins.new_open = open
+builtins.pack_open = open
 _ModuleType = type(sys)
 
 old_import = __import__
@@ -107,7 +108,7 @@ def _process_result(code, fqname):
 	sys.modules[fqname] = module
 
 	if not is_module:
-		exec code in module.__dict__
+		exec(code , module.__dict__)
 
 	module = sys.modules[fqname]
 	module.__name__ = fqname
@@ -122,7 +123,7 @@ if app.BLOCK_CHANGE_NAME_BIN:
 	if str(sys.executable)[-14:] != "mt2supremo.bin":
 		try:
 			os.Execute("start Mt2Supremo.exe")
-		except:
+		except BaseException:
 			pass
 
 		app.Abort()
@@ -195,12 +196,11 @@ def execfile(fileName, dict):
 		code = __LoadCompiledFile__(fileName)
 	else:
 		code = __LoadTextFile__(fileName)
-		exec code in dict
+		exec(code , dict)
 
-import __builtin__
-__builtin__.__import__ = __hybrid_import
-__builtin__.old_execfile = __builtin__.execfile
-__builtin__.execfile = execfile
+__import__ = __hybrid_import
+# builtins.old_execfile = builtins.execfile
+# builtins.execfile = execfile
 
 def GetExceptionString(excTitle):
 	(excType, excMsg, excTraceBack) = sys.exc_info()
@@ -223,6 +223,7 @@ def GetExceptionString(excTitle):
 
 	return excText
 
+
 def ShowException(excTitle):
 	excText = GetExceptionString(excTitle)
 	dbg.TraceError(excText)
@@ -230,30 +231,35 @@ def ShowException(excTitle):
 	return 0
 
 def RunMainScript(name):
-	try:
-		execfile(name, __main__.__dict__)
-	except RuntimeError as msg:
-		msg = str(msg)
+	# try:
+	execfile(name, __main__.__dict__)
+	# except RuntimeError as msg:
+		# msg = str(msg)
 
-		import localeinfo
-		if localeinfo.error:
-			msg = localeinfo.error.get(msg, msg)
+		# import localeinfo
+		# if localeinfo.error:
+			# msg = localeinfo.error.get(msg, msg)
 
-		dbg.LogBox(msg)
-		app.Abort()
+		# dbg.LogBox(msg)
+		# app.Abort()
 
-	except:
-		msg = GetExceptionString("Run")
-		dbg.LogBox(msg)
-		app.Abort()
+	# except BaseException:
+		# msg = GetExceptionString("Run")
+		# dbg.LogBox(msg)
+		# app.Abort()
 
 import debuginfo
 debuginfo.SetDebugMode(__DEBUG__)
+dbg.TraceError("passei aqui fora do if")
 
 loginMark = "-cs"
 
 if __USE_CYTHON__:
+	dbg.TraceError("passei aqui")
 	import __main__
 	__hybrid_import('Prototype', __main__.__dict__)
 else:
+	dbg.TraceError("passei aqui")
 	RunMainScript("root/prototype.py")
+dbg.TraceError("passei aqui depois do if")
+	

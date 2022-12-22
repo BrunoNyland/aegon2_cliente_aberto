@@ -1,17 +1,16 @@
 # Ridiculously simple test of the winsound module for Windows.
 
-from __future__ import print_function
-
 import functools
-import os
-import subprocess
 import time
 import unittest
 
-from test import test_support as support
+from test import support
+from test.support import import_helper
+
 
 support.requires('audio')
-winsound = support.import_module('winsound')
+winsound = import_helper.import_module('winsound')
+
 
 # Unless we actually have an ear in the room, we have no idea whether a sound
 # actually plays, and it's incredibly flaky trying to figure out if a sound
@@ -31,9 +30,11 @@ def sound_func(func):
             return ret
     return wrapper
 
+
 safe_Beep = sound_func(winsound.Beep)
 safe_MessageBeep = sound_func(winsound.MessageBeep)
 safe_PlaySound = sound_func(winsound.PlaySound)
+
 
 class BeepTest(unittest.TestCase):
 
@@ -47,8 +48,11 @@ class BeepTest(unittest.TestCase):
         safe_Beep(32767, 75)
 
     def test_increasingfrequency(self):
-        for i in xrange(100, 2000, 100):
+        for i in range(100, 2000, 100):
             safe_Beep(i, 75)
+
+    def test_keyword_args(self):
+        safe_Beep(duration=75, frequency=2000)
 
 
 class MessageBeepTest(unittest.TestCase):
@@ -76,6 +80,9 @@ class MessageBeepTest(unittest.TestCase):
     def test_question(self):
         safe_MessageBeep(winsound.MB_ICONQUESTION)
 
+    def test_keyword_args(self):
+        safe_MessageBeep(type=winsound.MB_OK)
+
 
 class PlaySoundTest(unittest.TestCase):
 
@@ -87,6 +94,27 @@ class PlaySoundTest(unittest.TestCase):
             winsound.PlaySound,
             "none", winsound.SND_ASYNC | winsound.SND_MEMORY
         )
+        self.assertRaises(TypeError, winsound.PlaySound, b"bad", 0)
+        self.assertRaises(TypeError, winsound.PlaySound, "bad",
+                          winsound.SND_MEMORY)
+        self.assertRaises(TypeError, winsound.PlaySound, 1, 0)
+        # embedded null character
+        self.assertRaises(ValueError, winsound.PlaySound, 'bad\0', 0)
+
+    def test_keyword_args(self):
+        safe_PlaySound(flags=winsound.SND_ALIAS, sound="SystemExit")
+
+    def test_snd_memory(self):
+        with open(support.findfile('pluck-pcm8.wav',
+                                   subdir='audiodata'), 'rb') as f:
+            audio_data = f.read()
+        safe_PlaySound(audio_data, winsound.SND_MEMORY)
+        audio_data = bytearray(audio_data)
+        safe_PlaySound(audio_data, winsound.SND_MEMORY)
+
+    def test_snd_filename(self):
+        fn = support.findfile('pluck-pcm8.wav', subdir='audiodata')
+        safe_PlaySound(fn, winsound.SND_FILENAME | winsound.SND_NODEFAULT)
 
     def test_aliases(self):
         aliases = [
@@ -97,7 +125,8 @@ class PlaySoundTest(unittest.TestCase):
             "SystemQuestion",
         ]
         for alias in aliases:
-            safe_PlaySound(alias, winsound.SND_ALIAS)
+            with self.subTest(alias=alias):
+                safe_PlaySound(alias, winsound.SND_ALIAS)
 
     def test_alias_fallback(self):
         safe_PlaySound('!"$%&/(#+*', winsound.SND_ALIAS)
@@ -117,9 +146,5 @@ class PlaySoundTest(unittest.TestCase):
         winsound.PlaySound(None, winsound.SND_PURGE)
 
 
-def test_main():
-    support.run_unittest(BeepTest, MessageBeepTest, PlaySoundTest)
-
-
-if __name__=="__main__":
-    test_main()
+if __name__ == "__main__":
+    unittest.main()

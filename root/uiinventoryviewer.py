@@ -46,12 +46,12 @@ class CostumeWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/costumewindow.py")
-		except:
+		except BaseException:
 			exception.Abort("CostumeWindow.LoadWindow.LoadObject")
 
 		try:
 			wndEquip = self.GetChild("CostumeSlot")
-		except:
+		except BaseException:
 			exception.Abort("CostumeWindow.LoadWindow.BindObject")
 
 		wndEquip.SetOverInItemEvent(self.wndInventory.OverInItemEquipment)
@@ -60,10 +60,10 @@ class CostumeWindow(ui.ScriptWindow):
 		self.wndEquip = wndEquip
 
 	def RefreshCostumeSlot(self):
-		for i in xrange(COSTUME_MAX_NUM):
+		for i in range(COSTUME_MAX_NUM):
 			slotNumber = COSTUME_START_INDEX + i
 
-			if not self.wndInventory.equipmentItems.has_key(slotNumber):
+			if not self.wndInventory.equipmentItems.__contains__(slotNumber):
 				continue
 
 			self.wndEquip.SetItemSlot(slotNumber, self.wndInventory.equipmentItems[slotNumber]["vnum"], 0)
@@ -82,7 +82,7 @@ class InventoryMenu(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/_inventorywindowmenu.py")
-		except:
+		except BaseException:
 			exception.Abort("InventoryWindow.LoadWindow.LoadObject")
 
 class InventoryWindow(ui.ScriptWindow):
@@ -142,7 +142,7 @@ class InventoryWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/_inventorywindow.py")
-		except:
+		except BaseException:
 			exception.Abort("InventoryWindow.LoadWindow.LoadObject")
 
 		wndItem = self.GetChild("ItemSlot")
@@ -318,10 +318,10 @@ class InventoryWindow(ui.ScriptWindow):
 		return self.inventoryPageIndex
 
 	def RefreshBagSlotWindow(self):
-		for i in xrange(player.INVENTORY_PAGE_SIZE):
+		for i in range(player.INVENTORY_PAGE_SIZE):
 			slotNumber = self.__InventoryLocalSlotPosToGlobalSlotPos(i)
 
-			if not self.inventoryItems.has_key(slotNumber):
+			if not self.inventoryItems.__contains__(slotNumber):
 				continue
 
 			itemCount = self.inventoryItems[slotNumber]["count"]
@@ -349,8 +349,8 @@ class InventoryWindow(ui.ScriptWindow):
 		self.wndItem.RefreshSlot()
 
 	def RefreshEquipSlotWindow(self):
-		for slotNumber in xrange(WEAR_MAX_NUM):
-			if not self.equipmentItems.has_key(slotNumber):
+		for slotNumber in range(WEAR_MAX_NUM):
+			if not self.equipmentItems.__contains__(slotNumber):
 				continue
 
 			itemCount = self.equipmentItems[slotNumber]["count"]
@@ -380,11 +380,11 @@ class InventoryWindow(ui.ScriptWindow):
 		slotIndex = self.__InventoryLocalSlotPosToGlobalSlotPos(slotIndex)
 
 		metinSlot = []
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			metinSlot.append(self.inventoryItems[slotIndex]["socket"][i])
 
 		attrSlot = []
-		for j in xrange(player.ATTRIBUTE_SLOT_MAX_NUM):
+		for j in range(player.ATTRIBUTE_SLOT_MAX_NUM):
 			attrSlot.append((self.inventoryItems[slotIndex]["attr"][j][0], self.inventoryItems[slotIndex]["attr"][j][1]))
 
 		if self.tooltipItem:
@@ -400,15 +400,15 @@ class InventoryWindow(ui.ScriptWindow):
 	def OverInItemEquipment(self, slotIndex):
 		slotIndex -= 200
 		# chat.AppendChat(chat.CHAT_TYPE_INFO, "slotIndex: %d" % (slotIndex))
-		if not self.equipmentItems.has_key(slotIndex):
+		if not self.equipmentItems.__contains__(slotIndex):
 			return
 
 		metinSlot = []
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			metinSlot.append(self.equipmentItems[slotIndex]["socket"][i])
 
 		attrSlot = []
-		for j in xrange(player.ATTRIBUTE_SLOT_MAX_NUM):
+		for j in range(player.ATTRIBUTE_SLOT_MAX_NUM):
 			attrSlot.append((self.equipmentItems[slotIndex]["attr"][j][0], self.equipmentItems[slotIndex]["attr"][j][1]))
 
 		if self.tooltipItem:

@@ -237,7 +237,7 @@ def LoadSavedOptions():
 				[int(data[19]), int(data[20])],
 				[int(data[21]), int(data[22])],
 			]
-		except:
+		except BaseException:
 			RemoveLine(line)
 			continue
 
@@ -590,7 +590,7 @@ class BonusSelector(ui.Window):
 			type = item.GetItemType()
 			subtype = item.GetItemSubType()
 			use = proposals[type]
-		except:
+		except BaseException:
 			type = item.ITEM_TYPE_WEAPON
 			subtype = 1
 
@@ -671,7 +671,7 @@ class BonusSelector(ui.Window):
 			item.SelectItem(self.sub_parent.vnum)
 			type = item.GetItemType()
 			use = proposals[type]
-		except:
+		except BaseException:
 			type = item.ITEM_TYPE_WEAPON
 
 		if type == item.ITEM_TYPE_ARMOR:
@@ -751,7 +751,7 @@ class ItemTabBar(ui.ScriptWindow):
 		self.tabList[id].Destroy()
 		self.tabCount = self.tabCount -1
 		if self.tabCount > id and id < 5:
-			for i in xrange(id, self.tabCount):
+			for i in range(id, self.tabCount):
 				self.tabList[i] = self.tabList[i+1] 
 				self.tabList[i].tabnum = i
 				self.tabList[i].SetPosition((self.tabList[i].width + self.tabList[i].dist) * i, 2)
@@ -1264,7 +1264,7 @@ class Bot(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/boot_main.py")
-		except:
+		except BaseException:
 			pass
 
 ### Fechar ### Fechar ### Fechar ### Fechar ### Fechar ### Fechar ### Fechar ######
@@ -1510,7 +1510,7 @@ class Bot(ui.ScriptWindow):
 				try:
 					c.listWin2.SetColor(c.item.StatusBar_rare.color)
 					c.txt3.SetText("Status: %s" % c.item.StatusText_rare.GetText())
-				except:
+				except BaseException:
 					pass
 
 		def ShowMainWindow(self):
@@ -1736,7 +1736,7 @@ class DropDown(ui.Window):
 		def GetValueMax(self):
 			try:
 				return MAX_NUM_FOR_BONUS[self.value]
-			except:
+			except BaseException:
 				return 0
 
 		def OnSelectedRender(self):
@@ -2002,7 +2002,7 @@ class Edit2(ui.EditLine):
 		try:
 			self.Bmax = MAX_NUM_FOR_BONUS[number]
 			self.SetText(str(MAX_NUM_FOR_BONUS[number]))
-		except:
+		except BaseException:
 			self.Bmax = 0
 			self.SetText("0")
 
@@ -2116,7 +2116,7 @@ class BoxNotEdit(ui.Bar):
 	def SetMaxNumber(self, number):
 		try:
 			self.Line.SetText(str(MAX_NUM_FOR_BONUS_RARE[number]))
-		except:
+		except BaseException:
 			self.Line.SetText("0")
 
 #################################################################################################################################

@@ -1,18 +1,21 @@
 """Tests for distutils.sysconfig."""
+import contextlib
 import os
-import test
-import unittest
 import shutil
 import subprocess
 import sys
 import textwrap
+import unittest
 
 from distutils import sysconfig
+from distutils.ccompiler import get_default_compiler
 from distutils.tests import support
-from test.test_support import TESTFN
+from test.support import run_unittest, swap_item, requires_subprocess, is_wasi
+from test.support.os_helper import TESTFN
+from test.support.warnings_helper import check_warnings
 
-class SysconfigTestCase(support.EnvironGuard,
-                        unittest.TestCase):
+
+class SysconfigTestCase(support.EnvironGuard, unittest.TestCase):
     def setUp(self):
         super(SysconfigTestCase, self).setUp()
         self.makefile = None
@@ -24,34 +27,157 @@ class SysconfigTestCase(support.EnvironGuard,
         super(SysconfigTestCase, self).tearDown()
 
     def cleanup_testfn(self):
-        path = test.test_support.TESTFN
-        if os.path.isfile(path):
-            os.remove(path)
-        elif os.path.isdir(path):
-            shutil.rmtree(path)
+        if os.path.isfile(TESTFN):
+            os.remove(TESTFN)
+        elif os.path.isdir(TESTFN):
+            shutil.rmtree(TESTFN)
+
+    @unittest.skipIf(is_wasi, "Incompatible with WASI mapdir and OOT builds")
+    def test_get_config_h_filename(self):
+        config_h = sysconfig.get_config_h_filename()
+        self.assertTrue(os.path.isfile(config_h), config_h)
 
     def test_get_python_lib(self):
-        lib_dir = sysconfig.get_python_lib()
         # XXX doesn't work on Linux when Python was never installed before
         #self.assertTrue(os.path.isdir(lib_dir), lib_dir)
         # test for pythonxx.lib?
         self.assertNotEqual(sysconfig.get_python_lib(),
                             sysconfig.get_python_lib(prefix=TESTFN))
-        _sysconfig = __import__('sysconfig')
-        res = sysconfig.get_python_lib(True, True)
-        self.assertEqual(_sysconfig.get_path('platstdlib'), res)
 
-    def test_get_python_inc(self):
-        inc_dir = sysconfig.get_python_inc()
-        # This is not much of a test.  We make sure Python.h exists
-        # in the directory returned by get_python_inc() but we don't know
-        # it is the correct file.
-        self.assertTrue(os.path.isdir(inc_dir), inc_dir)
-        python_h = os.path.join(inc_dir, "Python.h")
-        self.assertTrue(os.path.isfile(python_h), python_h)
+    def test_get_config_vars(self):
+        cvars = sysconfig.get_config_vars()
+        self.assertIsInstance(cvars, dict)
+        self.assertTrue(cvars)
+
+    @unittest.skipIf(is_wasi, "Incompatible with WASI mapdir and OOT builds")
+    def test_srcdir(self):
+        # See Issues #15322, #15364.
+        srcdir = sysconfig.get_config_var('srcdir')
+
+        self.assertTrue(os.path.isabs(srcdir), srcdir)
+        self.assertTrue(os.path.isdir(srcdir), srcdir)
+
+        if sysconfig.python_build:
+            # The python executable has not been installed so srcdir
+            # should be a full source checkout.
+            Python_h = os.path.join(srcdir, 'Include', 'Python.h')
+            self.assertTrue(os.path.exists(Python_h), Python_h)
+            # <srcdir>/PC/pyconfig.h always exists even if unused on POSIX.
+            pyconfig_h = os.path.join(srcdir, 'PC', 'pyconfig.h')
+            self.assertTrue(os.path.exists(pyconfig_h), pyconfig_h)
+            pyconfig_h_in = os.path.join(srcdir, 'pyconfig.h.in')
+            self.assertTrue(os.path.exists(pyconfig_h_in), pyconfig_h_in)
+        elif os.name == 'posix':
+            self.assertEqual(
+                os.path.dirname(sysconfig.get_makefile_filename()),
+                srcdir)
+
+    def test_srcdir_independent_of_cwd(self):
+        # srcdir should be independent of the current working directory
+        # See Issues #15322, #15364.
+        srcdir = sysconfig.get_config_var('srcdir')
+        cwd = os.getcwd()
+        try:
+            os.chdir('..')
+            srcdir2 = sysconfig.get_config_var('srcdir')
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(srcdir, srcdir2)
+
+    def customize_compiler(self):
+        # make sure AR gets caught
+        class compiler:
+            compiler_type = 'unix'
+
+            def set_executables(self, **kw):
+                self.exes = kw
+
+        sysconfig_vars = {
+            'AR': 'sc_ar',
+            'CC': 'sc_cc',
+            'CXX': 'sc_cxx',
+            'ARFLAGS': '--sc-arflags',
+            'CFLAGS': '--sc-cflags',
+            'CCSHARED': '--sc-ccshared',
+            'LDSHARED': 'sc_ldshared',
+            'SHLIB_SUFFIX': 'sc_shutil_suffix',
+
+            # On macOS, disable _osx_support.customize_compiler()
+            'CUSTOMIZED_OSX_COMPILER': 'True',
+        }
+
+        comp = compiler()
+        with contextlib.ExitStack() as cm:
+            for key, value in sysconfig_vars.items():
+                cm.enter_context(swap_item(sysconfig._config_vars, key, value))
+            sysconfig.customize_compiler(comp)
+
+        return comp
+
+    @unittest.skipUnless(get_default_compiler() == 'unix',
+                         'not testing if default compiler is not unix')
+    def test_customize_compiler(self):
+        # Make sure that sysconfig._config_vars is initialized
+        sysconfig.get_config_vars()
+
+        os.environ['AR'] = 'env_ar'
+        os.environ['CC'] = 'env_cc'
+        os.environ['CPP'] = 'env_cpp'
+        os.environ['CXX'] = 'env_cxx --env-cxx-flags'
+        os.environ['LDSHARED'] = 'env_ldshared'
+        os.environ['LDFLAGS'] = '--env-ldflags'
+        os.environ['ARFLAGS'] = '--env-arflags'
+        os.environ['CFLAGS'] = '--env-cflags'
+        os.environ['CPPFLAGS'] = '--env-cppflags'
+
+        comp = self.customize_compiler()
+        self.assertEqual(comp.exes['archiver'],
+                         'env_ar --env-arflags')
+        self.assertEqual(comp.exes['preprocessor'],
+                         'env_cpp --env-cppflags')
+        self.assertEqual(comp.exes['compiler'],
+                         'env_cc --sc-cflags --env-cflags --env-cppflags')
+        self.assertEqual(comp.exes['compiler_so'],
+                         ('env_cc --sc-cflags '
+                          '--env-cflags ''--env-cppflags --sc-ccshared'))
+        self.assertEqual(comp.exes['compiler_cxx'],
+                         'env_cxx --env-cxx-flags')
+        self.assertEqual(comp.exes['linker_exe'],
+                         'env_cc')
+        self.assertEqual(comp.exes['linker_so'],
+                         ('env_ldshared --env-ldflags --env-cflags'
+                          ' --env-cppflags'))
+        self.assertEqual(comp.shared_lib_extension, 'sc_shutil_suffix')
+
+        del os.environ['AR']
+        del os.environ['CC']
+        del os.environ['CPP']
+        del os.environ['CXX']
+        del os.environ['LDSHARED']
+        del os.environ['LDFLAGS']
+        del os.environ['ARFLAGS']
+        del os.environ['CFLAGS']
+        del os.environ['CPPFLAGS']
+
+        comp = self.customize_compiler()
+        self.assertEqual(comp.exes['archiver'],
+                         'sc_ar --sc-arflags')
+        self.assertEqual(comp.exes['preprocessor'],
+                         'sc_cc -E')
+        self.assertEqual(comp.exes['compiler'],
+                         'sc_cc --sc-cflags')
+        self.assertEqual(comp.exes['compiler_so'],
+                         'sc_cc --sc-cflags --sc-ccshared')
+        self.assertEqual(comp.exes['compiler_cxx'],
+                         'sc_cxx')
+        self.assertEqual(comp.exes['linker_exe'],
+                         'sc_cc')
+        self.assertEqual(comp.exes['linker_so'],
+                         'sc_ldshared')
+        self.assertEqual(comp.shared_lib_extension, 'sc_shutil_suffix')
 
     def test_parse_makefile_base(self):
-        self.makefile = test.test_support.TESTFN
+        self.makefile = TESTFN
         fd = open(self.makefile, 'w')
         try:
             fd.write(r"CONFIG_ARGS=  '--arg1=optarg1' 'ENV=LIB'" '\n')
@@ -63,7 +189,7 @@ class SysconfigTestCase(support.EnvironGuard,
                              'OTHER': 'foo'})
 
     def test_parse_makefile_literal_dollar(self):
-        self.makefile = test.test_support.TESTFN
+        self.makefile = TESTFN
         fd = open(self.makefile, 'w')
         try:
             fd.write(r"CONFIG_ARGS=  '--arg1=optarg1' 'ENV=\$$LIB'" '\n')
@@ -77,10 +203,13 @@ class SysconfigTestCase(support.EnvironGuard,
 
     def test_sysconfig_module(self):
         import sysconfig as global_sysconfig
-        self.assertEqual(global_sysconfig.get_config_var('CFLAGS'), sysconfig.get_config_var('CFLAGS'))
-        self.assertEqual(global_sysconfig.get_config_var('LDFLAGS'), sysconfig.get_config_var('LDFLAGS'))
+        self.assertEqual(global_sysconfig.get_config_var('CFLAGS'),
+                         sysconfig.get_config_var('CFLAGS'))
+        self.assertEqual(global_sysconfig.get_config_var('LDFLAGS'),
+                         sysconfig.get_config_var('LDFLAGS'))
 
-    @unittest.skipIf(sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER'),'compiler flags customized')
+    @unittest.skipIf(sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER'),
+                     'compiler flags customized')
     def test_sysconfig_compiler_vars(self):
         # On OS X, binary installers support extension module building on
         # various levels of the operating system with differing Xcode
@@ -99,9 +228,12 @@ class SysconfigTestCase(support.EnvironGuard,
         import sysconfig as global_sysconfig
         if sysconfig.get_config_var('CUSTOMIZED_OSX_COMPILER'):
             self.skipTest('compiler flags customized')
-        self.assertEqual(global_sysconfig.get_config_var('LDSHARED'), sysconfig.get_config_var('LDSHARED'))
-        self.assertEqual(global_sysconfig.get_config_var('CC'), sysconfig.get_config_var('CC'))
+        self.assertEqual(global_sysconfig.get_config_var('LDSHARED'),
+                         sysconfig.get_config_var('LDSHARED'))
+        self.assertEqual(global_sysconfig.get_config_var('CC'),
+                         sysconfig.get_config_var('CC'))
 
+    @requires_subprocess()
     def test_customize_compiler_before_get_config_vars(self):
         # Issue #21923: test that a Distribution compiler
         # instance can be called without an explicit call to
@@ -124,9 +256,9 @@ class SysconfigTestCase(support.EnvironGuard,
 
 def test_suite():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(SysconfigTestCase))
+    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(SysconfigTestCase))
     return suite
 
 
 if __name__ == '__main__':
-    test.test_support.run_unittest(test_suite())
+    run_unittest(test_suite())

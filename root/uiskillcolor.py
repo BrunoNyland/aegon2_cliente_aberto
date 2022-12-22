@@ -117,19 +117,19 @@ class SkillColorWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/skillcolorwindow.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("SkillColorWindow.__LoadWindow.LoadScriptFile")
 
 		try:
 			self.__BindObject()
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("SkillColorWindow.__LoadWindow.__BindObject")
 
 		try:
 			self.__BindEvent()
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("SkillColorWindow.__LoadWindow.__BindEvent")
 
@@ -367,7 +367,7 @@ class SkillColorWindow(ui.ScriptWindow):
 		dictLen = len(colorPresetList)
 		self.colorPresetWindowHeight = dictLen * buttonHeight
 
-		for i in xrange(dictLen):
+		for i in range(dictLen):
 			key = i
 			button = ui.Button()
 			button.SetParent(self.bg2ColorPresetWindow)
@@ -634,7 +634,7 @@ class SkillColorWindow(ui.ScriptWindow):
 		rgbCode = (0, 0 ,0)
 		try:
 			rgbCode = tuple(int(strValue[i:i+int(lv/3)], 16) for i in range(0, lv, int(lv/3)))
-		except:
+		except BaseException:
 			pass
 
 		return rgbCode
@@ -689,7 +689,7 @@ class SkillColorWindow(ui.ScriptWindow):
 							self.toolTip.SetThinBoardSize(5 * arglen)
 							self.toolTip.AppendTextLine(toolTipText, 0xffffff00)
 							self.toolTip.Show()
-						except:
+						except BaseException:
 							return 
 					else:
 						self.toolTip.Hide()

@@ -85,7 +85,7 @@ class WhisperDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/whisperdialog.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("WhisperDialog.LoadDialog.LoadScript")
 
@@ -108,7 +108,7 @@ class WhisperDialog(ui.ScriptWindow):
 				emojisBoard.SetParent(self.board)
 				self.emojisBoard = emojisBoard
 
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("DialogWindow.LoadDialog.BindObject")
 
@@ -293,7 +293,7 @@ class WhisperDialog(ui.ScriptWindow):
 			self.closeButton.SetPosition(width - 34, 8)
 			self.SetChatLineMax(int(max))
 
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("WhisperDialog.SetWhisperDialogSize.BindObject")
 
@@ -324,7 +324,7 @@ class WhisperDialog(ui.ScriptWindow):
 			self.ResizeWhisperDialog()
 
 		if loadMessages:
-			if constinfo.WHISPER_MESSAGES.has_key(targetName):
+			if constinfo.WHISPER_MESSAGES.__contains__(targetName):
 				for text in constinfo.WHISPER_MESSAGES[targetName]:
 					chat.AppendWhisper(text[0], targetName, text[1])
 
@@ -381,7 +381,7 @@ class WhisperDialog(ui.ScriptWindow):
 			self.titleNameEdit.KillFocus()
 			self.eventAcceptTarget(name)
 
-		if constinfo.WHISPER_MESSAGES.has_key(name):
+		if constinfo.WHISPER_MESSAGES.__contains__(name):
 			for text in constinfo.WHISPER_MESSAGES[name]:
 				chat.AppendWhisper(text[0], name, text[1])
 
@@ -418,7 +418,7 @@ class WhisperDialog(ui.ScriptWindow):
 
 			links = {}
 			if self.GetLinks(text, links):
-				for k,v in links.iteritems():
+				for k,v in links.items():
 					text = text.replace(k, v)
 
 			net.SendWhisperPacket(self.targetName, text)
@@ -430,7 +430,7 @@ class WhisperDialog(ui.ScriptWindow):
 
 			self.chatLine.SetText("")
 
-			if not constinfo.WHISPER_MESSAGES.has_key(self.targetName):
+			if not constinfo.WHISPER_MESSAGES.__contains__(self.targetName):
 				constinfo.WHISPER_MESSAGES.update({self.targetName : [(1, ("{}: {}".format(player.GetName(), text)))]})
 			else:
 				constinfo.WHISPER_MESSAGES[self.targetName].append([1, "{}: {}".format(player.GetName(), text)])

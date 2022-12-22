@@ -125,7 +125,7 @@ class GameOptions(ui.ScriptWindow):
 		self.WindowModeButtonList[i].Fill()
 # MONTA A LISTA DE RESOLUCOES DISPONIVEIS
 		self.RESOLUTION_CONT = systemSetting.GetResolutionCount()
-		for i in xrange(self.RESOLUTION_CONT):
+		for i in range(self.RESOLUTION_CONT):
 			width, height, bpp = systemSetting.GetResolution(i)
 			if bpp == 32:
 				self.RESOLUTION_LIST.append(systemSetting.GetResolution(i))
@@ -135,7 +135,7 @@ class GameOptions(ui.ScriptWindow):
 # BUSCA NA LISTA DE RESOLUCOES A RESOLUCAO CORRENTE
 		resolution_index = -1
 		len_res = len(self.RESOLUTION_LIST)
-		for i in xrange(len_res):
+		for i in range(len_res):
 			w, h, b = self.RESOLUTION_LIST[i]
 			if w == self.cur_width and h == self.cur_height:
 				resolution_index = i
@@ -232,37 +232,37 @@ class GameOptions(ui.ScriptWindow):
 
 		self.BlockExchangeButtonList.append(self.GetChild("BlockExchange_off_button"))
 		self.BlockExchangeButtonList.append(self.GetChild("BlockExchange_on_button"))
-		for i in xrange(len(self.BlockExchangeButtonList)):
+		for i in range(len(self.BlockExchangeButtonList)):
 			self.BlockExchangeButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_EXCHANGE)
 
 		self.BlockPartyButtonList.append(self.GetChild("BlockParty_off_button"))
 		self.BlockPartyButtonList.append(self.GetChild("BlockParty_on_button"))
-		for i in xrange(len(self.BlockPartyButtonList)):
+		for i in range(len(self.BlockPartyButtonList)):
 			self.BlockPartyButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_PARTY)
 
 		self.BlockGuildButtonList.append(self.GetChild("BlockGuild_off_button"))
 		self.BlockGuildButtonList.append(self.GetChild("BlockGuild_on_button"))
-		for i in xrange(len(self.BlockGuildButtonList)):
+		for i in range(len(self.BlockGuildButtonList)):
 			self.BlockGuildButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_GUILD)
 
 		self.BlockWhisperButtonList.append(self.GetChild("BlockWhisper_off_button"))
 		self.BlockWhisperButtonList.append(self.GetChild("BlockWhisper_on_button"))
-		for i in xrange(len(self.BlockWhisperButtonList)): 
+		for i in range(len(self.BlockWhisperButtonList)): 
 			self.BlockWhisperButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_WHISPER)
 
 		self.BlockFriendButtonList.append(self.GetChild("BlockFriend_off_button"))
 		self.BlockFriendButtonList.append(self.GetChild("BlockFriend_on_button"))
-		for i in xrange(len(self.BlockFriendButtonList)):
+		for i in range(len(self.BlockFriendButtonList)):
 			self.BlockFriendButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_FRIEND)
 
 		self.BlockPartyRequestButtonList.append(self.GetChild("BlockPartyRequest_off_button"))
 		self.BlockPartyRequestButtonList.append(self.GetChild("BlockPartyRequest_on_button"))
-		for i in xrange(len(self.BlockPartyRequestButtonList)):
+		for i in range(len(self.BlockPartyRequestButtonList)):
 			self.BlockPartyRequestButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_PARTY_REQUEST)
 
 		self.BlockVerSetButtonList.append(self.GetChild("VerSet_off_button"))
 		self.BlockVerSetButtonList.append(self.GetChild("VerSet_on_button"))
-		for i in xrange(len(self.BlockVerSetButtonList)):
+		for i in range(len(self.BlockVerSetButtonList)):
 			self.BlockVerSetButtonList[i].SetEvent(self.__OnClickBlock, player.BLOCK_VIEW_EQUIPMENT)
 
 		self.blockButtonList.append(self.BlockExchangeButtonList)
@@ -280,7 +280,7 @@ class GameOptions(ui.ScriptWindow):
 	# INICILIZAR NA ABA AUDIO
 ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS ### BLOQUEIOS 
 	def RefreshBlock(self):
-		for i in xrange(len(self.blockButtonList)):
+		for i in range(len(self.blockButtonList)):
 			if 0 != (constinfo.blockMode & (1 << i)):
 				self.blockButtonList[i][1].Empty()
 				self.blockButtonList[i][0].Fill()
@@ -329,7 +329,7 @@ class GameOptions(ui.ScriptWindow):
 	def __SetPKMode(self, mode):
 		for btn in self.pvpModeButtonDict.values():
 			btn.Empty()
-		if self.pvpModeButtonDict.has_key(mode):
+		if self.pvpModeButtonDict.__contains__(mode):
 			self.pvpModeButtonDict[mode].Fill()
 
 	def __SetPeacePKMode(self):
@@ -480,7 +480,7 @@ class GameOptions(ui.ScriptWindow):
 	def ReLoad_3D_Settings(self):
 		self.RESOLUTION_LIST = []
 		self.RESOLUTION_CONT = systemSetting.GetResolutionCount()
-		for i in xrange(self.RESOLUTION_CONT):
+		for i in range(self.RESOLUTION_CONT):
 			width, height, bpp = systemSetting.GetResolution(i)
 			if bpp == 32 and width > 800:
 				self.RESOLUTION_LIST.append(systemSetting.GetResolution(i))
@@ -492,7 +492,7 @@ class GameOptions(ui.ScriptWindow):
 # BUSCA NA LISTA DE RESOLUCOES A RESOLUCAO CORRENTE
 		resolution_index = -1
 		len_res = len(self.RESOLUTION_LIST)
-		for i in xrange(len_res):
+		for i in range(len_res):
 			w, h, b = self.RESOLUTION_LIST[i]
 			if w == self.cur_width and h == self.cur_height:
 				resolution_index = i
@@ -659,7 +659,7 @@ class GameOptions(ui.ScriptWindow):
 	def SetState(self, stateKey):
 		self.state = stateKey
 
-		for pageValue in self.pageDict.itervalues():
+		for pageValue in self.pageDict.values():
 			pageValue.Hide()
 		self.pageDict[stateKey].Show()
 

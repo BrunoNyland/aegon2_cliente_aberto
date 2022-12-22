@@ -1,8 +1,3 @@
-# NOTE: this file tests the new `io` library backported from Python 3.x.
-# Similar tests for the builtin file object can be found in test_file2k.py.
-
-from __future__ import print_function
-
 import sys
 import os
 import unittest
@@ -12,11 +7,13 @@ from weakref import proxy
 import io
 import _pyio as pyio
 
-from test.support import TESTFN, run_unittest
-from test import support
-from UserList import UserList
+from test.support import gc_collect
+from test.support.os_helper import TESTFN
+from test.support import os_helper
+from test.support import warnings_helper
+from collections import UserList
 
-class AutoFileTests(unittest.TestCase):
+class AutoFileTests:
     # file tests for which a test file is automatically set up
 
     def setUp(self):
@@ -25,7 +22,7 @@ class AutoFileTests(unittest.TestCase):
     def tearDown(self):
         if self.f:
             self.f.close()
-        support.unlink(TESTFN)
+        os_helper.unlink(TESTFN)
 
     def testWeakRefs(self):
         # verify weak references
@@ -34,6 +31,7 @@ class AutoFileTests(unittest.TestCase):
         self.assertEqual(self.f.tell(), p.tell())
         self.f.close()
         self.f = None
+        gc_collect()  # For PyPy or other GCs.
         self.assertRaises(ReferenceError, getattr, p, 'tell')
 
     def testAttributes(self):
@@ -50,13 +48,13 @@ class AutoFileTests(unittest.TestCase):
         a = array('b', b'x'*10)
         self.f = self.open(TESTFN, 'rb')
         n = self.f.readinto(a)
-        self.assertEqual(b'12', a.tostring()[:n])
+        self.assertEqual(b'12', a.tobytes()[:n])
 
     def testReadinto_text(self):
         # verify readinto refuses text files
         a = array('b', b'x'*10)
         self.f.close()
-        self.f = self.open(TESTFN, 'r')
+        self.f = self.open(TESTFN, encoding="utf-8")
         if hasattr(self.f, "readinto"):
             self.assertRaises(TypeError, self.f.readinto, a)
 
@@ -93,7 +91,7 @@ class AutoFileTests(unittest.TestCase):
         self.assertFalse(f.closed)
 
         if hasattr(f, "readinto"):
-            self.assertRaises((IOError, TypeError), f.readinto, "")
+            self.assertRaises((OSError, TypeError), f.readinto, "")
         f.close()
         self.assertTrue(f.closed)
 
@@ -101,7 +99,7 @@ class AutoFileTests(unittest.TestCase):
         methods = [('fileno', ()),
                    ('flush', ()),
                    ('isatty', ()),
-                   ('next', ()),
+                   ('__next__', ()),
                    ('read', ()),
                    ('write', (b"",)),
                    ('readline', ()),
@@ -112,8 +110,7 @@ class AutoFileTests(unittest.TestCase):
                    ('writelines', ([],)),
                    ('__iter__', ()),
                    ]
-        if not sys.platform.startswith('atheos'):
-            methods.append(('truncate', ()))
+        methods.append(('truncate', ()))
 
         # __exit__ should close the file
         self.f.__exit__(None, None, None)
@@ -128,29 +125,29 @@ class AutoFileTests(unittest.TestCase):
         self.assertEqual(self.f.__exit__(None, None, None), None)
         # it must also return None if an exception was given
         try:
-            1 // 0
+            1/0
         except:
             self.assertEqual(self.f.__exit__(*sys.exc_info()), None)
 
     def testReadWhenWriting(self):
-        self.assertRaises(IOError, self.f.read)
+        self.assertRaises(OSError, self.f.read)
 
-class CAutoFileTests(AutoFileTests):
+class CAutoFileTests(AutoFileTests, unittest.TestCase):
     open = io.open
 
-class PyAutoFileTests(AutoFileTests):
+class PyAutoFileTests(AutoFileTests, unittest.TestCase):
     open = staticmethod(pyio.open)
 
 
-class OtherFileTests(unittest.TestCase):
+class OtherFileTests:
 
     def tearDown(self):
-        support.unlink(TESTFN)
+        os_helper.unlink(TESTFN)
 
     def testModeStrings(self):
         # check invalid mode strings
         self.open(TESTFN, 'wb').close()
-        for mode in ("", "aU", "wU+"):
+        for mode in ("", "aU", "wU+", "U+", "+U", "rU+"):
             try:
                 f = self.open(TESTFN, mode)
             except ValueError:
@@ -158,6 +155,22 @@ class OtherFileTests(unittest.TestCase):
             else:
                 f.close()
                 self.fail('%r is an invalid file mode' % mode)
+
+    def testStdin(self):
+        if sys.platform == 'osf1V5':
+            # This causes the interpreter to exit on OSF1 v5.1.
+            self.skipTest(
+                ' sys.stdin.seek(-1) may crash the interpreter on OSF1.'
+                ' Test manually.')
+
+        if not sys.stdin.isatty():
+            # Issue 14853: stdin becomes seekable when redirected to a file
+            self.skipTest('stdin must be a TTY in this test')
+
+        with self.assertRaises((IOError, ValueError)):
+            sys.stdin.seek(-1)
+        with self.assertRaises((IOError, ValueError)):
+            sys.stdin.truncate()
 
     def testBadModeArgument(self):
         # verify that we get a sensible error message for bad mode argument
@@ -175,22 +188,33 @@ class OtherFileTests(unittest.TestCase):
             f.close()
             self.fail("no error for invalid mode: %s" % bad_mode)
 
+    def _checkBufferSize(self, s):
+        try:
+            f = self.open(TESTFN, 'wb', s)
+            f.write(str(s).encode("ascii"))
+            f.close()
+            f.close()
+            f = self.open(TESTFN, 'rb', s)
+            d = int(f.read().decode("ascii"))
+            f.close()
+            f.close()
+        except OSError as msg:
+            self.fail('error setting buffer size %d: %s' % (s, str(msg)))
+        self.assertEqual(d, s)
+
     def testSetBufferSize(self):
         # make sure that explicitly setting the buffer size doesn't cause
         # misbehaviour especially with repeated close() calls
-        for s in (-1, 0, 1, 512):
-            try:
-                f = self.open(TESTFN, 'wb', s)
-                f.write(str(s).encode("ascii"))
-                f.close()
-                f.close()
-                f = self.open(TESTFN, 'rb', s)
-                d = int(f.read().decode("ascii"))
-                f.close()
-                f.close()
-            except IOError as msg:
-                self.fail('error setting buffer size %d: %s' % (s, str(msg)))
-            self.assertEqual(d, s)
+        for s in (-1, 0, 512):
+            with warnings_helper.check_no_warnings(self,
+                                           message='line buffering',
+                                           category=RuntimeWarning):
+                self._checkBufferSize(s)
+
+        # test that attempts to use line buffering in binary mode cause
+        # a warning
+        with self.assertWarnsRegex(RuntimeWarning, 'line buffering'):
+            self._checkBufferSize(1)
 
     def testTruncateOnWindows(self):
         # SF bug <http://www.python.org/sf/801631>
@@ -278,7 +302,7 @@ class OtherFileTests(unittest.TestCase):
         except ValueError:
             self.fail("readinto() after next() with supposedly empty "
                         "iteration-buffer failed anyway")
-        line = buf.tostring()
+        line = buf.tobytes()
         if line != testline:
             self.fail("readinto() after next() with empty buffer "
                         "failed. Got %r, expected %r" % (line, testline))
@@ -300,8 +324,9 @@ class OtherFileTests(unittest.TestCase):
         if lines != testlines:
             self.fail("readlines() after next() with empty buffer "
                         "failed. Got %r, expected %r" % (line, testline))
-        # Reading after iteration hit EOF shouldn't hurt either
         f.close()
+
+        # Reading after iteration hit EOF shouldn't hurt either
         f = self.open(TESTFN, 'rb')
         try:
             for line in f:
@@ -316,16 +341,12 @@ class OtherFileTests(unittest.TestCase):
         finally:
             f.close()
 
-class COtherFileTests(OtherFileTests):
+class COtherFileTests(OtherFileTests, unittest.TestCase):
     open = io.open
 
-class PyOtherFileTests(OtherFileTests):
+class PyOtherFileTests(OtherFileTests, unittest.TestCase):
     open = staticmethod(pyio.open)
 
 
-def test_main():
-    run_unittest(CAutoFileTests, PyAutoFileTests,
-                 COtherFileTests, PyOtherFileTests)
-
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

@@ -1,5 +1,5 @@
 import unittest
-from test.support import cpython_only
+import test.support
 from ctypes import *
 
 class AnonTest(unittest.TestCase):
@@ -36,7 +36,7 @@ class AnonTest(unittest.TestCase):
                                                       {"_fields_": [],
                                                        "_anonymous_": ["x"]}))
 
-    @cpython_only
+    @test.support.cpython_only
     def test_issue31490(self):
         # There shouldn't be an assertion failure in case the class has an
         # attribute whose name is specified in _anonymous_ but not in _fields_.

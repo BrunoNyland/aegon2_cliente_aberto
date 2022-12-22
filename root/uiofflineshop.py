@@ -168,7 +168,7 @@ class OfflineShopAddItemWindow(ui.ScriptWindow):
 
 	def Refresh(self):
 		net.SendRefreshOfflineShop()
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -322,7 +322,7 @@ class OfflineShopAddItemWindow(ui.ScriptWindow):
 			self.tooltipItem.HideToolTip()
 
 	def OnUpdate(self):
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -347,7 +347,7 @@ class OfflineShopRemoveItemWindow(ui.ScriptWindow):
 	def Refresh(self):
 		net.SendRefreshOfflineShop()
 		iCount = 0
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			if (shop.GetOfflineShopItemID(i) == -842150451):
 				iCount = iCount + 1
 
@@ -355,7 +355,7 @@ class OfflineShopRemoveItemWindow(ui.ScriptWindow):
 			chat.AppendChat(chat.CHAT_TYPE_INFO, "Você não tem nada na loja offline no momento.")
 			return
 
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -479,7 +479,7 @@ class OfflineShopRemoveItemWindow(ui.ScriptWindow):
 			self.tooltipItem.HideToolTip()
 
 	def OnUpdate(self):
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -574,7 +574,7 @@ class OfflineShopChangePriceWindow(ui.ScriptWindow):
 
 	def Refresh(self):
 		net.SendRefreshOfflineShop()
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -713,7 +713,7 @@ class OfflineShopChangePriceWindow(ui.ScriptWindow):
 			self.tooltipItem.HideToolTip()
 
 	def OnUpdate(self):
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 			itemCount = shop.GetOfflineShopItemCount(i)
 			if (itemCount <= 1):
 				itemCount = 0
@@ -786,13 +786,13 @@ class OfflineShopDialog(ui.ScriptWindow):
 
 	def Refresh(self):
 		try:
-			for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
+			for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
 				itemCount = shop.GetOfflineShopItemCount(i)
 				if (itemCount <= 1):
 					itemCount = 0
 				self.itemSlotWindow.SetItemSlot(i, shop.GetOfflineShopItemID(i), itemCount)
 			wndMgr.RefreshSlot(self.itemSlotWindow.GetWindowHandle())
-		except:
+		except BaseException:
 			pass
 
 	def LoadDialog(self):

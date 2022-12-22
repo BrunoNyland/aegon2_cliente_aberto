@@ -87,7 +87,7 @@ class ExchangeDialog(ui.ScriptWindow):
 			self.GetChild("owner_face").SetOverVisual(self.faces_on + self.FACE_IMAGE_DICT[race])
 			self.GetChild("owner_face").SetDownVisual(self.faces_on + self.FACE_IMAGE_DICT[race])
 			self.GetChild("owner_face").SetEvent(self.interface.ToggleInventoryWindow)
-		except:
+		except BaseException:
 			pass
 
 		if characterName == "":
@@ -125,7 +125,7 @@ class ExchangeDialog(ui.ScriptWindow):
 			self.GetChild("target_face").SetUpVisual(self.faces + self.FACE_IMAGE_DICT[race])
 			self.GetChild("target_face").SetOverVisual(self.faces_on + self.FACE_IMAGE_DICT[race])
 			self.GetChild("target_face").SetDownVisual(self.faces_on + self.FACE_IMAGE_DICT[race])
-		except:
+		except BaseException:
 			pass
 
 		self.GetChild("target_face").SetEvent(self.interface.OpenWhisperDialog, str(exchange.GetNameFromTarget()))
@@ -234,7 +234,7 @@ class ExchangeDialog(ui.ScriptWindow):
 		mousemodule.mouseController.DeattachObject()
 
 	def RefreshOwnerSlot(self):
-		for i in xrange(exchange.EXCHANGE_ITEM_MAX_NUM):
+		for i in range(exchange.EXCHANGE_ITEM_MAX_NUM):
 			itemIndex = exchange.GetItemVnumFromSelf(i)
 			itemCount = exchange.GetItemCountFromSelf(i)
 			if itemCount == 1:
@@ -243,7 +243,7 @@ class ExchangeDialog(ui.ScriptWindow):
 		self.OwnerSlot.RefreshSlot()
 
 	def RefreshTargetSlot(self):
-		for i in xrange(exchange.EXCHANGE_ITEM_MAX_NUM):
+		for i in range(exchange.EXCHANGE_ITEM_MAX_NUM):
 			itemIndex = exchange.GetItemVnumFromTarget(i)
 			itemCount = exchange.GetItemCountFromTarget(i)
 			if itemCount == 1:

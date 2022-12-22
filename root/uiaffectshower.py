@@ -57,7 +57,7 @@ class LovePointImage(ui.ExpandedImageBox):
 
 		try:
 			self.LoadImage(fileName)
-		except:
+		except BaseException:
 			dbg.TraceError("LovePointImage.SetLoverInfo(lovePoint=%d) - LoadError %s" % (self.lovePoint, fileName))
 
 		# self.SetScale(0.7, 0.7)
@@ -134,7 +134,7 @@ class HorseImage(ui.ExpandedImageBox):
 
 			try:
 				self.LoadImage(fileName)
-			except:
+			except BaseException:
 				print("HorseImage.SetState(level=%d, health=%d, battery=%d) - LoadError %s" % (level, health, battery, fileName))
 
 		# self.SetScale(0.7, 0.7)
@@ -389,7 +389,7 @@ class AffectShower(ui.Window):
 				self.living_affectImageDict[key] = image
 
 		for aff in self.affectList:
-			if not self.living_affectImageDict.has_key(aff):
+			if not self.living_affectImageDict.__contains__(aff):
 				self.affectList.remove(aff)
 
 		self.affectImageDict = self.living_affectImageDict
@@ -408,10 +408,10 @@ class AffectShower(ui.Window):
 		else:
 			affect = type
 
-		if self.affectImageDict.has_key(affect):
+		if self.affectImageDict.__contains__(affect):
 			return
 
-		if not self.AFFECT_DATA_DICT.has_key(affect):
+		if not self.AFFECT_DATA_DICT.__contains__(affect):
 			return
 
 		if affect == chr.NEW_AFFECT_NO_DEATH_PENALTY or\
@@ -428,7 +428,7 @@ class AffectShower(ui.Window):
 		if affect != chr.NEW_AFFECT_AUTO_SP_RECOVERY and affect != chr.NEW_AFFECT_AUTO_HP_RECOVERY and not (app.ENABLE_AFFECT_POLYMORPH_REMOVE and affect == chr.NEW_AFFECT_POLYMORPH):
 			try:
 				description = description(float(value))
-			except:
+			except BaseException:
 				pass
 
 		try:
@@ -519,10 +519,10 @@ class AffectShower(ui.Window):
 		self.clientPlayTime = app.GetTime()
 
 	def __AppendAffect(self, affect):
-		if self.affectImageDict.has_key(affect):
+		if self.affectImageDict.__contains__(affect):
 			return
 
-		if not self.AFFECT_DATA_DICT.has_key(affect):
+		if not self.AFFECT_DATA_DICT.__contains__(affect):
 			return
 
 		name = self.AFFECT_DATA_DICT[affect][0]
@@ -541,7 +541,7 @@ class AffectShower(ui.Window):
 
 		try:
 			image.LoadImage(filename)
-		except:
+		except BaseException:
 			pass
 
 		image.SetToolTipText(name, 0, 40)
@@ -551,7 +551,7 @@ class AffectShower(ui.Window):
 		self.affectList.append(affect)
 
 	def __RemoveAffect(self, affect):
-		if not self.affectImageDict.has_key(affect):
+		if not self.affectImageDict.__contains__(affect):
 			return
 
 		del self.affectImageDict[affect]
@@ -582,7 +582,7 @@ class AffectShower(ui.Window):
 			xPos += self.IMAGE_STEP
 
 		for aff in self.affectList:
-			if self.affectImageDict.has_key(aff):
+			if self.affectImageDict.__contains__(aff):
 				self.affectImageDict[aff].SetPosition(xPos, 0)
 				xPos += self.IMAGE_STEP
 

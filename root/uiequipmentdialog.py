@@ -63,9 +63,9 @@ class EquipmentDialog(ui.ScriptWindow):
 
 		emptySocketList = []
 		emptyAttrList = []
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			emptySocketList.append(0)
-		for i in xrange(player.ATTRIBUTE_SLOT_MAX_NUM):
+		for i in range(player.ATTRIBUTE_SLOT_MAX_NUM):
 			emptyAttrList.append((0, 0))
 		self.itemDataDict[slotIndex] = (vnum, count, emptySocketList, emptyAttrList)
 

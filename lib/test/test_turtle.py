@@ -1,8 +1,11 @@
 import pickle
 import unittest
-from test import test_support as support
+from test import support
+from test.support import import_helper
+from test.support import os_helper
 
-turtle = support.import_module('turtle')
+
+turtle = import_helper.import_module('turtle')
 Vec2D = turtle.Vec2D
 
 test_config = """\
@@ -50,10 +53,10 @@ visible = False
 class TurtleConfigTest(unittest.TestCase):
 
     def get_cfg_file(self, cfg_str):
-        self.addCleanup(support.unlink, support.TESTFN)
-        with open(support.TESTFN, 'w') as f:
+        self.addCleanup(os_helper.unlink, os_helper.TESTFN)
+        with open(os_helper.TESTFN, 'w') as f:
             f.write(cfg_str)
-        return support.TESTFN
+        return os_helper.TESTFN
 
     def test_config_dict(self):
 
@@ -85,7 +88,7 @@ class TurtleConfigTest(unittest.TestCase):
 
         self.assertEqual(parsed_cfg, expected)
 
-    def test_partial_config_dict_with_commments(self):
+    def test_partial_config_dict_with_comments(self):
 
         cfg_name = self.get_cfg_file(test_config_two)
         parsed_cfg = turtle.config_dict(cfg_name)
@@ -127,6 +130,14 @@ class VectorComparisonMixin:
             self.assertAlmostEqual(
                 i, j, msg='values at index {} do not match'.format(idx))
 
+class Multiplier:
+
+    def __mul__(self, other):
+        return f'M*{other}'
+
+    def __rmul__(self, other):
+        return f'{other}*M'
+
 
 class TestVec2D(VectorComparisonMixin, unittest.TestCase):
 
@@ -159,23 +170,26 @@ class TestVec2D(VectorComparisonMixin, unittest.TestCase):
     def test_pickling(self):
         vec = Vec2D(0.5, 2)
         for proto in range(pickle.HIGHEST_PROTOCOL + 1):
-            pickled = pickle.dumps(vec, protocol=proto)
-            unpickled = pickle.loads(pickled)
-            self.assertEqual(unpickled, vec)
-            self.assertIsInstance(unpickled, Vec2D)
+            with self.subTest(proto=proto):
+                pickled = pickle.dumps(vec, protocol=proto)
+                unpickled = pickle.loads(pickled)
+                self.assertEqual(unpickled, vec)
+                self.assertIsInstance(unpickled, Vec2D)
 
     def _assert_arithmetic_cases(self, test_cases, lambda_operator):
         for test_case in test_cases:
-            ((first, second), expected) = test_case
+            with self.subTest(case=test_case):
 
-            op1 = Vec2D(*first)
-            op2 = Vec2D(*second)
+                ((first, second), expected) = test_case
 
-            result = lambda_operator(op1, op2)
+                op1 = Vec2D(*first)
+                op2 = Vec2D(*second)
 
-            expected = Vec2D(*expected)
+                result = lambda_operator(op1, op2)
 
-            self.assertVectorsAlmostEqual(result, expected)
+                expected = Vec2D(*expected)
+
+                self.assertVectorsAlmostEqual(result, expected)
 
     def test_vector_addition(self):
 
@@ -205,9 +219,15 @@ class TestVec2D(VectorComparisonMixin, unittest.TestCase):
         self.assertAlmostEqual(answer, expected)
 
         vec = Vec2D(0.5, 3)
-        answer = vec * 10
         expected = Vec2D(5, 30)
-        self.assertVectorsAlmostEqual(answer, expected)
+        self.assertVectorsAlmostEqual(vec * 10, expected)
+        self.assertVectorsAlmostEqual(10 * vec, expected)
+        self.assertVectorsAlmostEqual(vec * 10.0, expected)
+        self.assertVectorsAlmostEqual(10.0 * vec, expected)
+
+        M = Multiplier()
+        self.assertEqual(vec * M, Vec2D(f"{vec[0]}*M", f"{vec[1]}*M"))
+        self.assertEqual(M * vec, f'M*{vec}')
 
     def test_vector_negative(self):
         vec = Vec2D(10, -10)
@@ -215,17 +235,9 @@ class TestVec2D(VectorComparisonMixin, unittest.TestCase):
         self.assertVectorsAlmostEqual(-vec, expected)
 
     def test_distance(self):
-        vec = Vec2D(6, 8)
-        expected = 10
-        self.assertEqual(abs(vec), expected)
-
-        vec = Vec2D(0, 0)
-        expected = 0
-        self.assertEqual(abs(vec), expected)
-
-        vec = Vec2D(2.5, 6)
-        expected = 6.5
-        self.assertEqual(abs(vec), expected)
+        self.assertAlmostEqual(abs(Vec2D(6, 8)), 10)
+        self.assertEqual(abs(Vec2D(0, 0)), 0)
+        self.assertAlmostEqual(abs(Vec2D(2.5, 6)), 6.5)
 
     def test_rotate(self):
 
@@ -238,10 +250,11 @@ class TestVec2D(VectorComparisonMixin, unittest.TestCase):
         ]
 
         for case in cases:
-            (vec, rot), expected = case
-            vec = Vec2D(*vec)
-            got = vec.rotate(rot)
-            self.assertVectorsAlmostEqual(got, expected)
+            with self.subTest(case=case):
+                (vec, rot), expected = case
+                vec = Vec2D(*vec)
+                got = vec.rotate(rot)
+                self.assertVectorsAlmostEqual(got, expected)
 
 
 class TestTNavigator(VectorComparisonMixin, unittest.TestCase):
@@ -428,8 +441,5 @@ class TestTPen(unittest.TestCase):
         self.assertTrue(tpen.isvisible())
 
 
-def test_main():
-    support.run_unittest(TurtleConfigTest, TestVec2D, TestTNavigator, TestTPen)
-
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

@@ -55,7 +55,7 @@ def UpdateADBoard():
 		g_privateShopAdvertisementBoardDict[key].Show()
 
 def DeleteADBoard(vid):
-	if not g_privateShopAdvertisementBoardDict.has_key(vid):
+	if not g_privateShopAdvertisementBoardDict.__contains__(vid):
 		return
 	del g_privateShopAdvertisementBoardDict[vid]
 
@@ -132,7 +132,7 @@ class PrivateShopBuilder(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/privateshopbuilder.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PrivateShopBuilderWindow.LoadWindow.LoadObject")
 
@@ -143,7 +143,7 @@ class PrivateShopBuilder(ui.ScriptWindow):
 			self.btnOk = GetObject("OkButton")
 			self.btnClose = GetObject("CloseButton")
 			self.board = GetObject("board")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PrivateShopBuilderWindow.LoadWindow.BindObject")
 
@@ -218,9 +218,9 @@ class PrivateShopBuilder(ui.ScriptWindow):
 		setitemVNum=self.itemSlot.SetItemSlot
 		delItem=self.itemSlot.ClearSlot
 
-		for i in xrange(shop.SHOP_SLOT_COUNT):
+		for i in range(shop.SHOP_SLOT_COUNT):
 
-			if not self.itemStock.has_key(i):
+			if not self.itemStock.__contains__(i):
 				delItem(i)
 				continue
 
@@ -369,7 +369,7 @@ class PrivateShopBuilder(ui.ScriptWindow):
 	def OnOverInItem(self, slotIndex):
 
 		if self.tooltipItem:
-			if self.itemStock.has_key(slotIndex):
+			if self.itemStock.__contains__(slotIndex):
 				self.tooltipItem.SetPrivateShopBuilderItem(*self.itemStock[slotIndex] + (slotIndex,))
 
 	def OnOverOutItem(self):

@@ -35,7 +35,7 @@ class ShopDialog(ui.ScriptWindow):
 		getItemID=shop.GetItemID
 		getItemCount=shop.GetItemCount
 		setItemID=self.itemSlotWindow.SetItemSlot
-		for i in xrange(shop.SHOP_SLOT_COUNT):
+		for i in range(shop.SHOP_SLOT_COUNT):
 			itemCount = getItemCount(i)
 			if itemCount <= 1:
 				itemCount = 0
@@ -49,7 +49,7 @@ class ShopDialog(ui.ScriptWindow):
 		try:
 			PythonScriptLoader = ui.PythonScriptLoader()
 			PythonScriptLoader.LoadScriptFile(self, "uiscript/shopdialog.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ShopDialog.LoadDialog.LoadObject")
 
@@ -61,7 +61,7 @@ class ShopDialog(ui.ScriptWindow):
 			self.btnClose = GetObject("CloseButton")
 			self.board = GetObject("board")
 			self.AmountOnOff = GetObject("AmountButton")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("ShopDialog.LoadDialog.BindObject")
 

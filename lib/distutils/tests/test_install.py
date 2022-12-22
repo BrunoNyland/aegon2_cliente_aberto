@@ -5,10 +5,10 @@ import sys
 import unittest
 import site
 
-from test.test_support import captured_stdout, run_unittest
+from test.support import captured_stdout, run_unittest, requires_subprocess
 
 from distutils import sysconfig
-from distutils.command.install import install
+from distutils.command.install import install, HAS_USER_SITE
 from distutils.command import install as install_module
 from distutils.command.build_ext import build_ext
 from distutils.command.install import INSTALL_SCHEMES
@@ -17,18 +17,26 @@ from distutils.errors import DistutilsOptionError
 from distutils.extension import Extension
 
 from distutils.tests import support
+from test import support as test_support
 
 
 def _make_ext_name(modname):
-    if os.name == 'nt' and sys.executable.endswith('_d.exe'):
-        modname += '_d'
-    return modname + sysconfig.get_config_var('SO')
+    return modname + sysconfig.get_config_var('EXT_SUFFIX')
 
 
 class InstallTestCase(support.TempdirManager,
                       support.EnvironGuard,
                       support.LoggingSilencer,
                       unittest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._backup_config_vars = dict(sysconfig._config_vars)
+
+    def tearDown(self):
+        super().tearDown()
+        sysconfig._config_vars.clear()
+        sysconfig._config_vars.update(self._backup_config_vars)
 
     def test_home_installation_scheme(self):
         # This ensure two things:
@@ -59,16 +67,17 @@ class InstallTestCase(support.TempdirManager,
 
         libdir = os.path.join(destination, "lib", "python")
         check_path(cmd.install_lib, libdir)
-        check_path(cmd.install_platlib, libdir)
+        platlibdir = os.path.join(destination, sys.platlibdir, "python")
+        check_path(cmd.install_platlib, platlibdir)
         check_path(cmd.install_purelib, libdir)
         check_path(cmd.install_headers,
                    os.path.join(destination, "include", "python", "foopkg"))
         check_path(cmd.install_scripts, os.path.join(destination, "bin"))
         check_path(cmd.install_data, destination)
 
-    @unittest.skipIf(sys.version < '2.6',
-                     'site.USER_SITE was introduced in 2.6')
+    @unittest.skipUnless(HAS_USER_SITE, 'need user site')
     def test_user_site(self):
+        # test install with --user
         # preparing the environment for the test
         self.old_user_base = site.USER_BASE
         self.old_user_site = site.USER_SITE
@@ -94,8 +103,9 @@ class InstallTestCase(support.TempdirManager,
 
         self.addCleanup(cleanup)
 
-        for key in ('nt_user', 'unix_user', 'os2_home'):
-            self.assertIn(key, INSTALL_SCHEMES)
+        if HAS_USER_SITE:
+            for key in ('nt_user', 'unix_user'):
+                self.assertIn(key, INSTALL_SCHEMES)
 
         dist = Distribution({'name': 'xx'})
         cmd = install(dist)
@@ -176,7 +186,7 @@ class InstallTestCase(support.TempdirManager,
         project_dir, dist = self.create_dist(py_modules=['hello'],
                                              scripts=['sayhi'])
         os.chdir(project_dir)
-        self.write_file('hello.py', "def main(): print 'o hai'")
+        self.write_file('hello.py', "def main(): print('o hai')")
         self.write_file('sayhi', 'from hello import main; main()')
 
         cmd = install(dist)
@@ -193,11 +203,16 @@ class InstallTestCase(support.TempdirManager,
             f.close()
 
         found = [os.path.basename(line) for line in content.splitlines()]
-        expected = ['hello.py', 'hello.pyc', 'sayhi',
+        expected = ['hello.py', 'hello.%s.pyc' % sys.implementation.cache_tag,
+                    'sayhi',
                     'UNKNOWN-0.0.0-py%s.%s.egg-info' % sys.version_info[:2]]
         self.assertEqual(found, expected)
 
+    @requires_subprocess()
     def test_record_extensions(self):
+        cmd = test_support.missing_compiler_executable()
+        if cmd is not None:
+            self.skipTest('The %r command is not found' % cmd)
         install_dir = self.mkdtemp()
         project_dir, dist = self.create_dist(ext_modules=[
             Extension('xx', ['xxmodule.c'])])
@@ -240,7 +255,7 @@ class InstallTestCase(support.TempdirManager,
 
 
 def test_suite():
-    return unittest.makeSuite(InstallTestCase)
+    return unittest.TestLoader().loadTestsFromTestCase(InstallTestCase)
 
 if __name__ == "__main__":
     run_unittest(test_suite())

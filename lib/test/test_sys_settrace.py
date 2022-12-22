@@ -1,14 +1,19 @@
 # Testing the line trace facility.
 
-from test import test_support
+from test import support
 import unittest
+from unittest.mock import MagicMock
 import sys
 import difflib
 import gc
 from functools import wraps
+import asyncio
+from test.support import import_helper
+
+support.requires_working_socket(module=True)
 
 class tracecontext:
-    """Contex manager that traces its enter and exit."""
+    """Context manager that traces its enter and exit."""
     def __init__(self, output, value):
         self.output = output
         self.value = value
@@ -18,6 +23,24 @@ class tracecontext:
 
     def __exit__(self, *exc_info):
         self.output.append(-self.value)
+
+class asynctracecontext:
+    """Asynchronous context manager that traces its aenter and aexit."""
+    def __init__(self, output, value):
+        self.output = output
+        self.value = value
+
+    async def __aenter__(self):
+        self.output.append(self.value)
+
+    async def __aexit__(self, *exc_info):
+        self.output.append(-self.value)
+
+async def asynciter(iterable):
+    """Convert an iterable to an asynchronous iterator."""
+    for x in iterable:
+        yield x
+
 
 # A very basic example.  If this fails, we're in deep trouble.
 def basic():
@@ -29,25 +52,57 @@ basic.events = [(0, 'call'),
 
 # Many of the tests below are tricky because they involve pass statements.
 # If there is implicit control flow around a pass statement (in an except
-# clause or else caluse) under what conditions do you set a line number
+# clause or else clause) under what conditions do you set a line number
 # following that clause?
 
 
-# The entire "while 0:" statement is optimized away.  No code
-# exists for it, so the line numbers skip directly from "del x"
-# to "x = 1".
-def arigo_example():
+# Some constructs like "while 0:", "if 0:" or "if 1:...else:..." could be optimized
+# away.  Make sure that those lines aren't skipped.
+def arigo_example0():
     x = 1
     del x
     while 0:
         pass
     x = 1
 
-arigo_example.events = [(0, 'call'),
+arigo_example0.events = [(0, 'call'),
                         (1, 'line'),
                         (2, 'line'),
+                        (3, 'line'),
                         (5, 'line'),
                         (5, 'return')]
+
+def arigo_example1():
+    x = 1
+    del x
+    if 0:
+        pass
+    x = 1
+
+arigo_example1.events = [(0, 'call'),
+                        (1, 'line'),
+                        (2, 'line'),
+                        (3, 'line'),
+                        (5, 'line'),
+                        (5, 'return')]
+
+def arigo_example2():
+    x = 1
+    del x
+    if 1:
+        x = 1
+    else:
+        pass
+    return None
+
+arigo_example2.events = [(0, 'call'),
+                        (1, 'line'),
+                        (2, 'line'),
+                        (3, 'line'),
+                        (4, 'line'),
+                        (7, 'line'),
+                        (7, 'return')]
+
 
 # check that lines consisting of just one instruction get traced:
 def one_instr_line():
@@ -111,8 +166,8 @@ def raises():
 def test_raise():
     try:
         raises()
-    except Exception, exc:
-        x = 1
+    except Exception:
+        pass
 
 test_raise.events = [(0, 'call'),
                      (1, 'line'),
@@ -141,7 +196,7 @@ def _settrace_and_raise(tracefunc):
 def settrace_and_raise(tracefunc):
     try:
         _settrace_and_raise(tracefunc)
-    except RuntimeError, exc:
+    except RuntimeError:
         pass
 
 settrace_and_raise.events = [(2, 'exception'),
@@ -170,8 +225,7 @@ ireturn_example.events = [(0, 'call'),
                           (2, 'line'),
                           (3, 'line'),
                           (4, 'line'),
-                          (6, 'line'),
-                          (6, 'return')]
+                          (4, 'return')]
 
 # Tight loop with while(1) example (SF #765624)
 def tightloop_example():
@@ -189,8 +243,11 @@ tightloop_example.events = [(0, 'call'),
                             (3, 'line'),
                             (4, 'line'),
                             (5, 'line'),
+                            (4, 'line'),
                             (5, 'line'),
+                            (4, 'line'),
                             (5, 'line'),
+                            (4, 'line'),
                             (5, 'line'),
                             (5, 'exception'),
                             (6, 'line'),
@@ -247,15 +304,28 @@ generator_example.events = ([(0, 'call'),
 
 
 class Tracer:
-    def __init__(self):
+    def __init__(self, trace_line_events=None, trace_opcode_events=None):
+        self.trace_line_events = trace_line_events
+        self.trace_opcode_events = trace_opcode_events
         self.events = []
+
+    def _reconfigure_frame(self, frame):
+        if self.trace_line_events is not None:
+            frame.f_trace_lines = self.trace_line_events
+        if self.trace_opcode_events is not None:
+            frame.f_trace_opcodes = self.trace_opcode_events
+
     def trace(self, frame, event, arg):
+        self._reconfigure_frame(frame)
         self.events.append((frame.f_lineno, event))
         return self.trace
+
     def traceWithGenexp(self, frame, event, arg):
+        self._reconfigure_frame(frame)
         (o for o in [1])
         self.events.append((frame.f_lineno, event))
         return self.trace
+
 
 class TraceTestCase(unittest.TestCase):
 
@@ -264,10 +334,16 @@ class TraceTestCase(unittest.TestCase):
     def setUp(self):
         self.using_gc = gc.isenabled()
         gc.disable()
+        self.addCleanup(sys.settrace, sys.gettrace())
 
     def tearDown(self):
         if self.using_gc:
             gc.enable()
+
+    @staticmethod
+    def make_tracer():
+        """Helper to allow test subclasses to configure tracers differently"""
+        return Tracer()
 
     def compare_events(self, line_offset, events, expected_events):
         events = [(l - line_offset, e) for (l, e) in events]
@@ -278,21 +354,21 @@ class TraceTestCase(unittest.TestCase):
                                         [str(x) for x in events])))
 
     def run_and_compare(self, func, events):
-        tracer = Tracer()
+        tracer = self.make_tracer()
         sys.settrace(tracer.trace)
         func()
         sys.settrace(None)
-        self.compare_events(func.func_code.co_firstlineno,
+        self.compare_events(func.__code__.co_firstlineno,
                             tracer.events, events)
 
     def run_test(self, func):
         self.run_and_compare(func, func.events)
 
     def run_test2(self, func):
-        tracer = Tracer()
+        tracer = self.make_tracer()
         func(tracer.trace)
         sys.settrace(None)
-        self.compare_events(func.func_code.co_firstlineno,
+        self.compare_events(func.__code__.co_firstlineno,
                             tracer.events, func.events)
 
     def test_set_and_retrieve_none(self):
@@ -311,8 +387,12 @@ class TraceTestCase(unittest.TestCase):
 
     def test_01_basic(self):
         self.run_test(basic)
-    def test_02_arigo(self):
-        self.run_test(arigo_example)
+    def test_02_arigo0(self):
+        self.run_test(arigo_example0)
+    def test_02_arigo1(self):
+        self.run_test(arigo_example1)
+    def test_02_arigo2(self):
+        self.run_test(arigo_example2)
     def test_03_one_instr(self):
         self.run_test(one_instr_line)
     def test_04_no_pop_blocks(self):
@@ -341,7 +421,7 @@ class TraceTestCase(unittest.TestCase):
         # and if the traced function contains another generator
         # that is not completely exhausted, the trace stopped.
         # Worse: the 'finally' clause was not invoked.
-        tracer = Tracer()
+        tracer = self.make_tracer()
         sys.settrace(tracer.traceWithGenexp)
         generator_example()
         sys.settrace(None)
@@ -350,8 +430,8 @@ class TraceTestCase(unittest.TestCase):
 
     def test_14_onliner_if(self):
         def onliners():
-            if True: False
-            else: True
+            if True: x=False
+            else: x=True
             return 0
         self.run_and_compare(
             onliners,
@@ -392,9 +472,10 @@ class TraceTestCase(unittest.TestCase):
              (3, 'return')])
 
     def test_16_blank_lines(self):
-        exec("def f():\n" + "\n" * 256 + "    pass")
+        namespace = {}
+        exec("def f():\n" + "\n" * 256 + "    pass", namespace)
         self.run_and_compare(
-            f,
+            namespace["f"],
             [(0, 'call'),
              (257, 'line'),
              (257, 'return')])
@@ -408,8 +489,1151 @@ class TraceTestCase(unittest.TestCase):
             [(0, 'call'),
              (1, 'line')])
 
+    def test_18_except_with_name(self):
+        def func():
+            try:
+                try:
+                    raise Exception
+                except Exception as e:
+                    raise
+                    x = "Something"
+                    y = "Something"
+            except Exception:
+                pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (5, 'line'),
+             (8, 'line'),
+             (9, 'line'),
+             (9, 'return')])
+
+    def test_19_except_with_finally(self):
+        def func():
+            try:
+                try:
+                    raise Exception
+                finally:
+                    y = "Something"
+            except Exception:
+                b = 23
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (5, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (7, 'return')])
+
+    def test_20_async_for_loop(self):
+        class AsyncIteratorWrapper:
+            def __init__(self, obj):
+                self._it = iter(obj)
+
+            def __aiter__(self):
+                return self
+
+            async def __anext__(self):
+                try:
+                    return next(self._it)
+                except StopIteration:
+                    raise StopAsyncIteration
+
+        async def doit_async():
+            async for letter in AsyncIteratorWrapper("abc"):
+                x = letter
+            y = 42
+
+        def run(tracer):
+            x = doit_async()
+            try:
+                sys.settrace(tracer)
+                x.send(None)
+            finally:
+                sys.settrace(None)
+
+        tracer = self.make_tracer()
+        events = [
+                (0, 'call'),
+                (1, 'line'),
+                (-12, 'call'),
+                (-11, 'line'),
+                (-11, 'return'),
+                (-9, 'call'),
+                (-8, 'line'),
+                (-8, 'return'),
+                (-6, 'call'),
+                (-5, 'line'),
+                (-4, 'line'),
+                (-4, 'return'),
+                (1, 'exception'),
+                (2, 'line'),
+                (1, 'line'),
+                (-6, 'call'),
+                (-5, 'line'),
+                (-4, 'line'),
+                (-4, 'return'),
+                (1, 'exception'),
+                (2, 'line'),
+                (1, 'line'),
+                (-6, 'call'),
+                (-5, 'line'),
+                (-4, 'line'),
+                (-4, 'return'),
+                (1, 'exception'),
+                (2, 'line'),
+                (1, 'line'),
+                (-6, 'call'),
+                (-5, 'line'),
+                (-4, 'line'),
+                (-4, 'exception'),
+                (-3, 'line'),
+                (-2, 'line'),
+                (-2, 'exception'),
+                (-2, 'return'),
+                (1, 'exception'),
+                (3, 'line'),
+                (3, 'return')]
+        try:
+            run(tracer.trace)
+        except Exception:
+            pass
+        self.compare_events(doit_async.__code__.co_firstlineno,
+                            tracer.events, events)
+
+    def test_async_for_backwards_jump_has_no_line(self):
+        async def arange(n):
+            for i in range(n):
+                yield i
+        async def f():
+            async for i in arange(3):
+                if i > 100:
+                    break # should never be traced
+
+        tracer = self.make_tracer()
+        coro = f()
+        try:
+            sys.settrace(tracer.trace)
+            coro.send(None)
+        except Exception:
+            pass
+        finally:
+            sys.settrace(None)
+
+        events = [
+            (0, 'call'),
+            (1, 'line'),
+            (-3, 'call'),
+            (-2, 'line'),
+            (-1, 'line'),
+            (-1, 'return'),
+            (1, 'exception'),
+            (2, 'line'),
+            (1, 'line'),
+            (-1, 'call'),
+            (-2, 'line'),
+            (-1, 'line'),
+            (-1, 'return'),
+            (1, 'exception'),
+            (2, 'line'),
+            (1, 'line'),
+            (-1, 'call'),
+            (-2, 'line'),
+            (-1, 'line'),
+            (-1, 'return'),
+            (1, 'exception'),
+            (2, 'line'),
+            (1, 'line'),
+            (-1, 'call'),
+            (-2, 'line'),
+            (-2, 'return'),
+            (1, 'exception'),
+            (1, 'return'),
+        ]
+        self.compare_events(f.__code__.co_firstlineno,
+                            tracer.events, events)
+
+    def test_21_repeated_pass(self):
+        def func():
+            pass
+            pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'return')])
+
+    def test_loop_in_try_except(self):
+        # https://bugs.python.org/issue41670
+
+        def func():
+            try:
+                for i in []: pass
+                return 1
+            except:
+                return 2
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_try_except_no_exception(self):
+
+        def func():
+            try:
+                2
+            except:
+                4
+            else:
+                6
+                if False:
+                    8
+                else:
+                    10
+                if func.__name__ == 'Fred':
+                    12
+            finally:
+                14
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (10, 'line'),
+             (11, 'line'),
+             (14, 'line'),
+             (14, 'return')])
+
+    def test_try_exception_in_else(self):
+
+        def func():
+            try:
+                try:
+                    3
+                except:
+                    5
+                else:
+                    7
+                    raise Exception
+                finally:
+                    10
+            except:
+                12
+            finally:
+                14
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (7, 'line'),
+             (8, 'line'),
+             (8, 'exception'),
+             (10, 'line'),
+             (11, 'line'),
+             (12, 'line'),
+             (14, 'line'),
+             (14, 'return')])
+
+    def test_nested_loops(self):
+
+        def func():
+            for i in range(2):
+                for j in range(2):
+                    a = i + j
+            return a == 1
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (2, 'line'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (2, 'line'),
+             (1, 'line'),
+             (4, 'line'),
+             (4, 'return')])
+
+    def test_if_break(self):
+
+        def func():
+            seq = [1, 0]
+            while seq:
+                n = seq.pop()
+                if n:
+                    break   # line 5
+            else:
+                n = 99
+            return n        # line 8
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (8, 'line'),
+             (8, 'return')])
+
+    def test_break_through_finally(self):
+
+        def func():
+            a, c, d, i = 1, 1, 1, 99
+            try:
+                for i in range(3):
+                    try:
+                        a = 5
+                        if i > 0:
+                            break                   # line 7
+                        a = 8
+                    finally:
+                        c = 10
+            except:
+                d = 12                              # line 12
+            assert a == 5 and c == 10 and d == 1    # line 13
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (8, 'line'),
+             (10, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (10, 'line'),
+             (13, 'line'),
+             (13, 'return')])
+
+    def test_continue_through_finally(self):
+
+        def func():
+            a, b, c, d, i = 1, 1, 1, 1, 99
+            try:
+                for i in range(2):
+                    try:
+                        a = 5
+                        if i > 0:
+                            continue                # line 7
+                        b = 8
+                    finally:
+                        c = 10
+            except:
+                d = 12                              # line 12
+            assert (a, b, c, d) == (5, 8, 10, 1)    # line 13
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (8, 'line'),
+             (10, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (10, 'line'),
+             (3, 'line'),
+             (13, 'line'),
+             (13, 'return')])
+
+    def test_return_through_finally(self):
+
+        def func():
+            try:
+                return 2
+            finally:
+                4
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (4, 'line'),
+             (4, 'return')])
+
+    def test_try_except_with_wrong_type(self):
+
+        def func():
+            try:
+                2/0
+            except IndexError:
+                4
+            finally:
+                return 6
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'exception'),
+             (3, 'line'),
+             (6, 'line'),
+             (6, 'return')])
+
+    def test_break_to_continue1(self):
+
+        def func():
+            TRUE = 1
+            x = [1]
+            while x:
+                x.pop()
+                while TRUE:
+                    break
+                continue
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_break_to_continue2(self):
+
+        def func():
+            TRUE = 1
+            x = [1]
+            while x:
+                x.pop()
+                while TRUE:
+                    break
+                else:
+                    continue
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (6, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_break_to_break(self):
+
+        def func():
+            TRUE = 1
+            while TRUE:
+                while TRUE:
+                    break
+                break
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (5, 'return')])
+
+    def test_nested_ifs(self):
+
+        def func():
+            a = b = 1
+            if a == 1:
+                if b == 1:
+                    x = 4
+                else:
+                    y = 6
+            else:
+                z = 8
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (4, 'return')])
+
+    def test_nested_ifs_with_and(self):
+
+        def func():
+            if A:
+                if B:
+                    if C:
+                        if D:
+                            return False
+                else:
+                    return False
+            elif E and F:
+                return True
+
+        A = B = True
+        C = False
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_nested_try_if(self):
+
+        def func():
+            x = "hello"
+            try:
+                3/0
+            except ZeroDivisionError:
+                if x == 'raise':
+                    raise ValueError()   # line 6
+            f = 7
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (5, 'line'),
+             (7, 'line'),
+             (7, 'return')])
+
+    def test_if_false_in_with(self):
+
+        class C:
+            def __enter__(self):
+                return self
+            def __exit__(*args):
+                pass
+
+        def func():
+            with C():
+                if False:
+                    pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (-5, 'call'),
+             (-4, 'line'),
+             (-4, 'return'),
+             (2, 'line'),
+             (1, 'line'),
+             (-3, 'call'),
+             (-2, 'line'),
+             (-2, 'return'),
+             (1, 'return')])
+
+    def test_if_false_in_try_except(self):
+
+        def func():
+            try:
+                if False:
+                    pass
+            except Exception:
+                X
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'return')])
+
+    def test_implicit_return_in_class(self):
+
+        def func():
+            class A:
+                if 3 < 9:
+                    a = 1
+                else:
+                    a = 2
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (1, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return'),
+             (1, 'return')])
+
+    def test_try_in_try(self):
+        def func():
+            try:
+                try:
+                    pass
+                except Exception as ex:
+                    pass
+            except Exception:
+                pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_try_in_try_with_exception(self):
+
+        def func():
+            try:
+                try:
+                    raise TypeError
+                except ValueError as ex:
+                    5
+            except TypeError:
+                7
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (7, 'return')])
+
+        def func():
+            try:
+                try:
+                    raise ValueError
+                except ValueError as ex:
+                    5
+            except TypeError:
+                7
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (5, 'line'),
+             (5, 'return')])
+
+    def test_if_in_if_in_if(self):
+        def func(a=0, p=1, z=1):
+            if p:
+                if a:
+                    if z:
+                        pass
+                    else:
+                        pass
+            else:
+                pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'return')])
+
+    def test_early_exit_with(self):
+
+        class C:
+            def __enter__(self):
+                return self
+            def __exit__(*args):
+                pass
+
+        def func_break():
+            for i in (1,2):
+                with C():
+                    break
+            pass
+
+        def func_return():
+            with C():
+                return
+
+        self.run_and_compare(func_break,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (-5, 'call'),
+             (-4, 'line'),
+             (-4, 'return'),
+             (3, 'line'),
+             (2, 'line'),
+             (-3, 'call'),
+             (-2, 'line'),
+             (-2, 'return'),
+             (4, 'line'),
+             (4, 'return')])
+
+        self.run_and_compare(func_return,
+            [(0, 'call'),
+             (1, 'line'),
+             (-11, 'call'),
+             (-10, 'line'),
+             (-10, 'return'),
+             (2, 'line'),
+             (1, 'line'),
+             (-9, 'call'),
+             (-8, 'line'),
+             (-8, 'return'),
+             (1, 'return')])
+
+    def test_flow_converges_on_same_line(self):
+
+        def foo(x):
+            if x:
+                try:
+                    1/(x - 1)
+                except ZeroDivisionError:
+                    pass
+            return x
+
+        def func():
+            for i in range(2):
+                foo(i)
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (-8, 'call'),
+             (-7, 'line'),
+             (-2, 'line'),
+             (-2, 'return'),
+             (1, 'line'),
+             (2, 'line'),
+             (-8, 'call'),
+             (-7, 'line'),
+             (-6, 'line'),
+             (-5, 'line'),
+             (-5, 'exception'),
+             (-4, 'line'),
+             (-3, 'line'),
+             (-2, 'line'),
+             (-2, 'return'),
+             (1, 'line'),
+             (1, 'return')])
+
+    def test_no_tracing_of_named_except_cleanup(self):
+
+        def func():
+            x = 0
+            try:
+                1/x
+            except ZeroDivisionError as error:
+                if x:
+                    raise
+            return "done"
+
+        self.run_and_compare(func,
+        [(0, 'call'),
+            (1, 'line'),
+            (2, 'line'),
+            (3, 'line'),
+            (3, 'exception'),
+            (4, 'line'),
+            (5, 'line'),
+            (7, 'line'),
+            (7, 'return')])
+
+    def test_tracing_exception_raised_in_with(self):
+
+        class NullCtx:
+            def __enter__(self):
+                return self
+            def __exit__(self, *excinfo):
+                pass
+
+        def func():
+            try:
+                with NullCtx():
+                    1/0
+            except ZeroDivisionError:
+                pass
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (-5, 'call'),
+             (-4, 'line'),
+             (-4, 'return'),
+             (3, 'line'),
+             (3, 'exception'),
+             (2, 'line'),
+             (-3, 'call'),
+             (-2, 'line'),
+             (-2, 'return'),
+             (4, 'line'),
+             (5, 'line'),
+             (5, 'return')])
+
+    def test_try_except_star_no_exception(self):
+
+        def func():
+            try:
+                2
+            except* Exception:
+                4
+            else:
+                6
+                if False:
+                    8
+                else:
+                    10
+                if func.__name__ == 'Fred':
+                    12
+            finally:
+                14
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (10, 'line'),
+             (11, 'line'),
+             (14, 'line'),
+             (14, 'return')])
+
+    def test_try_except_star_named_no_exception(self):
+
+        def func():
+            try:
+                2
+            except* Exception as e:
+                4
+            else:
+                6
+            finally:
+                8
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (6, 'line'),
+             (8, 'line'),
+             (8, 'return')])
+
+    def test_try_except_star_exception_caught(self):
+
+        def func():
+            try:
+                raise ValueError(2)
+            except* ValueError:
+                4
+            else:
+                6
+            finally:
+                8
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'exception'),
+             (3, 'line'),
+             (4, 'line'),
+             (8, 'line'),
+             (8, 'return')])
+
+    def test_try_except_star_named_exception_caught(self):
+
+        def func():
+            try:
+                raise ValueError(2)
+            except* ValueError as e:
+                4
+            else:
+                6
+            finally:
+                8
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (2, 'exception'),
+             (3, 'line'),
+             (4, 'line'),
+             (8, 'line'),
+             (8, 'return')])
+
+    def test_try_except_star_exception_not_caught(self):
+
+        def func():
+            try:
+                try:
+                    raise ValueError(3)
+                except* TypeError:
+                    5
+            except ValueError:
+                7
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (7, 'return')])
+
+    def test_try_except_star_named_exception_not_caught(self):
+
+        def func():
+            try:
+                try:
+                    raise ValueError(3)
+                except* TypeError as e:
+                    5
+            except ValueError:
+                7
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (4, 'line'),
+             (6, 'line'),
+             (7, 'line'),
+             (7, 'return')])
+
+    def test_try_except_star_nested(self):
+
+        def func():
+            try:
+                try:
+                    raise ExceptionGroup(
+                        'eg',
+                        [ValueError(5), TypeError('bad type')])
+                except* TypeError as e:
+                    7
+                except* OSError:
+                    9
+                except* ValueError:
+                    raise
+            except* ValueError:
+                try:
+                    raise TypeError(14)
+                except* OSError:
+                    16
+                except* TypeError as e:
+                    18
+            return 0
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (4, 'line'),
+             (5, 'line'),
+             (3, 'line'),
+             (3, 'exception'),
+             (6, 'line'),
+             (7, 'line'),
+             (8, 'line'),
+             (10, 'line'),
+             (11, 'line'),
+             (12, 'line'),
+             (13, 'line'),
+             (14, 'line'),
+             (14, 'exception'),
+             (15, 'line'),
+             (17, 'line'),
+             (18, 'line'),
+             (19, 'line'),
+             (19, 'return')])
+
+    def test_notrace_lambda(self):
+        #Regression test for issue 46314
+
+        def func():
+            1
+            lambda x: 2
+            3
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return')])
+
+    def test_class_creation_with_docstrings(self):
+
+        def func():
+            class Class_1:
+                ''' the docstring. 2'''
+                def __init__(self):
+                    ''' Another docstring. 4'''
+                    self.a = 5
+
+        self.run_and_compare(func,
+            [(0, 'call'),
+             (1, 'line'),
+             (1, 'call'),
+             (1, 'line'),
+             (2, 'line'),
+             (3, 'line'),
+             (3, 'return'),
+             (1, 'return')])
+
+    @support.cpython_only
+    def test_no_line_event_after_creating_generator(self):
+        # Spurious line events before call events only show up with C tracer
+
+        # Skip this test if the _testcapi module isn't available.
+        _testcapi = import_helper.import_module('_testcapi')
+
+        def gen():
+            yield 1
+
+        def func():
+            for _ in (
+                gen()
+            ):
+                pass
+
+        EXPECTED_EVENTS = [
+            (0, 'call'),
+            (2, 'line'),
+            (1, 'line'),
+            (-3, 'call'),
+            (-2, 'line'),
+            (-2, 'return'),
+            (4, 'line'),
+            (1, 'line'),
+            (-2, 'call'),
+            (-2, 'return'),
+            (1, 'return'),
+        ]
+
+        # C level events should be the same as expected and the same as Python level.
+
+        events = []
+        # Turning on and off tracing must be on same line to avoid unwanted LINE events.
+        _testcapi.settrace_to_record(events); func(); sys.settrace(None)
+        start_line = func.__code__.co_firstlineno
+        events = [
+            (line-start_line, EVENT_NAMES[what])
+            for (what, line, arg) in events
+        ]
+        self.assertEqual(events, EXPECTED_EVENTS)
+
+        self.run_and_compare(func, EXPECTED_EVENTS)
+
+    def test_very_large_function(self):
+        # There is a separate code path when the number of lines > (1 << 15).
+        d = {}
+        exec("""def f():              # line 0
+            x = 0                     # line 1
+            y = 1                     # line 2
+            %s                        # lines 3 through (1 << 16)
+            x += 1                    #
+            return""" % ('\n' * (1 << 16),), d)
+        f = d['f']
+
+        EXPECTED_EVENTS = [
+            (0, 'call'),
+            (1, 'line'),
+            (2, 'line'),
+            (65540, 'line'),
+            (65541, 'line'),
+            (65541, 'return'),
+        ]
+
+        self.run_and_compare(f, EXPECTED_EVENTS)
+
+
+EVENT_NAMES = [
+    'call',
+    'exception',
+    'line',
+    'return'
+]
+
+
+class SkipLineEventsTraceTestCase(TraceTestCase):
+    """Repeat the trace tests, but with per-line events skipped"""
+
+    def compare_events(self, line_offset, events, expected_events):
+        skip_line_events = [e for e in expected_events if e[1] != 'line']
+        super().compare_events(line_offset, events, skip_line_events)
+
+    @staticmethod
+    def make_tracer():
+        return Tracer(trace_line_events=False)
+
+
+@support.cpython_only
+class TraceOpcodesTestCase(TraceTestCase):
+    """Repeat the trace tests, but with per-opcodes events enabled"""
+
+    def compare_events(self, line_offset, events, expected_events):
+        skip_opcode_events = [e for e in events if e[1] != 'opcode']
+        if len(events) > 1:
+            self.assertLess(len(skip_opcode_events), len(events),
+                            msg="No 'opcode' events received by the tracer")
+        super().compare_events(line_offset, skip_opcode_events, expected_events)
+
+    @staticmethod
+    def make_tracer():
+        return Tracer(trace_opcode_events=True)
+
 
 class RaisingTraceFuncTestCase(unittest.TestCase):
+    def setUp(self):
+        self.addCleanup(sys.settrace, sys.gettrace())
+
     def trace(self, frame, event, arg):
         """A trace function that raises an exception in response to a
         specific trace event."""
@@ -423,7 +1647,7 @@ class RaisingTraceFuncTestCase(unittest.TestCase):
         we're testing, so that the 'exception' trace event fires."""
         if self.raiseOnEvent == 'exception':
             x = 0
-            y = 1 // x
+            y = 1/x
         else:
             return 1
 
@@ -432,7 +1656,7 @@ class RaisingTraceFuncTestCase(unittest.TestCase):
         handled OK."""
         self.raiseOnEvent = event
         try:
-            for i in xrange(sys.getrecursionlimit() + 1):
+            for i in range(sys.getrecursionlimit() + 1):
                 sys.settrace(self.trace)
                 try:
                     self.f()
@@ -456,12 +1680,12 @@ class RaisingTraceFuncTestCase(unittest.TestCase):
     def test_trash_stack(self):
         def f():
             for i in range(5):
-                print i  # line tracing will raise an exception at this line
+                print(i)  # line tracing will raise an exception at this line
 
         def g(frame, why, extra):
             if (why == 'line' and
-                frame.f_lineno == f.func_code.co_firstlineno + 2):
-                raise RuntimeError, "i am crashing"
+                frame.f_lineno == f.__code__.co_firstlineno + 2):
+                raise RuntimeError("i am crashing")
             return g
 
         sys.settrace(g)
@@ -475,6 +1699,43 @@ class RaisingTraceFuncTestCase(unittest.TestCase):
             self.fail("exception not propagated")
 
 
+    def test_exception_arguments(self):
+        def f():
+            x = 0
+            # this should raise an error
+            x.no_such_attr
+        def g(frame, event, arg):
+            if (event == 'exception'):
+                type, exception, trace = arg
+                self.assertIsInstance(exception, Exception)
+            return g
+
+        existing = sys.gettrace()
+        try:
+            sys.settrace(g)
+            try:
+                f()
+            except AttributeError:
+                # this is expected
+                pass
+        finally:
+            sys.settrace(existing)
+
+    def test_line_event_raises_before_opcode_event(self):
+        exception = ValueError("BOOM!")
+        def trace(frame, event, arg):
+            if event == "line":
+                raise exception
+            frame.f_trace_opcodes = True
+            return trace
+        def f():
+            pass
+        with self.assertRaises(ValueError) as caught:
+            sys.settrace(trace)
+            f()
+        self.assertIs(caught.exception, exception)
+
+
 # 'Jump' tests: assigning to frame.f_lineno within a trace function
 # moves the execution position - it's how debuggers implement a Jump
 # command (aka. "Set next statement").
@@ -484,7 +1745,7 @@ class JumpTracer:
 
     def __init__(self, function, jumpFrom, jumpTo, event='line',
                  decorated=False):
-        self.code = function.func_code
+        self.code = function.__code__
         self.jumpFrom = jumpFrom
         self.jumpTo = jumpTo
         self.event = event
@@ -501,7 +1762,7 @@ class JumpTracer:
         if (self.firstLine is None and frame.f_code == self.code and
                 event == 'line'):
             self.firstLine = frame.f_lineno - 1
-        if (event == self.event and self.firstLine and
+        if (event == self.event and self.firstLine is not None and
                 frame.f_lineno == self.firstLine + self.jumpFrom):
             f = frame
             while f is not None and f.f_code != self.code:
@@ -558,9 +1819,23 @@ class JumpTestCase(unittest.TestCase):
         if error is None:
             func(output)
         else:
-            with self.assertRaisesRegexp(*error):
+            with self.assertRaisesRegex(*error):
                 func(output)
         sys.settrace(None)
+        self.compare_jump_output(expected, output)
+
+    def run_async_test(self, func, jumpFrom, jumpTo, expected, error=None,
+                 event='line', decorated=False):
+        tracer = JumpTracer(func, jumpFrom, jumpTo, event, decorated)
+        sys.settrace(tracer.trace)
+        output = []
+        if error is None:
+            asyncio.run(func(output))
+        else:
+            with self.assertRaisesRegex(*error):
+                asyncio.run(func(output))
+        sys.settrace(None)
+        asyncio.set_event_loop_policy(None)
         self.compare_jump_output(expected, output)
 
     def jump_test(jumpFrom, jumpTo, expected, error=None, event='line'):
@@ -571,6 +1846,18 @@ class JumpTestCase(unittest.TestCase):
             @wraps(func)
             def test(self):
                 self.run_test(func, jumpFrom, jumpTo, expected,
+                              error=error, event=event, decorated=True)
+            return test
+        return decorator
+
+    def async_jump_test(jumpFrom, jumpTo, expected, error=None, event='line'):
+        """Decorator that creates a test that makes a jump
+        from one place to another in the following asynchronous code.
+        """
+        def decorator(func):
+            @wraps(func)
+            def test(self):
+                self.run_async_test(func, jumpFrom, jumpTo, expected,
                               error=error, event=event, decorated=True)
             return test
         return decorator
@@ -606,6 +1893,23 @@ class JumpTestCase(unittest.TestCase):
             output.append(6)
         output.append(7)
 
+    @async_jump_test(4, 5, [3, 5])
+    async def test_jump_out_of_async_for_block_forwards(output):
+        for i in [1]:
+            async for i in asynciter([1, 2]):
+                output.append(3)
+                output.append(4)
+            output.append(5)
+
+    @async_jump_test(5, 2, [2, 4, 2, 4, 5, 6])
+    async def test_jump_out_of_async_for_block_backwards(output):
+        for i in [1]:
+            output.append(2)
+            async for i in asynciter([1]):
+                output.append(4)
+                output.append(5)
+            output.append(6)
+
     @jump_test(1, 2, [3])
     def test_jump_to_codeless_line(output):
         output.append(1)
@@ -635,7 +1939,7 @@ class JumpTestCase(unittest.TestCase):
     def test_jump_in_nested_finally_2(output):
         try:
             output.append(2)
-            1.0/0.0
+            1/0
             return
         finally:
             output.append(6)
@@ -646,7 +1950,7 @@ class JumpTestCase(unittest.TestCase):
     def test_jump_in_nested_finally_3(output):
         try:
             output.append(2)
-            1.0/0.0
+            1/0
             return
         finally:
             output.append(6)
@@ -657,12 +1961,43 @@ class JumpTestCase(unittest.TestCase):
             output.append(11)
         output.append(12)
 
-    @jump_test(3, 4, [1, 4])
-    def test_jump_infinite_while_loop(output):
+    @jump_test(5, 11, [2, 4], (ValueError, 'exception'))
+    def test_no_jump_over_return_try_finally_in_finally_block(output):
+        try:
+            output.append(2)
+        finally:
+            output.append(4)
+            output.append(5)
+            return
+            try:
+                output.append(8)
+            finally:
+                output.append(10)
+            pass
+        output.append(12)
+
+    @jump_test(3, 4, [1], (ValueError, 'after'))
+    def test_no_jump_infinite_while_loop(output):
         output.append(1)
         while True:
             output.append(3)
         output.append(4)
+
+    @jump_test(2, 4, [4, 4])
+    def test_jump_forwards_into_while_block(output):
+        i = 1
+        output.append(2)
+        while i <= 2:
+            output.append(4)
+            i += 1
+
+    @jump_test(5, 3, [3, 3, 3, 5])
+    def test_jump_backwards_into_while_block(output):
+        i = 1
+        while i <= 2:
+            output.append(3)
+            i += 1
+        output.append(5)
 
     @jump_test(2, 3, [1, 3])
     def test_jump_forwards_out_of_with_block(output):
@@ -670,10 +2005,22 @@ class JumpTestCase(unittest.TestCase):
             output.append(2)
         output.append(3)
 
+    @async_jump_test(2, 3, [1, 3])
+    async def test_jump_forwards_out_of_async_with_block(output):
+        async with asynctracecontext(output, 1):
+            output.append(2)
+        output.append(3)
+
     @jump_test(3, 1, [1, 2, 1, 2, 3, -2])
     def test_jump_backwards_out_of_with_block(output):
         output.append(1)
         with tracecontext(output, 2):
+            output.append(3)
+
+    @async_jump_test(3, 1, [1, 2, 1, 2, 3, -2])
+    async def test_jump_backwards_out_of_async_with_block(output):
+        output.append(1)
+        async with asynctracecontext(output, 2):
             output.append(3)
 
     @jump_test(2, 5, [5])
@@ -713,7 +2060,7 @@ class JumpTestCase(unittest.TestCase):
     @jump_test(5, 7, [4, 7, 8])
     def test_jump_between_except_blocks(output):
         try:
-            1.0/0.0
+            1/0
         except ZeroDivisionError:
             output.append(4)
             output.append(5)
@@ -721,15 +2068,35 @@ class JumpTestCase(unittest.TestCase):
             output.append(7)
         output.append(8)
 
+    @jump_test(5, 7, [4, 7, 8])
+    def test_jump_from_except_to_finally(output):
+        try:
+            1/0
+        except ZeroDivisionError:
+            output.append(4)
+            output.append(5)
+        finally:
+            output.append(7)
+        output.append(8)
+
     @jump_test(5, 6, [4, 6, 7])
     def test_jump_within_except_block(output):
         try:
-            1.0/0.0
+            1/0
         except:
             output.append(4)
             output.append(5)
             output.append(6)
         output.append(7)
+
+    @jump_test(6, 1, [1, 5, 1, 5])
+    def test_jump_over_try_except(output):
+        output.append(1)
+        try:
+            1 / 0
+        except ZeroDivisionError as e:
+            output.append(5)
+        x = 42  # has to be a two-instruction block
 
     @jump_test(2, 4, [1, 4, 5, -4])
     def test_jump_across_with(output):
@@ -739,11 +2106,28 @@ class JumpTestCase(unittest.TestCase):
         with tracecontext(output, 4):
             output.append(5)
 
+    @async_jump_test(2, 4, [1, 4, 5, -4])
+    async def test_jump_across_async_with(output):
+        output.append(1)
+        async with asynctracecontext(output, 2):
+            output.append(3)
+        async with asynctracecontext(output, 4):
+            output.append(5)
+
     @jump_test(4, 5, [1, 3, 5, 6])
     def test_jump_out_of_with_block_within_for_block(output):
         output.append(1)
         for i in [1]:
             with tracecontext(output, 3):
+                output.append(4)
+            output.append(5)
+        output.append(6)
+
+    @async_jump_test(4, 5, [1, 3, 5, 6])
+    async def test_jump_out_of_async_with_block_within_for_block(output):
+        output.append(1)
+        for i in [1]:
+            async with asynctracecontext(output, 3):
                 output.append(4)
             output.append(5)
         output.append(6)
@@ -757,12 +2141,31 @@ class JumpTestCase(unittest.TestCase):
             output.append(5)
         output.append(6)
 
+    @async_jump_test(4, 5, [1, 2, 3, 5, -2, 6])
+    async def test_jump_out_of_async_with_block_within_with_block(output):
+        output.append(1)
+        with tracecontext(output, 2):
+            async with asynctracecontext(output, 3):
+                output.append(4)
+            output.append(5)
+        output.append(6)
+
     @jump_test(5, 6, [2, 4, 6, 7])
     def test_jump_out_of_with_block_within_finally_block(output):
         try:
             output.append(2)
         finally:
             with tracecontext(output, 4):
+                output.append(5)
+            output.append(6)
+        output.append(7)
+
+    @async_jump_test(5, 6, [2, 4, 6, 7])
+    async def test_jump_out_of_async_with_block_within_finally_block(output):
+        try:
+            output.append(2)
+        finally:
+            async with asynctracecontext(output, 4):
                 output.append(5)
             output.append(6)
         output.append(7)
@@ -786,6 +2189,14 @@ class JumpTestCase(unittest.TestCase):
     def test_jump_out_of_with_assignment(output):
         output.append(1)
         with tracecontext(output, 2) \
+                as x:
+            output.append(4)
+        output.append(5)
+
+    @async_jump_test(3, 5, [1, 2, 5])
+    async def test_jump_out_of_async_with_assignment(output):
+        output.append(1)
+        async with asynctracecontext(output, 2) \
                 as x:
             output.append(4)
         output.append(5)
@@ -823,6 +2234,17 @@ class JumpTestCase(unittest.TestCase):
         output.append(1)
         if not output:  # always false
             for i in [3]:
+                output.append(4)
+        else:
+            output.append(6)
+            output.append(7)
+        output.append(8)
+
+    @async_jump_test(1, 7, [7, 8])
+    async def test_jump_over_async_for_block_before_else(output):
+        output.append(1)
+        if not output:  # always false
+            async for i in asynciter([3]):
                 output.append(4)
         else:
             output.append(6)
@@ -880,58 +2302,67 @@ class JumpTestCase(unittest.TestCase):
         for i in 1, 2:
             output.append(3)
 
+    @async_jump_test(1, 3, [], (ValueError, 'into'))
+    async def test_no_jump_forwards_into_async_for_block(output):
+        output.append(1)
+        async for i in asynciter([1, 2]):
+            output.append(3)
+        pass
+
     @jump_test(3, 2, [2, 2], (ValueError, 'into'))
     def test_no_jump_backwards_into_for_block(output):
         for i in 1, 2:
             output.append(2)
         output.append(3)
 
-    @jump_test(2, 4, [], (ValueError, 'into'))
-    def test_no_jump_forwards_into_while_block(output):
-        i = 1
-        output.append(2)
-        while i <= 2:
-            output.append(4)
-            i += 1
+    @async_jump_test(3, 2, [2, 2], (ValueError, "can't jump into the body of a for loop"))
+    async def test_no_jump_backwards_into_async_for_block(output):
+        async for i in asynciter([1, 2]):
+            output.append(2)
+        output.append(3)
 
-    @jump_test(5, 3, [3, 3], (ValueError, 'into'))
-    def test_no_jump_backwards_into_while_block(output):
-        i = 1
-        while i <= 2:
-            output.append(3)
-            i += 1
-        output.append(5)
-
-    @jump_test(1, 3, [], (ValueError, 'into'))
+    @jump_test(1, 3, [], (ValueError, 'stack'))
     def test_no_jump_forwards_into_with_block(output):
         output.append(1)
         with tracecontext(output, 2):
             output.append(3)
 
-    @jump_test(3, 2, [1, 2, -1], (ValueError, 'into'))
+    @async_jump_test(1, 3, [], (ValueError, 'stack'))
+    async def test_no_jump_forwards_into_async_with_block(output):
+        output.append(1)
+        async with asynctracecontext(output, 2):
+            output.append(3)
+
+    @jump_test(3, 2, [1, 2, -1], (ValueError, 'stack'))
     def test_no_jump_backwards_into_with_block(output):
         with tracecontext(output, 1):
             output.append(2)
         output.append(3)
 
-    @jump_test(1, 3, [], (ValueError, 'into'))
-    def test_no_jump_forwards_into_try_finally_block(output):
+    @async_jump_test(3, 2, [1, 2, -1], (ValueError, 'stack'))
+    async def test_no_jump_backwards_into_async_with_block(output):
+        async with asynctracecontext(output, 1):
+            output.append(2)
+        output.append(3)
+
+    @jump_test(1, 3, [3, 5])
+    def test_jump_forwards_into_try_finally_block(output):
         output.append(1)
         try:
             output.append(3)
         finally:
             output.append(5)
 
-    @jump_test(5, 2, [2, 4], (ValueError, 'into'))
-    def test_no_jump_backwards_into_try_finally_block(output):
+    @jump_test(5, 2, [2, 4, 2, 4, 5])
+    def test_jump_backwards_into_try_finally_block(output):
         try:
             output.append(2)
         finally:
             output.append(4)
         output.append(5)
 
-    @jump_test(1, 3, [], (ValueError, 'into'))
-    def test_no_jump_forwards_into_try_except_block(output):
+    @jump_test(1, 3, [3])
+    def test_jump_forwards_into_try_except_block(output):
         output.append(1)
         try:
             output.append(3)
@@ -939,8 +2370,8 @@ class JumpTestCase(unittest.TestCase):
             output.append(5)
             raise
 
-    @jump_test(6, 2, [2], (ValueError, 'into'))
-    def test_no_jump_backwards_into_try_except_block(output):
+    @jump_test(6, 2, [2, 2, 6])
+    def test_jump_backwards_into_try_except_block(output):
         try:
             output.append(2)
         except:
@@ -948,8 +2379,28 @@ class JumpTestCase(unittest.TestCase):
             raise
         output.append(6)
 
-    @jump_test(3, 6, [2, 5, 6], (ValueError, 'finally'))
-    def test_no_jump_into_finally_block(output):
+    # 'except' with a variable creates an implicit finally block
+    @jump_test(5, 7, [4, 7, 8])
+    def test_jump_between_except_blocks_2(output):
+        try:
+            1/0
+        except ZeroDivisionError:
+            output.append(4)
+            output.append(5)
+        except FloatingPointError as e:
+            output.append(7)
+        output.append(8)
+
+    @jump_test(1, 5, [5])
+    def test_jump_into_finally_block(output):
+        output.append(1)
+        try:
+            output.append(3)
+        finally:
+            output.append(5)
+
+    @jump_test(3, 6, [2, 6, 7])
+    def test_jump_into_finally_block_from_try_block(output):
         try:
             output.append(2)
             output.append(3)
@@ -958,35 +2409,114 @@ class JumpTestCase(unittest.TestCase):
             output.append(6)
         output.append(7)
 
-    @jump_test(1, 5, [], (ValueError, 'finally'))
-    def test_no_jump_into_finally_block_2(output):
+    @jump_test(5, 1, [1, 3, 1, 3, 5])
+    def test_jump_out_of_finally_block(output):
         output.append(1)
         try:
             output.append(3)
         finally:
             output.append(5)
 
-    @jump_test(5, 1, [1, 3], (ValueError, 'finally'))
-    def test_no_jump_out_of_finally_block(output):
+    @jump_test(1, 5, [], (ValueError, "can't jump into an 'except' block as there's no exception"))
+    def test_no_jump_into_bare_except_block(output):
         output.append(1)
         try:
             output.append(3)
-        finally:
+        except:
             output.append(5)
 
-    @jump_test(3, 5, [1, 2, -2], (ValueError, 'into'))
-    def test_no_jump_between_with_blocks(output):
+    @jump_test(1, 5, [], (ValueError, "can't jump into an 'except' block as there's no exception"))
+    def test_no_jump_into_qualified_except_block(output):
+        output.append(1)
+        try:
+            output.append(3)
+        except Exception:
+            output.append(5)
+
+    @jump_test(3, 6, [2, 5, 6], (ValueError, "can't jump into an 'except' block as there's no exception"))
+    def test_no_jump_into_bare_except_block_from_try_block(output):
+        try:
+            output.append(2)
+            output.append(3)
+        except:  # executed if the jump is failed
+            output.append(5)
+            output.append(6)
+            raise
+        output.append(8)
+
+    @jump_test(3, 6, [2], (ValueError, "can't jump into an 'except' block as there's no exception"))
+    def test_no_jump_into_qualified_except_block_from_try_block(output):
+        try:
+            output.append(2)
+            output.append(3)
+        except ZeroDivisionError:
+            output.append(5)
+            output.append(6)
+            raise
+        output.append(8)
+
+    @jump_test(7, 1, [1, 3, 6, 1, 3, 6, 7])
+    def test_jump_out_of_bare_except_block(output):
+        output.append(1)
+        try:
+            output.append(3)
+            1/0
+        except:
+            output.append(6)
+            output.append(7)
+
+    @jump_test(7, 1, [1, 3, 6, 1, 3, 6, 7])
+    def test_jump_out_of_qualified_except_block(output):
+        output.append(1)
+        try:
+            output.append(3)
+            1/0
+        except Exception:
+            output.append(6)
+            output.append(7)
+
+    @jump_test(3, 5, [1, 2, 5, -2])
+    def test_jump_between_with_blocks(output):
         output.append(1)
         with tracecontext(output, 2):
             output.append(3)
         with tracecontext(output, 4):
             output.append(5)
 
+    @async_jump_test(3, 5, [1, 2, 5, -2])
+    async def test_jump_between_async_with_blocks(output):
+        output.append(1)
+        async with asynctracecontext(output, 2):
+            output.append(3)
+        async with asynctracecontext(output, 4):
+            output.append(5)
+
+    @jump_test(5, 7, [2, 4], (ValueError, "after"))
+    def test_no_jump_over_return_out_of_finally_block(output):
+        try:
+            output.append(2)
+        finally:
+            output.append(4)
+            output.append(5)
+            return
+        output.append(7)
+
     @jump_test(7, 4, [1, 6], (ValueError, 'into'))
     def test_no_jump_into_for_block_before_else(output):
         output.append(1)
         if not output:  # always false
             for i in [3]:
+                output.append(4)
+        else:
+            output.append(6)
+            output.append(7)
+        output.append(8)
+
+    @async_jump_test(7, 4, [1, 6], (ValueError, 'into'))
+    async def test_no_jump_into_async_for_block_before_else(output):
+        output.append(1)
+        if not output:  # always false
+            async for i in asynciter([3]):
                 output.append(4)
         else:
             output.append(6)
@@ -1026,11 +2556,11 @@ output.append(3)
 output.append(4)
 """, "<fake module>", "exec")
         class fake_function:
-            func_code = code
-        tracer = JumpTracer(fake_function, 2, 0)
+            __code__ = code
+        tracer = JumpTracer(fake_function, 4, 1)
         sys.settrace(tracer.trace)
         namespace = {"output": []}
-        exec code in namespace
+        exec(code, namespace)
         sys.settrace(None)
         self.compare_jump_output([2, 3, 2, 3, 4], namespace["output"])
 
@@ -1053,24 +2583,237 @@ output.append(4)
                "can only jump from a 'line' trace event"))
     def test_no_jump_from_exception_event(output):
         output.append(1)
-        1 // 0
+        1 / 0
 
-    @jump_test(3, 2, [2], event='return', error=(ValueError,
-               "can't jump from a yield statement"))
-    def test_no_jump_from_yield(output):
+    @jump_test(3, 2, [2, 5], event='return')
+    def test_jump_from_yield(output):
         def gen():
             output.append(2)
             yield 3
         next(gen())
         output.append(5)
 
+    @jump_test(2, 3, [1, 3])
+    def test_jump_forward_over_listcomp(output):
+        output.append(1)
+        x = [i for i in range(10)]
+        output.append(3)
 
-def test_main():
-    test_support.run_unittest(
-        TraceTestCase,
-        RaisingTraceFuncTestCase,
-        JumpTestCase
-    )
+    # checking for segfaults.
+    # See https://github.com/python/cpython/issues/92311
+    @jump_test(3, 1, [])
+    def test_jump_backward_over_listcomp(output):
+        a = 1
+        x = [i for i in range(10)]
+        c = 3
+
+    @jump_test(8, 2, [2, 7, 2])
+    def test_jump_backward_over_listcomp_v2(output):
+        flag = False
+        output.append(2)
+        if flag:
+            return
+        x = [i for i in range(5)]
+        flag = 6
+        output.append(7)
+        output.append(8)
+
+    @async_jump_test(2, 3, [1, 3])
+    async def test_jump_forward_over_async_listcomp(output):
+        output.append(1)
+        x = [i async for i in asynciter(range(10))]
+        output.append(3)
+
+    @async_jump_test(3, 1, [])
+    async def test_jump_backward_over_async_listcomp(output):
+        a = 1
+        x = [i async for i in asynciter(range(10))]
+        c = 3
+
+    @async_jump_test(8, 2, [2, 7, 2])
+    async def test_jump_backward_over_async_listcomp_v2(output):
+        flag = False
+        output.append(2)
+        if flag:
+            return
+        x = [i async for i in asynciter(range(5))]
+        flag = 6
+        output.append(7)
+        output.append(8)
+
+    # checking for segfaults.
+    @jump_test(3, 7, [], error=(ValueError, "stack"))
+    def test_jump_with_null_on_stack_load_global(output):
+        a = 1
+        print(
+            output.append(3)
+        )
+        output.append(5)
+        (
+            ( # 7
+                a
+                +
+                10
+            )
+            +
+            13
+        )
+        output.append(15)
+
+    # checking for segfaults.
+    @jump_test(4, 8, [], error=(ValueError, "stack"))
+    def test_jump_with_null_on_stack_push_null(output):
+        a = 1
+        f = print
+        f(
+            output.append(4)
+        )
+        output.append(6)
+        (
+            ( # 8
+                a
+                +
+                11
+            )
+            +
+            14
+        )
+        output.append(16)
+
+    # checking for segfaults.
+    @jump_test(3, 7, [], error=(ValueError, "stack"))
+    def test_jump_with_null_on_stack_load_attr(output):
+        a = 1
+        list.append(
+            output, 3
+        )
+        output.append(5)
+        (
+            ( # 7
+                a
+                +
+                10
+            )
+            +
+            13
+        )
+        output.append(15)
+
+    @jump_test(2, 3, [1, 3])
+    def test_jump_extended_args_unpack_ex_simple(output):
+        output.append(1)
+        _, *_, _ = output.append(2) or "Spam"
+        output.append(3)
+
+    @jump_test(3, 4, [1, 4, 4, 5])
+    def test_jump_extended_args_unpack_ex_tricky(output):
+        output.append(1)
+        (
+            _, *_, _
+        ) = output.append(4) or "Spam"
+        output.append(5)
+
+    def test_jump_extended_args_for_iter(self):
+        # In addition to failing when extended arg handling is broken, this can
+        # also hang for a *very* long time:
+        source = [
+            "def f(output):",
+            "    output.append(1)",
+            "    for _ in spam:",
+            *(f"        output.append({i})" for i in range(3, 100_000)),
+            f"    output.append(100_000)",
+        ]
+        namespace = {}
+        exec("\n".join(source), namespace)
+        f = namespace["f"]
+        self.run_test(f,  2, 100_000, [1, 100_000])
+
+    @jump_test(2, 3, [1, 3])
+    def test_jump_or_pop(output):
+        output.append(1)
+        _ = output.append(2) and "Spam"
+        output.append(3)
+
+
+class TestExtendedArgs(unittest.TestCase):
+
+    def setUp(self):
+        self.addCleanup(sys.settrace, sys.gettrace())
+        sys.settrace(None)
+
+    def count_traces(self, func):
+        # warmup
+        for _ in range(20):
+            func()
+
+        counts = {"call": 0, "line": 0, "return": 0}
+        def trace(frame, event, arg):
+            counts[event] += 1
+            return trace
+
+        sys.settrace(trace)
+        func()
+        sys.settrace(None)
+
+        return counts
+
+    def test_trace_unpack_long_sequence(self):
+        ns = {}
+        code = "def f():\n  (" + "y,\n   "*300 + ") = range(300)"
+        exec(code, ns)
+        counts = self.count_traces(ns["f"])
+        self.assertEqual(counts, {'call': 1, 'line': 301, 'return': 1})
+
+    def test_trace_lots_of_globals(self):
+        code = """if 1:
+            def f():
+                return (
+                    {}
+                )
+        """.format("\n+\n".join(f"var{i}\n" for i in range(1000)))
+        ns = {f"var{i}": i for i in range(1000)}
+        exec(code, ns)
+        counts = self.count_traces(ns["f"])
+        self.assertEqual(counts, {'call': 1, 'line': 2000, 'return': 1})
+
+
+class TestEdgeCases(unittest.TestCase):
+
+    def setUp(self):
+        self.addCleanup(sys.settrace, sys.gettrace())
+        sys.settrace(None)
+
+    def test_reentrancy(self):
+        def foo(*args):
+            ...
+
+        def bar(*args):
+            ...
+
+        class A:
+            def __call__(self, *args):
+                pass
+
+            def __del__(self):
+                sys.settrace(bar)
+
+        sys.settrace(A())
+        with support.catch_unraisable_exception() as cm:
+            sys.settrace(foo)
+            self.assertEqual(cm.unraisable.object, A.__del__)
+            self.assertIsInstance(cm.unraisable.exc_value, RuntimeError)
+
+        self.assertEqual(sys.gettrace(), foo)
+
+
+    def test_same_object(self):
+        def foo(*args):
+            ...
+
+        sys.settrace(foo)
+        del foo
+        sys.settrace(sys.gettrace())
+
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

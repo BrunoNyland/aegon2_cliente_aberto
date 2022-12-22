@@ -72,7 +72,7 @@ class CostumeWindow(ui.ScriptWindow):
 	def RefreshCostumeSlot(self):
 		getItemVNum = player.GetItemIndex
 
-		for i in xrange(item.COSTUME_SLOT_COUNT):
+		for i in range(item.COSTUME_SLOT_COUNT):
 			slotNumber = item.COSTUME_SLOT_START + i
 			self.wndEquip.SetItemSlot(slotNumber, getItemVNum(slotNumber), 0)
 
@@ -172,7 +172,7 @@ class InventoryWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/_inventorywindow.py")
-		except:
+		except BaseException:
 			exception.Abort("InventoryWindow.LoadWindow.LoadObject")
 
 		wndItem = self.GetChild("ItemSlot")
@@ -488,7 +488,7 @@ class InventoryWindow(ui.ScriptWindow):
 					self.wndItem.SetUsableSlotOnTopWnd(localIndex)
 			return
 
-		for i in xrange(player.INVENTORY_PAGE_SIZE):
+		for i in range(player.INVENTORY_PAGE_SIZE):
 			slotNumber = self.__InventoryLocalSlotPosToGlobalSlotPos(i)
 
 			if onTopWnd == player.ON_TOP_WND_NONE:
@@ -534,7 +534,7 @@ class InventoryWindow(ui.ScriptWindow):
 		getItemCount = player.GetItemCount
 		setItemVNum = self.wndItem.SetItemSlot
 
-		for i in xrange(player.INVENTORY_PAGE_SIZE):
+		for i in range(player.INVENTORY_PAGE_SIZE):
 			slotNumber = self.__InventoryLocalSlotPosToGlobalSlotPos(i)
 
 			itemCount = getItemCount(slotNumber)
@@ -551,7 +551,7 @@ class InventoryWindow(ui.ScriptWindow):
 			self.wndItem.EnableCoverButton(i)
 
 			if constinfo.IS_AUTO_POTION(itemVnum):
-				metinSocket = [player.GetItemMetinSocket(slotNumber, j) for j in xrange(player.METIN_SOCKET_MAX_NUM)]
+				metinSocket = [player.GetItemMetinSocket(slotNumber, j) for j in range(player.METIN_SOCKET_MAX_NUM)]
 
 				if slotNumber >= player.INVENTORY_PAGE_SIZE*self.inventoryPageIndex:
 					slotNumber -= player.INVENTORY_PAGE_SIZE*self.inventoryPageIndex
@@ -586,7 +586,7 @@ class InventoryWindow(ui.ScriptWindow):
 		for wnd in self.bindWnds:
 			try:
 				wnd.RefreshLockedSlot()
-			except:
+			except BaseException:
 				to_delete.append(wnd)
 
 		for wnd in to_delete:
@@ -596,7 +596,7 @@ class InventoryWindow(ui.ScriptWindow):
 		getItemVNum = player.GetItemIndex
 		getItemCount = player.GetItemCount
 		setItemVNum = self.wndEquip.SetItemSlot
-		for i in xrange(player.EQUIPMENT_SLOT_START, player.EQUIPMENT_SLOT_START+16):
+		for i in range(player.EQUIPMENT_SLOT_START, player.EQUIPMENT_SLOT_START+16):
 			slotNumber = i
 			itemCount = getItemCount(slotNumber)
 			if itemCount <= 1:
@@ -1069,7 +1069,7 @@ class InventoryWindow(ui.ScriptWindow):
 		if item.ITEM_TYPE_WEAPON != item.GetItemType():
 			return False
 
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			if player.GetItemMetinSocket(dstSlotPos, i) == constinfo.ERROR_METIN_STONE:
 				return True
 		return False
@@ -1107,7 +1107,7 @@ class InventoryWindow(ui.ScriptWindow):
 		if not item.GetItemType() in (item.ITEM_TYPE_WEAPON, item.ITEM_TYPE_ARMOR):	 
 			return False
 
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			if player.GetItemAttribute(dstSlotPos, i) != 0:
 				return True
 
@@ -1169,7 +1169,7 @@ class InventoryWindow(ui.ScriptWindow):
 			return False
 
 		attrCount = 0
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			if player.GetItemAttribute(dstSlotPos, i) != 0:
 				attrCount += 1
 
@@ -1190,7 +1190,7 @@ class InventoryWindow(ui.ScriptWindow):
 		for wnd in self.bindWnds:
 			try:
 				wnd.RefreshLockedSlot()
-			except:
+			except BaseException:
 				to_delete.append(wnd)
 
 		for wnd in to_delete:

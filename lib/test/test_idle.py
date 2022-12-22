@@ -1,20 +1,28 @@
 import unittest
-from test import test_support as support
-from test.test_support import import_module
+from test.support.import_helper import import_module
+from test.support import check_sanitizer
 
-# Skip test if _thread or _tkinter wasn't built or idlelib was deleted.
-import_module('threading')  # imported by idlelib.PyShell, imports _thread
-tk = import_module('Tkinter')  # imports _tkinter
-idletest = import_module('idlelib.idle_test')
+if check_sanitizer(address=True, memory=True):
+    raise unittest.SkipTest("Tests involvin libX11 can SEGFAULT on ASAN/MSAN builds")
 
-# Without test_main present, regrtest.runtest_inner (line1219) calls
-# unittest.TestLoader().loadTestsFromModule(this_module) which calls
-# load_tests() if it finds it. (Unittest.main does the same.)
-load_tests = idletest.load_tests
+# Skip test_idle if _tkinter wasn't built, if tkinter is missing,
+# if tcl/tk is not the 8.5+ needed for ttk widgets,
+# or if idlelib is missing (not installed).
+tk = import_module('tkinter')  # Also imports _tkinter.
+if tk.TkVersion < 8.5:
+    raise unittest.SkipTest("IDLE requires tk 8.5 or later.")
+idlelib = import_module('idlelib')
 
-# pre-3.3 regrtest does not support the load_tests protocol. use test_main
-def test_main():
-    support.run_unittest(unittest.TestLoader().loadTestsFromModule(idletest))
+# Before importing and executing more of idlelib,
+# tell IDLE to avoid changing the environment.
+idlelib.testing = True
+
+# Unittest.main and test.libregrtest.runtest.runtest_inner
+# call load_tests, when present here, to discover tests to run.
+from idlelib.idle_test import load_tests
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2, exit=False)
+    tk.NoDefaultRoot()
+    unittest.main(exit=False)
+    tk._support_default_root = True
+    tk._default_root = None

@@ -1,29 +1,30 @@
-import unittest
-from test import test_support
-
+import os
 import time
+import unittest
+
 
 class StructSeqTest(unittest.TestCase):
 
     def test_tuple(self):
         t = time.gmtime()
+        self.assertIsInstance(t, tuple)
         astuple = tuple(t)
         self.assertEqual(len(t), len(astuple))
         self.assertEqual(t, astuple)
 
         # Check that slicing works the same way; at one point, slicing t[i:j] with
         # 0 < i < j could produce NULLs in the result.
-        for i in xrange(-len(t), len(t)):
+        for i in range(-len(t), len(t)):
             self.assertEqual(t[i:], astuple[i:])
-            for j in xrange(-len(t), len(t)):
+            for j in range(-len(t), len(t)):
                 self.assertEqual(t[i:j], astuple[i:j])
 
-        for j in xrange(-len(t), len(t)):
+        for j in range(-len(t), len(t)):
             self.assertEqual(t[:j], astuple[:j])
 
         self.assertRaises(IndexError, t.__getitem__, -len(t)-1)
         self.assertRaises(IndexError, t.__getitem__, len(t))
-        for i in xrange(-len(t), len(t)-1):
+        for i in range(-len(t), len(t)-1):
             self.assertEqual(t[i], astuple[i])
 
     def test_repr(self):
@@ -33,17 +34,24 @@ class StructSeqTest(unittest.TestCase):
         self.assertEqual(repr(t),
             "time.struct_time(tm_year=1970, tm_mon=1, tm_mday=1, tm_hour=0, "
             "tm_min=0, tm_sec=0, tm_wday=3, tm_yday=1, tm_isdst=0)")
+        # os.stat() gives a complicated struct sequence.
+        st = os.stat(__file__)
+        rep = repr(st)
+        self.assertTrue(rep.startswith("os.stat_result"))
+        self.assertIn("st_mode=", rep)
+        self.assertIn("st_ino=", rep)
+        self.assertIn("st_dev=", rep)
 
     def test_concat(self):
         t1 = time.gmtime()
         t2 = t1 + tuple(t1)
-        for i in xrange(len(t1)):
+        for i in range(len(t1)):
             self.assertEqual(t2[i], t2[i+len(t1)])
 
     def test_repeat(self):
         t1 = time.gmtime()
         t2 = 3 * t1
-        for i in xrange(len(t1)):
+        for i in range(len(t1)):
             self.assertEqual(t2[i], t2[i+len(t1)])
             self.assertEqual(t2[i], t2[i+2*len(t1)])
 
@@ -69,8 +77,9 @@ class StructSeqTest(unittest.TestCase):
 
     def test_fields(self):
         t = time.gmtime()
-        self.assertEqual(len(t), t.n_fields)
-        self.assertEqual(t.n_fields, t.n_sequence_fields+t.n_unnamed_fields)
+        self.assertEqual(len(t), t.n_sequence_fields)
+        self.assertEqual(t.n_unnamed_fields, 0)
+        self.assertEqual(t.n_fields, time._STRUCT_TM_ITEMS)
 
     def test_constructor(self):
         t = time.struct_time
@@ -113,8 +122,17 @@ class StructSeqTest(unittest.TestCase):
                     self.assertEqual(list(t[start:stop:step]),
                                      L[start:stop:step])
 
-def test_main():
-    test_support.run_unittest(StructSeqTest)
+    def test_match_args(self):
+        expected_args = ('tm_year', 'tm_mon', 'tm_mday', 'tm_hour', 'tm_min',
+                         'tm_sec', 'tm_wday', 'tm_yday', 'tm_isdst')
+        self.assertEqual(time.struct_time.__match_args__, expected_args)
+
+    def test_match_args_with_unnamed_fields(self):
+        expected_args = ('st_mode', 'st_ino', 'st_dev', 'st_nlink', 'st_uid',
+                         'st_gid', 'st_size')
+        self.assertEqual(os.stat_result.n_unnamed_fields, 3)
+        self.assertEqual(os.stat_result.__match_args__, expected_args)
+
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

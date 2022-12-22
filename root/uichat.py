@@ -198,7 +198,7 @@ class ChatLine(ui.EditLine):
 	def GetCurrentChatModeName(self):
 		try:
 			return self.CHAT_MODE_NAME[self.chatMode]
-		except:
+		except BaseException:
 			exception.Abort("ChatLine.GetCurrentChatModeName")
 
 	def SetEscapeEvent(self, event):
@@ -261,7 +261,7 @@ class ChatLine(ui.EditLine):
 
 		links = {}
 		if self.GetLinks(text, links):
-			for k, v in links.iteritems():
+			for k, v in links.items():
 				text = text.replace(k, v)
 
 		net.SendChatPacket(text, type)

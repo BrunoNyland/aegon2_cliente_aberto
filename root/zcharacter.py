@@ -160,7 +160,7 @@ class CharacterWindow(ui.ScriptWindow):
 			self.__BindObject()
 			self.__BindEvent()
 			self.Refreshing()
-		except:
+		except BaseException:
 			exception.Abort("CharacterWindow.__LoadWindow")
 
 		self.SetState("STATUS")
@@ -243,7 +243,7 @@ class CharacterWindow(ui.ScriptWindow):
 		self.questScrollBar = self.GetChild("Quest_ScrollBar")
 		self.questScrollBar.SetScrollEvent(self.OnQuestScroll)
 		self.questSlot = self.GetChild("Quest_Slot")
-		for i in xrange(6):
+		for i in range(6):
 			self.questSlot.HideSlotBaseImage(i)
 			self.questSlot.SetCoverButton(i,\
 											"interface/icons/special/quest_closed.tga",\
@@ -254,7 +254,7 @@ class CharacterWindow(ui.ScriptWindow):
 		self.questNameList = []
 		self.questLastTimeList = []
 		self.questLastCountList = []
-		for i in xrange(6):
+		for i in range(6):
 			self.questHeaderList.append(self.GetChild("Quest_Header_0" + str(i)))
 			self.questNameList.append(self.GetChild("Quest_Name_0" + str(i)))
 			self.questLastTimeList.append(self.GetChild("Quest_LastTime_0" + str(i)))
@@ -327,7 +327,7 @@ class CharacterWindow(ui.ScriptWindow):
 			slot.SetCoverButton(slotIdx)
 
 		if app.ENABLE_EXPRESSING_EMOTION:
-			for i in xrange(0, 17):
+			for i in range(0, 17):
 				slotIdx = app.SLOT_EMOTION_START + i
 				emotionIdx = slotIdx
 
@@ -445,7 +445,7 @@ class CharacterWindow(ui.ScriptWindow):
 ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ### SKILLS ###
 	def __SetSkillSlotEvent(self):
 		place = "interface/controls/common/button_status/"
-		for skillPageValue in self.skillPageDict.itervalues():
+		for skillPageValue in self.skillPageDict.values():
 			skillPageValue.SetSlotStyle(wndMgr.SLOT_STYLE_NONE)
 			skillPageValue.SetSelectItemSlotEvent(self.SelectSkill)
 			skillPageValue.SetSelectEmptySlotEvent(self.SelectEmptySlot)
@@ -490,7 +490,7 @@ class CharacterWindow(ui.ScriptWindow):
 	def SetState(self, stateKey):
 		self.state = stateKey
 
-		for pageValue in self.pageDict.itervalues():
+		for pageValue in self.pageDict.values():
 			pageValue.Hide()
 		self.pageDict[stateKey].Show()
 
@@ -694,7 +694,7 @@ class CharacterWindow(ui.ScriptWindow):
 
 	def __UpdateQuestClock(self):
 		if "QUEST" == self.state:
-			for i in xrange(min(quest.GetQuestCount(), 6)):
+			for i in range(min(quest.GetQuestCount(), 6)):
 				(lastName, lastTime) = quest.GetQuestLastTime(i)
 
 				clockText = localeinfo.QUEST_UNLIMITED_TIME
@@ -741,11 +741,11 @@ class CharacterWindow(ui.ScriptWindow):
 		getSkillLevelUpPoint = skill.GetSkillLevelUpPoint
 		getSkillMaxLevel = skill.GetSkillMaxLevel
 
-		for i in xrange(slotCount + 1):
+		for i in range(slotCount + 1):
 			slotIndex = i + startSlotIndex
 			skillIndex = getSkillIndex(slotIndex)
 
-			for j in xrange(skill.SKILL_GRADE_COUNT):
+			for j in range(skill.SKILL_GRADE_COUNT):
 				skillPage.ClearSlot(self.__GetRealSkillSlot(j, i))
 
 			if 0 == skillIndex:
@@ -767,7 +767,7 @@ class CharacterWindow(ui.ScriptWindow):
 				skillPage.SetSlotCount(slotIndex, skillLevel)
 
 			elif skill.SKILL_TYPE_ACTIVE == skillType:
-				for j in xrange(skill.SKILL_GRADE_COUNT):
+				for j in range(skill.SKILL_GRADE_COUNT):
 					realSlotIndex = self.__GetRealSkillSlot(j, slotIndex)
 					if not ((self.__CanUseSkillNow()) and (skillGrade != j)):
 						skillPage.SetSkillSlotNew(realSlotIndex, skillIndex, j, skillLevel)
@@ -840,7 +840,7 @@ class CharacterWindow(ui.ScriptWindow):
 		if "HORSE" == name:
 			startSlotIndex += self.ACTIVE_PAGE_SLOT_COUNT
 
-		for i in xrange(self.PAGE_SLOT_COUNT +1):
+		for i in range(self.PAGE_SLOT_COUNT +1):
 			slotIndex = i + startSlotIndex
 			skillIndex = player.GetSkillIndex(slotIndex)
 			skillGrade = player.GetSkillGrade(slotIndex)
@@ -877,7 +877,7 @@ class CharacterWindow(ui.ScriptWindow):
 
 			xPos = 35
 			yPos = 0
-			for idx in xrange(self.PAGE_SLOT_COUNT):
+			for idx in range(self.PAGE_SLOT_COUNT):
 				skillSlot = idx
 				if skillSlot < 6:
 					skillIndex = player.GetSkillIndex(skillSlot + 1)
@@ -1019,7 +1019,7 @@ class CharacterWindow(ui.ScriptWindow):
 			else:
 				self.guildNameValue.SetText(guildName)
 
-		except:
+		except BaseException:
 			exception.Abort("CharacterWindow.RefreshCharacter.BindObject")
 
 		race = net.GetMainActorRace()
@@ -1041,7 +1041,7 @@ class CharacterWindow(ui.ScriptWindow):
 	# def __SetSkillGroupName(self, race, group):
 		# job = chr.RaceToJob(race)
 
-		# if not self.SKILL_GROUP_NAME_DICT.has_key(job):
+		# if not self.SKILL_GROUP_NAME_DICT.__contains__(job):
 			# return
 
 		# nameList = self.SKILL_GROUP_NAME_DICT[job]

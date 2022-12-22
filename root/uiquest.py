@@ -80,7 +80,7 @@ class QuestCurtain(ui.Window):
 		self.TopBar.SetPosition(0, -self.BarHeight-1)
 		self.BottomBar.SetPosition(0, wndMgr.GetScreenHeight()+1)
 		for OnDoneEvent in QuestCurtain.OnDoneEventList:
-			apply(OnDoneEvent, (self,))
+			OnDoneEvent(* (self,))
 		QuestCurtain.OnDoneEventList = []
 
 	def OnUpdate(self):
@@ -437,7 +437,7 @@ class QuestDialog(ui.ScriptWindow):
 		if not self.board:
 			return
 
-		self.btnAnswer = [self.MakeEachButton(i) for i in xrange (n)]
+		self.btnAnswer = [self.MakeEachButton(i) for i in range (n)]
 
 		self.prevbutton = self.MakeNextPrevPageButton()
 		self.prevbutton.SetPosition(self.sx+self.board.GetWidth()/2-164, self.board.GetHeight()/2-16)
@@ -688,7 +688,7 @@ class QuestDialog(ui.ScriptWindow):
 
 			import grpText
 			lineCount = grpText.GetSplitingTextLineCount(tempDesc, 25)
-			for i in xrange(lineCount):
+			for i in range(lineCount):
 				desc += grpText.GetSplitingTextLine(tempDesc, 25, i) + "/"
 
 			desc = desc[:-1]

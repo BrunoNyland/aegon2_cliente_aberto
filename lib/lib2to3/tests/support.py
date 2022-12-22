@@ -3,10 +3,8 @@
 
 # Python imports
 import unittest
-import sys
 import os
 import os.path
-import re
 from textwrap import dedent
 
 # Local imports
@@ -17,7 +15,13 @@ test_dir = os.path.dirname(__file__)
 proj_dir = os.path.normpath(os.path.join(test_dir, ".."))
 grammar_path = os.path.join(test_dir, "..", "Grammar.txt")
 grammar = pgen2_driver.load_grammar(grammar_path)
+grammar_no_print_statement = pgen2_driver.load_grammar(grammar_path)
+del grammar_no_print_statement.keywords["print"]
 driver = pgen2_driver.Driver(grammar, convert=pytree.convert)
+driver_no_print_statement = pgen2_driver.Driver(
+    grammar_no_print_statement,
+    convert=pytree.convert
+)
 
 def parse_string(string):
     return driver.parse_string(reformat(string), debug=True)
@@ -28,7 +32,7 @@ def run_all_tests(test_mod=None, tests=None):
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 def reformat(string):
-    return dedent(string) + u"\n\n"
+    return dedent(string) + "\n\n"
 
 def get_refactorer(fixer_pkg="lib2to3", fixers=None, options=None):
     """

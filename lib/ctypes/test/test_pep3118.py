@@ -25,14 +25,17 @@ class Test(unittest.TestCase):
             v = memoryview(ob)
             try:
                 self.assertEqual(normalize(v.format), normalize(fmt))
-                if shape is not None:
+                if shape:
                     self.assertEqual(len(v), shape[0])
                 else:
                     self.assertEqual(len(v) * sizeof(itemtp), sizeof(ob))
                 self.assertEqual(v.itemsize, sizeof(itemtp))
                 self.assertEqual(v.shape, shape)
-                # ctypes object always have a non-strided memory block
-                self.assertEqual(v.strides, None)
+                # XXX Issue #12851: PyCData_NewGetBuffer() must provide strides
+                #     if requested. memoryview currently reconstructs missing
+                #     stride information, so this assert will fail.
+                # self.assertEqual(v.strides, ())
+
                 # they are always read/write
                 self.assertFalse(v.readonly)
 
@@ -52,14 +55,15 @@ class Test(unittest.TestCase):
             v = memoryview(ob)
             try:
                 self.assertEqual(v.format, fmt)
-                if shape is not None:
+                if shape:
                     self.assertEqual(len(v), shape[0])
                 else:
                     self.assertEqual(len(v) * sizeof(itemtp), sizeof(ob))
                 self.assertEqual(v.itemsize, sizeof(itemtp))
                 self.assertEqual(v.shape, shape)
-                # ctypes object always have a non-strided memory block
-                self.assertEqual(v.strides, None)
+                # XXX Issue #12851
+                # self.assertEqual(v.strides, ())
+
                 # they are always read/write
                 self.assertFalse(v.readonly)
 
@@ -94,7 +98,6 @@ class aUnion(Union):
 
 class StructWithArrays(Structure):
     _fields_ = [("x", c_long * 3 * 2), ("y", Point * 4)]
-
 
 class Incomplete(Structure):
     pass
@@ -142,33 +145,33 @@ native_types = [
 
     ## simple types
 
-    (c_char,                    "<c",                   None,           c_char),
-    (c_byte,                    "<b",                   None,           c_byte),
-    (c_ubyte,                   "<B",                   None,           c_ubyte),
-    (c_short,                   "<" + s_short,          None,           c_short),
-    (c_ushort,                  "<" + s_ushort,         None,           c_ushort),
+    (c_char,                    "<c",                   (),           c_char),
+    (c_byte,                    "<b",                   (),           c_byte),
+    (c_ubyte,                   "<B",                   (),           c_ubyte),
+    (c_short,                   "<" + s_short,          (),           c_short),
+    (c_ushort,                  "<" + s_ushort,         (),           c_ushort),
 
-    (c_int,                     "<" + s_int,            None,           c_int),
-    (c_uint,                    "<" + s_uint,           None,           c_uint),
+    (c_int,                     "<" + s_int,            (),           c_int),
+    (c_uint,                    "<" + s_uint,           (),           c_uint),
 
-    (c_long,                    "<" + s_long,           None,           c_long),
-    (c_ulong,                   "<" + s_ulong,          None,           c_ulong),
+    (c_long,                    "<" + s_long,           (),           c_long),
+    (c_ulong,                   "<" + s_ulong,          (),           c_ulong),
 
-    (c_longlong,                "<" + s_longlong,       None,           c_longlong),
-    (c_ulonglong,               "<" + s_ulonglong,      None,           c_ulonglong),
+    (c_longlong,                "<" + s_longlong,       (),           c_longlong),
+    (c_ulonglong,               "<" + s_ulonglong,      (),           c_ulonglong),
 
-    (c_float,                   "<f",                   None,           c_float),
-    (c_double,                  "<d",                   None,           c_double),
+    (c_float,                   "<f",                   (),           c_float),
+    (c_double,                  "<d",                   (),           c_double),
 
-    (c_longdouble,              "<" + s_longdouble,     None,           c_longdouble),
+    (c_longdouble,              "<" + s_longdouble,     (),           c_longdouble),
 
-    (c_bool,                    "<" + s_bool,           None,           c_bool),
-    (py_object,                 "<O",                   None,           py_object),
+    (c_bool,                    "<" + s_bool,           (),           c_bool),
+    (py_object,                 "<O",                   (),           py_object),
 
     ## pointers
 
-    (POINTER(c_byte),           "&<b",                  None,           POINTER(c_byte)),
-    (POINTER(POINTER(c_long)),  "&&<" + s_long,         None,           POINTER(POINTER(c_long))),
+    (POINTER(c_byte),           "&<b",                  (),           POINTER(c_byte)),
+    (POINTER(POINTER(c_long)),  "&&<" + s_long,         (),           POINTER(POINTER(c_long))),
 
     ## arrays and pointers
 
@@ -176,35 +179,35 @@ native_types = [
     (c_float * 4 * 3 * 2,       "<f",                   (2,3,4),        c_float),
     (POINTER(c_short) * 2,      "&<" + s_short,         (2,),           POINTER(c_short)),
     (POINTER(c_short) * 2 * 3,  "&<" + s_short,         (3,2,),         POINTER(c_short)),
-    (POINTER(c_short * 2),      "&(2)<" + s_short,      None,             POINTER(c_short)),
+    (POINTER(c_short * 2),      "&(2)<" + s_short,      (),             POINTER(c_short)),
 
     ## structures and unions
 
-    (Point,                     "T{<l:x:<l:y:}".replace('l', s_long),  None,  Point),
+    (Point,                     "T{<l:x:<l:y:}".replace('l', s_long),  (),  Point),
     # packed structures do not implement the pep
-    (PackedPoint,               "B",                                   None,  PackedPoint),
-    (Point2,                    "T{<l:x:<l:y:}".replace('l', s_long),  None,  Point2),
-    (EmptyStruct,               "T{}",                                 None,  EmptyStruct),
-    # the pep does't support unions
-    (aUnion,                    "B",                                   None,  aUnion),
+    (PackedPoint,               "B",                                   (),  PackedPoint),
+    (Point2,                    "T{<l:x:<l:y:}".replace('l', s_long),  (),  Point2),
+    (EmptyStruct,               "T{}",                                 (),  EmptyStruct),
+    # the pep doesn't support unions
+    (aUnion,                    "B",                                   (),  aUnion),
     # structure with sub-arrays
-    (StructWithArrays, "T{(2,3)<l:x:(4)T{<l:x:<l:y:}:y:}".replace('l', s_long), None, StructWithArrays),
+    (StructWithArrays, "T{(2,3)<l:x:(4)T{<l:x:<l:y:}:y:}".replace('l', s_long), (), StructWithArrays),
     (StructWithArrays * 3, "T{(2,3)<l:x:(4)T{<l:x:<l:y:}:y:}".replace('l', s_long), (3,), StructWithArrays),
 
     ## pointer to incomplete structure
-    (Incomplete,                "B",                    None,           Incomplete),
-    (POINTER(Incomplete),       "&B",                   None,           POINTER(Incomplete)),
+    (Incomplete,                "B",                    (),           Incomplete),
+    (POINTER(Incomplete),       "&B",                   (),           POINTER(Incomplete)),
 
     # 'Complete' is a structure that starts incomplete, but is completed after the
     # pointer type to it has been created.
-    (Complete,                  "T{<l:a:}".replace('l', s_long), None, Complete),
+    (Complete,                  "T{<l:a:}".replace('l', s_long), (), Complete),
     # Unfortunately the pointer format string is not fixed...
-    (POINTER(Complete),         "&B",                   None,           POINTER(Complete)),
+    (POINTER(Complete),         "&B",                   (),           POINTER(Complete)),
 
     ## other
 
     # function signatures are not implemented
-    (CFUNCTYPE(None),           "X{}",                  None,           CFUNCTYPE(None)),
+    (CFUNCTYPE(None),           "X{}",                  (),           CFUNCTYPE(None)),
 
     ]
 
@@ -220,10 +223,10 @@ class LEPoint(LittleEndianStructure):
 # and little endian machines.
 #
 endian_types = [
-    (BEPoint, "T{>l:x:>l:y:}".replace('l', s_long), None, BEPoint),
-    (LEPoint, "T{<l:x:<l:y:}".replace('l', s_long), None, LEPoint),
-    (POINTER(BEPoint), "&T{>l:x:>l:y:}".replace('l', s_long), None, POINTER(BEPoint)),
-    (POINTER(LEPoint), "&T{<l:x:<l:y:}".replace('l', s_long), None, POINTER(LEPoint)),
+    (BEPoint, "T{>l:x:>l:y:}".replace('l', s_long), (), BEPoint),
+    (LEPoint, "T{<l:x:<l:y:}".replace('l', s_long), (), LEPoint),
+    (POINTER(BEPoint), "&T{>l:x:>l:y:}".replace('l', s_long), (), POINTER(BEPoint)),
+    (POINTER(LEPoint), "&T{<l:x:<l:y:}".replace('l', s_long), (), POINTER(LEPoint)),
     ]
 
 if __name__ == "__main__":

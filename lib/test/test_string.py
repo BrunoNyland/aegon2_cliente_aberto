@@ -1,99 +1,24 @@
 import unittest
 import string
 from string import Template
-from test import test_support, string_tests
-from UserList import UserList
-
-class StringTest(
-    string_tests.CommonTest,
-    string_tests.MixinStrStringUserStringTest
-    ):
-
-    type2test = str
-
-    def checkequal(self, result, object, methodname, *args):
-        realresult = getattr(string, methodname)(object, *args)
-        self.assertEqual(
-            result,
-            realresult
-        )
-
-    def checkraises(self, exc, obj, methodname, *args):
-        with self.assertRaises(exc) as cm:
-            getattr(string, methodname)(obj, *args)
-        self.assertNotEqual(cm.exception.args[0], '')
-
-    def checkcall(self, object, methodname, *args):
-        getattr(string, methodname)(object, *args)
-
-    def test_join(self):
-        # These are the same checks as in string_test.ObjectTest.test_join
-        # but the argument order ist different
-        self.checkequal('a b c d', ['a', 'b', 'c', 'd'], 'join', ' ')
-        self.checkequal('abcd', ('a', 'b', 'c', 'd'), 'join', '')
-        self.checkequal('w x y z', string_tests.Sequence(), 'join', ' ')
-        self.checkequal('abc', ('abc',), 'join', 'a')
-        self.checkequal('z', UserList(['z']), 'join', 'a')
-        if test_support.have_unicode:
-            self.checkequal(unicode('a.b.c'), ['a', 'b', 'c'], 'join', unicode('.'))
-            self.checkequal(unicode('a.b.c'), [unicode('a'), 'b', 'c'], 'join', '.')
-            self.checkequal(unicode('a.b.c'), ['a', unicode('b'), 'c'], 'join', '.')
-            self.checkequal(unicode('a.b.c'), ['a', 'b', unicode('c')], 'join', '.')
-            self.checkraises(TypeError, ['a', unicode('b'), 3], 'join', '.')
-        for i in [5, 25, 125]:
-            self.checkequal(
-                ((('a' * i) + '-') * i)[:-1],
-                ['a' * i] * i, 'join', '-')
-            self.checkequal(
-                ((('a' * i) + '-') * i)[:-1],
-                ('a' * i,) * i, 'join', '-')
-
-        self.checkraises(TypeError, string_tests.BadSeq1(), 'join', ' ')
-        self.checkequal('a b c', string_tests.BadSeq2(), 'join', ' ')
-        try:
-            def f():
-                yield 4 + ""
-            self.fixtype(' ').join(f())
-        except TypeError, e:
-            if '+' not in str(e):
-                self.fail('join() ate exception message')
-        else:
-            self.fail('exception not raised')
 
 
 class ModuleTest(unittest.TestCase):
 
     def test_attrs(self):
-        string.whitespace
-        string.lowercase
-        string.uppercase
-        string.letters
-        string.digits
-        string.hexdigits
-        string.octdigits
-        string.punctuation
-        string.printable
-
-    def test_atoi(self):
-        self.assertEqual(string.atoi(" 1 "), 1)
-        self.assertRaises(ValueError, string.atoi, " 1x")
-        self.assertRaises(ValueError, string.atoi, " x1 ")
-
-    def test_atol(self):
-        self.assertEqual(string.atol("  1  "), 1L)
-        self.assertRaises(ValueError, string.atol, "  1x ")
-        self.assertRaises(ValueError, string.atol, "  x1 ")
-
-    def test_atof(self):
-        self.assertAlmostEqual(string.atof("  1  "), 1.0)
-        self.assertRaises(ValueError, string.atof, "  1x ")
-        self.assertRaises(ValueError, string.atof, "  x1 ")
-
-    def test_maketrans(self):
-        transtable = '\000\001\002\003\004\005\006\007\010\011\012\013\014\015\016\017\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037 !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`xyzdefghijklmnopqrstuvwxyz{|}~\177\200\201\202\203\204\205\206\207\210\211\212\213\214\215\216\217\220\221\222\223\224\225\226\227\230\231\232\233\234\235\236\237\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377'
-
-        self.assertEqual(string.maketrans('abc', 'xyz'), transtable)
-        self.assertRaises(ValueError, string.maketrans, 'abc', 'xyzq')
+        # While the exact order of the items in these attributes is not
+        # technically part of the "language spec", in practice there is almost
+        # certainly user code that depends on the order, so de-facto it *is*
+        # part of the spec.
+        self.assertEqual(string.whitespace, ' \t\n\r\x0b\x0c')
+        self.assertEqual(string.ascii_lowercase, 'abcdefghijklmnopqrstuvwxyz')
+        self.assertEqual(string.ascii_uppercase, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        self.assertEqual(string.ascii_letters, string.ascii_lowercase + string.ascii_uppercase)
+        self.assertEqual(string.digits, '0123456789')
+        self.assertEqual(string.hexdigits, string.digits + 'abcdefABCDEF')
+        self.assertEqual(string.octdigits, '01234567')
+        self.assertEqual(string.punctuation, '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~')
+        self.assertEqual(string.printable, string.digits + string.ascii_lowercase + string.ascii_uppercase + string.punctuation + string.whitespace)
 
     def test_capwords(self):
         self.assertEqual(string.capwords('abc def ghi'), 'Abc Def Ghi')
@@ -106,15 +31,77 @@ class ModuleTest(unittest.TestCase):
         self.assertEqual(string.capwords('\taBc\tDeF\t'), 'Abc Def')
         self.assertEqual(string.capwords('\taBc\tDeF\t', '\t'), '\tAbc\tDef\t')
 
-    def test_formatter(self):
+    def test_basic_formatter(self):
         fmt = string.Formatter()
         self.assertEqual(fmt.format("foo"), "foo")
-
         self.assertEqual(fmt.format("foo{0}", "bar"), "foobar")
         self.assertEqual(fmt.format("foo{1}{0}-{1}", "bar", 6), "foo6bar-6")
-        self.assertEqual(fmt.format("-{arg!r}-", arg='test'), "-'test'-")
+        self.assertRaises(TypeError, fmt.format)
+        self.assertRaises(TypeError, string.Formatter.format)
 
-        # override get_value ############################################
+    def test_format_keyword_arguments(self):
+        fmt = string.Formatter()
+        self.assertEqual(fmt.format("-{arg}-", arg='test'), '-test-')
+        self.assertRaises(KeyError, fmt.format, "-{arg}-")
+        self.assertEqual(fmt.format("-{self}-", self='test'), '-test-')
+        self.assertRaises(KeyError, fmt.format, "-{self}-")
+        self.assertEqual(fmt.format("-{format_string}-", format_string='test'),
+                         '-test-')
+        self.assertRaises(KeyError, fmt.format, "-{format_string}-")
+        with self.assertRaisesRegex(TypeError, "format_string"):
+            fmt.format(format_string="-{arg}-", arg='test')
+
+    def test_auto_numbering(self):
+        fmt = string.Formatter()
+        self.assertEqual(fmt.format('foo{}{}', 'bar', 6),
+                         'foo{}{}'.format('bar', 6))
+        self.assertEqual(fmt.format('foo{1}{num}{1}', None, 'bar', num=6),
+                         'foo{1}{num}{1}'.format(None, 'bar', num=6))
+        self.assertEqual(fmt.format('{:^{}}', 'bar', 6),
+                         '{:^{}}'.format('bar', 6))
+        self.assertEqual(fmt.format('{:^{}} {}', 'bar', 6, 'X'),
+                         '{:^{}} {}'.format('bar', 6, 'X'))
+        self.assertEqual(fmt.format('{:^{pad}}{}', 'foo', 'bar', pad=6),
+                         '{:^{pad}}{}'.format('foo', 'bar', pad=6))
+
+        with self.assertRaises(ValueError):
+            fmt.format('foo{1}{}', 'bar', 6)
+
+        with self.assertRaises(ValueError):
+            fmt.format('foo{}{1}', 'bar', 6)
+
+    def test_conversion_specifiers(self):
+        fmt = string.Formatter()
+        self.assertEqual(fmt.format("-{arg!r}-", arg='test'), "-'test'-")
+        self.assertEqual(fmt.format("{0!s}", 'test'), 'test')
+        self.assertRaises(ValueError, fmt.format, "{0!h}", 'test')
+        # issue13579
+        self.assertEqual(fmt.format("{0!a}", 42), '42')
+        self.assertEqual(fmt.format("{0!a}",  string.ascii_letters),
+            "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'")
+        self.assertEqual(fmt.format("{0!a}",  chr(255)), "'\\xff'")
+        self.assertEqual(fmt.format("{0!a}",  chr(256)), "'\\u0100'")
+
+    def test_name_lookup(self):
+        fmt = string.Formatter()
+        class AnyAttr:
+            def __getattr__(self, attr):
+                return attr
+        x = AnyAttr()
+        self.assertEqual(fmt.format("{0.lumber}{0.jack}", x), 'lumberjack')
+        with self.assertRaises(AttributeError):
+            fmt.format("{0.lumber}{0.jack}", '')
+
+    def test_index_lookup(self):
+        fmt = string.Formatter()
+        lookup = ["eggs", "and", "spam"]
+        self.assertEqual(fmt.format("{0[2]}{0[0]}", lookup), 'spameggs')
+        with self.assertRaises(IndexError):
+            fmt.format("{0[2]}{0[0]}", [])
+        with self.assertRaises(KeyError):
+            fmt.format("{0[2]}{0[0]}", {})
+
+    def test_override_get_value(self):
         class NamespaceFormatter(string.Formatter):
             def __init__(self, namespace={}):
                 string.Formatter.__init__(self)
@@ -134,7 +121,7 @@ class ModuleTest(unittest.TestCase):
         self.assertEqual(fmt.format("{greeting}, world!"), 'hello, world!')
 
 
-        # override format_field #########################################
+    def test_override_format_field(self):
         class CallFormatter(string.Formatter):
             def format_field(self, value, format_spec):
                 return format(value(), format_spec)
@@ -143,18 +130,18 @@ class ModuleTest(unittest.TestCase):
         self.assertEqual(fmt.format('*{0}*', lambda : 'result'), '*result*')
 
 
-        # override convert_field ########################################
+    def test_override_convert_field(self):
         class XFormatter(string.Formatter):
             def convert_field(self, value, conversion):
                 if conversion == 'x':
                     return None
-                return super(XFormatter, self).convert_field(value, conversion)
+                return super().convert_field(value, conversion)
 
         fmt = XFormatter()
         self.assertEqual(fmt.format("{0!r}:{0!x}", 'foo', 'foo'), "'foo':None")
 
 
-        # override parse ################################################
+    def test_override_parse(self):
         class BarFormatter(string.Formatter):
             # returns an iterable that contains tuples of the form:
             # (literal_text, field_name, format_spec, conversion)
@@ -170,7 +157,7 @@ class ModuleTest(unittest.TestCase):
         fmt = BarFormatter()
         self.assertEqual(fmt.format('*|+0:^10s|*', 'foo'), '*   foo    *')
 
-        # test all parameters used
+    def test_check_unused_args(self):
         class CheckAllUsedFormatter(string.Formatter):
             def check_unused_args(self, used_args, args, kwargs):
                 # Track which arguments actually got used
@@ -192,32 +179,13 @@ class ModuleTest(unittest.TestCase):
         self.assertRaises(ValueError, fmt.format, "{0}", 10, 20, i=100)
         self.assertRaises(ValueError, fmt.format, "{i}", 10, 20, i=100)
 
-        # Alternate formatting is not supported
-        self.assertRaises(ValueError, format, '', '#')
-        self.assertRaises(ValueError, format, '', '#20')
-
-    def test_format_keyword_arguments(self):
+    def test_vformat_recursion_limit(self):
         fmt = string.Formatter()
-        self.assertEqual(fmt.format("-{arg}-", arg='test'), '-test-')
-        self.assertRaises(KeyError, fmt.format, "-{arg}-")
-        self.assertEqual(fmt.format("-{self}-", self='test'), '-test-')
-        self.assertRaises(KeyError, fmt.format, "-{self}-")
-        self.assertEqual(fmt.format("-{format_string}-", format_string='test'),
-                         '-test-')
-        self.assertRaises(KeyError, fmt.format, "-{format_string}-")
-        self.assertEqual(fmt.format(arg='test', format_string="-{arg}-"),
-                         '-test-')
-
-class BytesAliasTest(unittest.TestCase):
-
-    def test_builtin(self):
-        self.assertTrue(str is bytes)
-
-    def test_syntax(self):
-        self.assertEqual(b"spam", "spam")
-        self.assertEqual(br"egg\foo", "egg\\foo")
-        self.assertTrue(type(b""), str)
-        self.assertTrue(type(br""), str)
+        args = ()
+        kwargs = dict(i=100)
+        with self.assertRaises(ValueError) as err:
+            fmt._vformat("{i}", args, kwargs, set(), -1)
+        self.assertIn("recursion", str(err.exception))
 
 
 # Template tests (formerly housed in test_pep292.py)
@@ -250,6 +218,16 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(s.substitute(d), 'tim likes ham for dinner')
         self.assertRaises(KeyError, s.substitute,
                           dict(who='tim', what='ham'))
+
+    def test_regular_templates_with_upper_case(self):
+        s = Template('$WHO likes ${WHAT} for ${MEAL}')
+        d = dict(WHO='tim', WHAT='ham', MEAL='dinner')
+        self.assertEqual(s.substitute(d), 'tim likes ham for dinner')
+
+    def test_regular_templates_with_non_letters(self):
+        s = Template('$_wh0_ likes ${_w_h_a_t_} for ${mea1}')
+        d = dict(_wh0_='tim', _w_h_a_t_='ham', mea1='dinner')
+        self.assertEqual(s.substitute(d), 'tim likes ham for dinner')
 
     def test_escapes(self):
         eq = self.assertEqual
@@ -302,6 +280,12 @@ class TestTemplate(unittest.TestCase):
         raises(ValueError, s.substitute, dict(who='tim'))
         s = Template('$who likes $100')
         raises(ValueError, s.substitute, dict(who='tim'))
+        # Template.idpattern should match to only ASCII characters.
+        # https://bugs.python.org/issue31672
+        s = Template("$who likes $\u0131")  # (DOTLESS I)
+        raises(ValueError, s.substitute, dict(who='tim'))
+        s = Template("$who likes $\u0130")  # (LATIN CAPITAL LETTER I WITH DOT ABOVE)
+        raises(ValueError, s.substitute, dict(who='tim'))
 
     def test_idpattern_override(self):
         class PathPattern(Template):
@@ -313,6 +297,38 @@ class TestTemplate(unittest.TestCase):
         m.bag.what = 'ham'
         s = PathPattern('$bag.foo.who likes to eat a bag of $bag.what')
         self.assertEqual(s.substitute(m), 'tim likes to eat a bag of ham')
+
+    def test_flags_override(self):
+        class MyPattern(Template):
+            flags = 0
+        s = MyPattern('$wHO likes ${WHAT} for ${meal}')
+        d = dict(wHO='tim', WHAT='ham', meal='dinner', w='fred')
+        self.assertRaises(ValueError, s.substitute, d)
+        self.assertEqual(s.safe_substitute(d), 'fredHO likes ${WHAT} for dinner')
+
+    def test_idpattern_override_inside_outside(self):
+        # bpo-1198569: Allow the regexp inside and outside braces to be
+        # different when deriving from Template.
+        class MyPattern(Template):
+            idpattern = r'[a-z]+'
+            braceidpattern = r'[A-Z]+'
+            flags = 0
+        m = dict(foo='foo', BAR='BAR')
+        s = MyPattern('$foo ${BAR}')
+        self.assertEqual(s.substitute(m), 'foo BAR')
+
+    def test_idpattern_override_inside_outside_invalid_unbraced(self):
+        # bpo-1198569: Allow the regexp inside and outside braces to be
+        # different when deriving from Template.
+        class MyPattern(Template):
+            idpattern = r'[a-z]+'
+            braceidpattern = r'[A-Z]+'
+            flags = 0
+        m = dict(foo='foo', BAR='BAR')
+        s = MyPattern('$FOO')
+        self.assertRaises(ValueError, s.substitute, m)
+        s = MyPattern('${bar}')
+        self.assertRaises(ValueError, s.substitute, m)
 
     def test_pattern_override(self):
         class MyPattern(Template):
@@ -376,10 +392,30 @@ class TestTemplate(unittest.TestCase):
         val = t.safe_substitute({'location': 'Cleveland'})
         self.assertEqual(val, 'PyCon in Cleveland')
 
+    def test_invalid_with_no_lines(self):
+        # The error formatting for invalid templates
+        # has a special case for no data that the default
+        # pattern can't trigger (always has at least '$')
+        # So we craft a pattern that is always invalid
+        # with no leading data.
+        class MyTemplate(Template):
+            pattern = r"""
+              (?P<invalid>) |
+              unreachable(
+                (?P<named>)   |
+                (?P<braced>)  |
+                (?P<escaped>)
+              )
+            """
+        s = MyTemplate('')
+        with self.assertRaises(ValueError) as err:
+            s.substitute({})
+        self.assertIn('line 1, col 1', str(err.exception))
+
     def test_unicode_values(self):
         s = Template('$who likes $what')
-        d = dict(who=u't\xffm', what=u'f\xfe\fed')
-        self.assertEqual(s.substitute(d), u't\xffm likes f\xfe\x0ced')
+        d = dict(who='t\xffm', what='f\xfe\fed')
+        self.assertEqual(s.substitute(d), 't\xffm likes f\xfe\x0ced')
 
     def test_keyword_arguments(self):
         eq = self.assertEqual
@@ -439,9 +475,57 @@ class TestTemplate(unittest.TestCase):
         self.assertEqual(s.substitute(dict(who='tim', what='ham')),
                          'tim likes to eat a bag of ham worth $100')
 
+    def test_is_valid(self):
+        eq = self.assertEqual
+        s = Template('$who likes to eat a bag of ${what} worth $$100')
+        self.assertTrue(s.is_valid())
 
-def test_main():
-    test_support.run_unittest(StringTest, ModuleTest, BytesAliasTest, TestTemplate)
+        s = Template('$who likes to eat a bag of ${what} worth $100')
+        self.assertFalse(s.is_valid())
+
+        # if the pattern has an unrecognized capture group,
+        # it should raise ValueError like substitute and safe_substitute do
+        class BadPattern(Template):
+            pattern = r"""
+            (?P<badname>.*)                  |
+            (?P<escaped>@{2})                   |
+            @(?P<named>[_a-z][._a-z0-9]*)       |
+            @{(?P<braced>[_a-z][._a-z0-9]*)}    |
+            (?P<invalid>@)                      |
+            """
+        s = BadPattern('@bag.foo.who likes to eat a bag of @bag.what')
+        self.assertRaises(ValueError, s.is_valid)
+
+    def test_get_identifiers(self):
+        eq = self.assertEqual
+        raises = self.assertRaises
+        s = Template('$who likes to eat a bag of ${what} worth $$100')
+        ids = s.get_identifiers()
+        eq(ids, ['who', 'what'])
+
+        # repeated identifiers only included once
+        s = Template('$who likes to eat a bag of ${what} worth $$100; ${who} likes to eat a bag of $what worth $$100')
+        ids = s.get_identifiers()
+        eq(ids, ['who', 'what'])
+
+        # invalid identifiers are ignored
+        s = Template('$who likes to eat a bag of ${what} worth $100')
+        ids = s.get_identifiers()
+        eq(ids, ['who', 'what'])
+
+        # if the pattern has an unrecognized capture group,
+        # it should raise ValueError like substitute and safe_substitute do
+        class BadPattern(Template):
+            pattern = r"""
+            (?P<badname>.*)                  |
+            (?P<escaped>@{2})                   |
+            @(?P<named>[_a-z][._a-z0-9]*)       |
+            @{(?P<braced>[_a-z][._a-z0-9]*)}    |
+            (?P<invalid>@)                      |
+            """
+        s = BadPattern('@bag.foo.who likes to eat a bag of @bag.what')
+        self.assertRaises(ValueError, s.get_identifiers)
+
 
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

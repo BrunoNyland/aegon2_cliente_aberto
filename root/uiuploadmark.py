@@ -60,7 +60,7 @@ class PopupDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/popupdialog.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PopupDialog.__Load")
 
@@ -68,7 +68,7 @@ class PopupDialog(ui.ScriptWindow):
 		try:
 			self.textLine = self.GetChild("message")
 			self.okButton = self.GetChild("accept")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("PopupDialog.__Bind")
 
@@ -133,7 +133,7 @@ class MarkSelectDialog(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/marklistwindow.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("MarkListBox.__Load")
 
@@ -149,7 +149,7 @@ class MarkSelectDialog(ui.ScriptWindow):
 			self.cancelButton = self.GetChild("cancel")
 			self.refreshButton = self.GetChild("refresh")
 
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("MarkListBox.__Bind")
 

@@ -205,7 +205,7 @@ class MessengerGroupItem(MessengerItem):
 		self.separator.Show()
 
 	def AppendMember(self, member, key, name):
-		# for i in xrange(len(self.memberList)):
+		# for i in range(len(self.memberList)):
 			# self.memberList[i].SetNormal()
 		member.SetKey(key)
 		member.SetName(name)
@@ -214,7 +214,7 @@ class MessengerGroupItem(MessengerItem):
 		return member
 
 	def RemoveMember(self, item):
-		for i in xrange(len(self.memberList)):
+		for i in range(len(self.memberList)):
 			if item == self.memberList[i]:
 				del self.memberList[i]
 				break
@@ -302,7 +302,7 @@ class MessengerGuildItem(MessengerMemberItem):
 		net.SendGuildUseSkillPacket(155, self.key)
 
 	def CanRemove(self):
-		for i in xrange(guild.ENEMY_GUILD_SLOT_MAX_COUNT):
+		for i in range(guild.ENEMY_GUILD_SLOT_MAX_COUNT):
 			if guild.GetEnemyGuildName(i) != "":
 				return False
 
@@ -417,7 +417,7 @@ class MessengerWindow(ui.ScriptWindow):
 			self.guildButton = self.GetChild("GuildButton")
 			self.buttonsSeparator = self.GetChild("ButtonsSeparator")
 			self.scrollBarSeparator = self.GetChild("ScrollBarSeparator")
-		except:
+		except BaseException:
 			exception.Abort("MessengerWindow.__LoadWindow.__Bind")
 
 		self.board.SetCloseEvent(self.Close)
@@ -823,5 +823,5 @@ class MessengerWindow(ui.ScriptWindow):
 	# x.OnLogin(0, 4, "PlayerNoobdokacete")
 	# x.OnLogin(2, 0, "[Dev]Crazy")
 	# x.OnLogin(2, 1, "[Dev]Minions")
-# except:
+# except BaseException:
 	# pass

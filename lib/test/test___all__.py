@@ -1,15 +1,21 @@
-from __future__ import print_function
-
 import unittest
-from test import test_support as support
+from test import support
+from test.support import warnings_helper
 import os
 import sys
+import types
 
-# Setup bsddb warnings
 try:
-    bsddb = support.import_module('bsddb', deprecated=True)
-except unittest.SkipTest:
-    pass
+    import _multiprocessing
+except ModuleNotFoundError:
+    _multiprocessing = None
+
+
+if support.check_sanitizer(address=True, memory=True):
+    # bpo-46633: test___all__ is skipped because importing some modules
+    # directly can trigger known problems with ASAN (like tk or crypt).
+    raise unittest.SkipTest("workaround ASAN build issues on loading tests "
+                            "like tk or crypt")
 
 
 class NoAll(RuntimeError):
@@ -21,12 +27,27 @@ class FailedImport(RuntimeError):
 
 class AllTest(unittest.TestCase):
 
+    def setUp(self):
+        # concurrent.futures uses a __getattr__ hook. Its __all__ triggers
+        # import of a submodule, which fails when _multiprocessing is not
+        # available.
+        if _multiprocessing is None:
+            sys.modules["_multiprocessing"] = types.ModuleType("_multiprocessing")
+
+    def tearDown(self):
+        if _multiprocessing is None:
+            sys.modules.pop("_multiprocessing")
+
     def check_all(self, modname):
         names = {}
-        with support.check_warnings((".* (module|package)",
-                                     DeprecationWarning), quiet=True):
+        with warnings_helper.check_warnings(
+            (f".*{modname}", DeprecationWarning),
+            (".* (module|package)", DeprecationWarning),
+            (".* (module|package)", PendingDeprecationWarning),
+            ("", ResourceWarning),
+            quiet=True):
             try:
-                exec "import %s" % modname in names
+                exec("import %s" % modname, names)
             except:
                 # Silent fail here seems the best route since some modules
                 # may not be available or not initialize properly in all
@@ -35,17 +56,28 @@ class AllTest(unittest.TestCase):
         if not hasattr(sys.modules[modname], "__all__"):
             raise NoAll(modname)
         names = {}
-        try:
-            exec "from %s import *" % modname in names
-        except Exception as e:
-            # Include the module name in the exception string
-            self.fail("__all__ failure in {}: {}: {}".format(
-                      modname, e.__class__.__name__, e))
-        if "__builtins__" in names:
-            del names["__builtins__"]
-        keys = set(names)
-        all = set(sys.modules[modname].__all__)
-        self.assertEqual(keys, all)
+        with self.subTest(module=modname):
+            with warnings_helper.check_warnings(
+                ("", DeprecationWarning),
+                ("", ResourceWarning),
+                quiet=True):
+                try:
+                    exec("from %s import *" % modname, names)
+                except Exception as e:
+                    # Include the module name in the exception string
+                    self.fail("__all__ failure in {}: {}: {}".format(
+                              modname, e.__class__.__name__, e))
+                if "__builtins__" in names:
+                    del names["__builtins__"]
+                if '__annotations__' in names:
+                    del names['__annotations__']
+                if "__warningregistry__" in names:
+                    del names["__warningregistry__"]
+                keys = set(names)
+                all_list = sys.modules[modname].__all__
+                all_set = set(all_list)
+                self.assertCountEqual(all_set, all_list, "in module {}".format(modname))
+                self.assertEqual(keys, all_set, "in module {}".format(modname))
 
     def walk_modules(self, basedir, modpath):
         for fn in sorted(os.listdir(basedir)):
@@ -62,8 +94,8 @@ class AllTest(unittest.TestCase):
             yield path, modpath + fn[:-3]
 
     def test_all(self):
-        # Blacklisted modules and packages
-        blacklist = set([
+        # List of denied modules and packages
+        denylist = set([
             # Will raise a SyntaxError when compiling the exec statement
             '__future__',
         ])
@@ -73,29 +105,18 @@ class AllTest(unittest.TestCase):
             # than an AttributeError somewhere deep in CGIHTTPServer.
             import _socket
 
-        # rlcompleter needs special consideration; it imports readline which
-        # initializes GNU readline which calls setlocale(LC_CTYPE, "")... :-(
-        import locale
-        locale_tuple = locale.getlocale(locale.LC_CTYPE)
-        try:
-            import rlcompleter
-        except ImportError:
-            pass
-        finally:
-            locale.setlocale(locale.LC_CTYPE, locale_tuple)
-
         ignored = []
         failed_imports = []
         lib_dir = os.path.dirname(os.path.dirname(__file__))
         for path, modname in self.walk_modules(lib_dir, ""):
             m = modname
-            blacklisted = False
+            denied = False
             while m:
-                if m in blacklist:
-                    blacklisted = True
+                if m in denylist:
+                    denied = True
                     break
                 m = m.rpartition('.')[0]
-            if blacklisted:
+            if denied:
                 continue
             if support.verbose:
                 print(modname)
@@ -103,7 +124,7 @@ class AllTest(unittest.TestCase):
                 # This heuristic speeds up the process by removing, de facto,
                 # most test modules (and avoiding the auto-executing ones).
                 with open(path, "rb") as f:
-                    if "__all__" not in f.read():
+                    if b"__all__" not in f.read():
                         raise NoAll(modname)
                     self.check_all(modname)
             except NoAll:
@@ -117,8 +138,5 @@ class AllTest(unittest.TestCase):
             print('Following modules failed to be imported:', failed_imports)
 
 
-def test_main():
-    support.run_unittest(AllTest)
-
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

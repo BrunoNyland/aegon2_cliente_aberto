@@ -2,21 +2,30 @@
 A testcase which accesses *values* in a dll.
 """
 
+import _imp
+import importlib.util
 import unittest
 import sys
 from ctypes import *
+from test.support import import_helper
 
 import _ctypes_test
 
 class ValuesTestCase(unittest.TestCase):
 
     def test_an_integer(self):
+        # This test checks and changes an integer stored inside the
+        # _ctypes_test dll/shared lib.
         ctdll = CDLL(_ctypes_test.__file__)
         an_integer = c_int.in_dll(ctdll, "an_integer")
         x = an_integer.value
         self.assertEqual(x, ctdll.get_an_integer())
         an_integer.value *= 2
         self.assertEqual(x*2, ctdll.get_an_integer())
+        # To avoid test failures when this test is repeated several
+        # times the original value must be restored
+        an_integer.value = x
+        self.assertEqual(x, ctdll.get_an_integer())
 
     def test_undefined(self):
         ctdll = CDLL(_ctypes_test.__file__)
@@ -26,20 +35,11 @@ class PythonValuesTestCase(unittest.TestCase):
     """This test only works when python itself is a dll/shared library"""
 
     def test_optimizeflag(self):
-        # This test accesses the Py_OptimizeFlag intger, which is
-        # exported by the Python dll.
+        # This test accesses the Py_OptimizeFlag integer, which is
+        # exported by the Python dll and should match the sys.flags value
 
-        # It's value is set depending on the -O and -OO flags:
-        # if not given, it is 0 and __debug__ is 1.
-        # If -O is given, the flag is 1, for -OO it is 2.
-        # docstrings are also removed in the latter case.
         opt = c_int.in_dll(pythonapi, "Py_OptimizeFlag").value
-        if __debug__:
-            self.assertEqual(opt, 0)
-        elif ValuesTestCase.__doc__ is not None:
-            self.assertEqual(opt, 1)
-        else:
-            self.assertEqual(opt, 2)
+        self.assertEqual(opt, sys.flags.optimize)
 
     def test_frozentable(self):
         # Python exports a PyImport_FrozenModules symbol. This is a
@@ -53,24 +53,44 @@ class PythonValuesTestCase(unittest.TestCase):
         class struct_frozen(Structure):
             _fields_ = [("name", c_char_p),
                         ("code", POINTER(c_ubyte)),
-                        ("size", c_int)]
+                        ("size", c_int),
+                        ("is_package", c_int),
+                        ("get_code", POINTER(c_ubyte)),  # Function ptr
+                        ]
         FrozenTable = POINTER(struct_frozen)
 
-        ft = FrozenTable.in_dll(pythonapi, "PyImport_FrozenModules")
-        # ft is a pointer to the struct_frozen entries:
-        items = []
-        for entry in ft:
-            # This is dangerous. We *can* iterate over a pointer, but
-            # the loop will not terminate (maybe with an access
-            # violation;-) because the pointer instance has no size.
-            if entry.name is None:
-                break
-            items.append((entry.name, entry.size))
+        modules = []
+        for group in ["Bootstrap", "Stdlib", "Test"]:
+            ft = FrozenTable.in_dll(pythonapi, f"_PyImport_Frozen{group}")
+            # ft is a pointer to the struct_frozen entries:
+            for entry in ft:
+                # This is dangerous. We *can* iterate over a pointer, but
+                # the loop will not terminate (maybe with an access
+                # violation;-) because the pointer instance has no size.
+                if entry.name is None:
+                    break
+                modname = entry.name.decode("ascii")
+                modules.append(modname)
+                with self.subTest(modname):
+                    if entry.size != 0:
+                        # Do a sanity check on entry.size and entry.code.
+                        self.assertGreater(abs(entry.size), 10)
+                        self.assertTrue([entry.code[i] for i in range(abs(entry.size))])
+                    # Check the module's package-ness.
+                    with import_helper.frozen_modules():
+                        spec = importlib.util.find_spec(modname)
+                    if entry.is_package:
+                        # It's a package.
+                        self.assertIsNotNone(spec.submodule_search_locations)
+                    else:
+                        self.assertIsNone(spec.submodule_search_locations)
 
-        expected = [("__hello__", 104),
-                    ("__phello__", -104),
-                    ("__phello__.spam", 104)]
-        self.assertEqual(items, expected)
+        with import_helper.frozen_modules():
+            expected = _imp._frozen_module_names()
+        self.maxDiff = None
+        self.assertEqual(modules, expected,
+                         "_PyImport_FrozenBootstrap example "
+                         "in Doc/library/ctypes.rst may be out of date")
 
         from ctypes import _pointer_type_cache
         del _pointer_type_cache[struct_frozen]

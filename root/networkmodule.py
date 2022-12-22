@@ -145,7 +145,7 @@ class MainStream(object):
 				opFile = open("memory_leak/window_memory_leak%i.txt" % leakReport, "w+")
 				opRootFile = open("memory_leak/window_memory_leak_root%i.txt" % leakReport, "w+")
 
-				for i, v in constinfo.WINDOW_OBJ_LIST.iteritems():
+				for i, v in constinfo.WINDOW_OBJ_LIST.items():
 					opFile.write(v.typeStr + " parent type: " + v.strParent + "\n")
 					for j in v.traceBack:
 						opFile.write("\t" + j + "\n")

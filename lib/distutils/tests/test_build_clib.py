@@ -2,17 +2,28 @@
 import unittest
 import os
 import sys
+import sysconfig
 
-from test.test_support import run_unittest
+from test.support import (
+    run_unittest, missing_compiler_executable, requires_subprocess
+)
 
 from distutils.command.build_clib import build_clib
 from distutils.errors import DistutilsSetupError
 from distutils.tests import support
-from distutils.spawn import find_executable
 
 class BuildCLibTestCase(support.TempdirManager,
                         support.LoggingSilencer,
                         unittest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._backup_CONFIG_VARS = dict(sysconfig._CONFIG_VARS)
+
+    def tearDown(self):
+        super().tearDown()
+        sysconfig._CONFIG_VARS.clear()
+        sysconfig._CONFIG_VARS.update(self._backup_CONFIG_VARS)
 
     def test_check_library_dist(self):
         pkg_dir, dist = self.create_dist()
@@ -103,6 +114,7 @@ class BuildCLibTestCase(support.TempdirManager,
         self.assertRaises(DistutilsSetupError, cmd.finalize_options)
 
     @unittest.skipIf(sys.platform == 'win32', "can't test on Windows")
+    @requires_subprocess()
     def test_run(self):
         pkg_dir, dist = self.create_dist()
         cmd = build_clib(dist)
@@ -116,19 +128,11 @@ class BuildCLibTestCase(support.TempdirManager,
         cmd.build_temp = build_temp
         cmd.build_clib = build_temp
 
-        # before we run the command, we want to make sure
-        # all commands are present on the system
-        # by creating a compiler and checking its executables
-        from distutils.ccompiler import new_compiler
-        from distutils.sysconfig import customize_compiler
-
-        compiler = new_compiler()
-        customize_compiler(compiler)
-        for ccmd in compiler.executables.values():
-            if ccmd is None:
-                continue
-            if find_executable(ccmd[0]) is None:
-                self.skipTest('The %r command is not found' % ccmd[0])
+        # Before we run the command, we want to make sure
+        # all commands are present on the system.
+        ccmd = missing_compiler_executable()
+        if ccmd is not None:
+            self.skipTest('The %r command is not found' % ccmd)
 
         # this should work
         cmd.run()
@@ -137,7 +141,7 @@ class BuildCLibTestCase(support.TempdirManager,
         self.assertIn('libfoo.a', os.listdir(build_temp))
 
 def test_suite():
-    return unittest.makeSuite(BuildCLibTestCase)
+    return unittest.TestLoader().loadTestsFromTestCase(BuildCLibTestCase)
 
 if __name__ == "__main__":
     run_unittest(test_suite())

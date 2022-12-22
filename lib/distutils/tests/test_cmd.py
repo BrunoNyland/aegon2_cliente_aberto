@@ -1,7 +1,7 @@
 """Tests for distutils.cmd."""
 import unittest
 import os
-from test.test_support import captured_stdout, run_unittest
+from test.support import captured_stdout, run_unittest
 
 from distutils.cmd import Command
 from distutils.dist import Distribution
@@ -120,7 +120,7 @@ class CommandTestCase(unittest.TestCase):
             debug.DEBUG = False
 
 def test_suite():
-    return unittest.makeSuite(CommandTestCase)
+    return unittest.TestLoader().loadTestsFromTestCase(CommandTestCase)
 
 if __name__ == '__main__':
     run_unittest(test_suite())

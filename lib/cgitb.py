@@ -31,7 +31,11 @@ import tempfile
 import time
 import tokenize
 import traceback
-import types
+import warnings
+from html import escape as html_escape
+
+warnings._deprecated(__name__, remove=(3, 13))
+
 
 def reset():
     """Return a string that resets the CGI and browser to a known state."""
@@ -102,14 +106,20 @@ def scanvars(reader, frame, locals):
 def html(einfo, context=5):
     """Return a nice HTML document describing a given traceback."""
     etype, evalue, etb = einfo
-    if type(etype) is types.ClassType:
+    if isinstance(etype, type):
         etype = etype.__name__
     pyver = 'Python ' + sys.version.split()[0] + ': ' + sys.executable
     date = time.ctime(time.time())
-    head = '<body bgcolor="#f0f0f8">' + pydoc.html.heading(
-        '<big><big>%s</big></big>' %
-        strong(pydoc.html.escape(str(etype))),
-        '#ffffff', '#6622aa', pyver + '<br>' + date) + '''
+    head = f'''
+<body bgcolor="#f0f0f8">
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#6622aa">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br>
+<big><big><strong>{html_escape(str(etype))}</strong></big></big></font></td>
+<td align=right valign=bottom>
+<font color="#ffffff" face="helvetica, arial">{pyver}<br>{date}</font></td>
+</tr></table>
 <p>A problem occurred in a Python script.  Here is the sequence of
 function calls leading up to the error, in the order they occurred.</p>'''
 
@@ -125,8 +135,9 @@ function calls leading up to the error, in the order they occurred.</p>'''
         args, varargs, varkw, locals = inspect.getargvalues(frame)
         call = ''
         if func != '?':
-            call = 'in ' + strong(pydoc.html.escape(func)) + \
-                inspect.formatargvalues(args, varargs, varkw, locals,
+            call = 'in ' + strong(pydoc.html.escape(func))
+            if func != "<module>":
+                call += inspect.formatargvalues(args, varargs, varkw, locals,
                     formatvalue=lambda value: '=' + pydoc.html.repr(value))
 
         highlight = {}
@@ -172,18 +183,17 @@ function calls leading up to the error, in the order they occurred.</p>'''
 
     exception = ['<p>%s: %s' % (strong(pydoc.html.escape(str(etype))),
                                 pydoc.html.escape(str(evalue)))]
-    if isinstance(evalue, BaseException):
-        for name in dir(evalue):
-            if name[:1] == '_': continue
-            value = pydoc.html.repr(getattr(evalue, name))
-            exception.append('\n<br>%s%s&nbsp;=\n%s' % (indent, name, value))
+    for name in dir(evalue):
+        if name[:1] == '_': continue
+        value = pydoc.html.repr(getattr(evalue, name))
+        exception.append('\n<br>%s%s&nbsp;=\n%s' % (indent, name, value))
 
     return head + ''.join(frames) + ''.join(exception) + '''
 
 
 <!-- The above is a description of an error in a Python program, formatted
-     for a Web browser because the 'cgitb' module was enabled.  In case you
-     are not reading this in a Web browser, here is the original traceback:
+     for a web browser because the 'cgitb' module was enabled.  In case you
+     are not reading this in a web browser, here is the original traceback:
 
 %s
 -->
@@ -193,7 +203,7 @@ function calls leading up to the error, in the order they occurred.</p>'''
 def text(einfo, context=5):
     """Return a plain text document describing a given traceback."""
     etype, evalue, etb = einfo
-    if type(etype) is types.ClassType:
+    if isinstance(etype, type):
         etype = etype.__name__
     pyver = 'Python ' + sys.version.split()[0] + ': ' + sys.executable
     date = time.ctime(time.time())
@@ -209,8 +219,9 @@ function calls leading up to the error, in the order they occurred.
         args, varargs, varkw, locals = inspect.getargvalues(frame)
         call = ''
         if func != '?':
-            call = 'in ' + func + \
-                inspect.formatargvalues(args, varargs, varkw, locals,
+            call = 'in ' + func
+            if func != "<module>":
+                call += inspect.formatargvalues(args, varargs, varkw, locals,
                     formatvalue=lambda value: '=' + pydoc.text.repr(value))
 
         highlight = {}
@@ -243,10 +254,9 @@ function calls leading up to the error, in the order they occurred.
         frames.append('\n%s\n' % '\n'.join(rows))
 
     exception = ['%s: %s' % (str(etype), str(evalue))]
-    if isinstance(evalue, BaseException):
-        for name in dir(evalue):
-            value = pydoc.text.repr(getattr(evalue, name))
-            exception.append('\n%s%s = %s' % (" "*4, name, value))
+    for name in dir(evalue):
+        value = pydoc.text.repr(getattr(evalue, name))
+        exception.append('\n%s%s = %s' % (" "*4, name, value))
 
     return head + ''.join(frames) + ''.join(exception) + '''
 
@@ -297,9 +307,8 @@ class Hook:
             (fd, path) = tempfile.mkstemp(suffix=suffix, dir=self.logdir)
 
             try:
-                file = os.fdopen(fd, 'w')
-                file.write(doc)
-                file.close()
+                with os.fdopen(fd, 'w') as file:
+                    file.write(doc)
                 msg = '%s contains the description of this error.' % path
             except:
                 msg = 'Tried to save traceback to %s, but failed.' % path

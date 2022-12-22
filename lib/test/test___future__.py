@@ -1,5 +1,4 @@
 import unittest
-from test import test_support
 import __future__
 
 GOOD_SERIALS = ("alpha", "beta", "candidate", "final")
@@ -38,7 +37,7 @@ class FutureTest(unittest.TestCase):
                 a(isinstance(major, int), "%s major isn't int"  % name)
                 a(isinstance(minor, int), "%s minor isn't int" % name)
                 a(isinstance(micro, int), "%s micro isn't int" % name)
-                a(isinstance(level, basestring),
+                a(isinstance(level, str),
                     "%s level isn't string" % name)
                 a(level in GOOD_SERIALS,
                        "%s level string has unknown value" % name)
@@ -58,8 +57,5 @@ class FutureTest(unittest.TestCase):
                    ".compiler_flag isn't int")
 
 
-def test_main():
-    test_support.run_unittest(FutureTest)
-
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

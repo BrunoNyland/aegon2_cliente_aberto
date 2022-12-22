@@ -1,15 +1,19 @@
-from test import test_support
-test_support.requires('audio')
+from test import support
+from test.support import import_helper, warnings_helper
+import warnings
+support.requires('audio')
 
-from test.test_support import findfile
+from test.support import findfile
 
-ossaudiodev = test_support.import_module('ossaudiodev')
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", DeprecationWarning)
+    ossaudiodev = import_helper.import_module('ossaudiodev')
+audioop = warnings_helper.import_deprecated('audioop')
+sunau = warnings_helper.import_deprecated('sunau')
 
 import errno
 import sys
-import sunau
 import time
-import audioop
 import unittest
 
 # Arggh, AFMT_S16_NE not defined on all platforms -- seems to be a
@@ -44,7 +48,7 @@ class OSSAudioDevTests(unittest.TestCase):
     def play_sound_file(self, data, rate, ssize, nchannels):
         try:
             dsp = ossaudiodev.open('w')
-        except IOError, msg:
+        except OSError as msg:
             if msg.args[0] in (errno.EACCES, errno.ENOENT,
                                errno.ENODEV, errno.EBUSY):
                 raise unittest.SkipTest(msg)
@@ -66,26 +70,27 @@ class OSSAudioDevTests(unittest.TestCase):
         for attr in ('closed', 'name', 'mode'):
             try:
                 setattr(dsp, attr, 42)
-            except TypeError:
+            except (TypeError, AttributeError):
                 pass
             else:
                 self.fail("dsp.%s not read-only" % attr)
 
         # Compute expected running time of sound sample (in seconds).
-        expected_time = float(len(data)) / (ssize//8) / nchannels / rate
+        expected_time = float(len(data)) / (ssize/8) / nchannels / rate
 
         # set parameters based on .au file headers
         dsp.setparameters(AFMT_S16_NE, nchannels, rate)
         self.assertTrue(abs(expected_time - 3.51) < 1e-2, expected_time)
-        t1 = time.time()
+        t1 = time.monotonic()
         dsp.write(data)
         dsp.close()
-        t2 = time.time()
+        t2 = time.monotonic()
         elapsed_time = t2 - t1
 
         percent_diff = (abs(elapsed_time - expected_time) / expected_time) * 100
         self.assertTrue(percent_diff <= 10.0,
-                        "elapsed time > 10% off of expected time")
+                        "elapsed time (%s) > 10%% off of expected time (%s)" %
+                        (elapsed_time, expected_time))
 
     def set_parameters(self, dsp):
         # Two configurations for testing:
@@ -137,7 +142,7 @@ class OSSAudioDevTests(unittest.TestCase):
 
             try:
                 result = dsp.setparameters(fmt, channels, rate, True)
-            except ossaudiodev.OSSAudioError, err:
+            except ossaudiodev.OSSAudioError as err:
                 pass
             else:
                 self.fail("expected OSSAudioError")
@@ -158,17 +163,43 @@ class OSSAudioDevTests(unittest.TestCase):
             dsp.close()
             self.assertTrue(dsp.closed)
 
+    def test_mixer_methods(self):
+        # Issue #8139: ossaudiodev didn't initialize its types properly,
+        # therefore some methods were unavailable.
+        with ossaudiodev.openmixer() as mixer:
+            self.assertGreaterEqual(mixer.fileno(), 0)
 
-def test_main():
+    def test_with(self):
+        with ossaudiodev.open('w') as dsp:
+            pass
+        self.assertTrue(dsp.closed)
+
+    def test_on_closed(self):
+        dsp = ossaudiodev.open('w')
+        dsp.close()
+        self.assertRaises(ValueError, dsp.fileno)
+        self.assertRaises(ValueError, dsp.read, 1)
+        self.assertRaises(ValueError, dsp.write, b'x')
+        self.assertRaises(ValueError, dsp.writeall, b'x')
+        self.assertRaises(ValueError, dsp.bufsize)
+        self.assertRaises(ValueError, dsp.obufcount)
+        self.assertRaises(ValueError, dsp.obufcount)
+        self.assertRaises(ValueError, dsp.obuffree)
+        self.assertRaises(ValueError, dsp.getptr)
+
+        mixer = ossaudiodev.openmixer()
+        mixer.close()
+        self.assertRaises(ValueError, mixer.fileno)
+
+def setUpModule():
     try:
         dsp = ossaudiodev.open('w')
-    except (ossaudiodev.error, IOError), msg:
+    except (ossaudiodev.error, OSError) as msg:
         if msg.args[0] in (errno.EACCES, errno.ENOENT,
                            errno.ENODEV, errno.EBUSY):
             raise unittest.SkipTest(msg)
         raise
     dsp.close()
-    test_support.run_unittest(__name__)
 
 if __name__ == "__main__":
-    test_main()
+    unittest.main()

@@ -4,26 +4,38 @@ HyperParser uses PyParser.  PyParser mostly gives information on the
 proper indentation of code.  HyperParser gives additional information on
 the structure of code.
 """
-
+from keyword import iskeyword
 import string
-import keyword
-from idlelib import PyParse
+
+from idlelib import pyparse
+
+# all ASCII chars that may be in an identifier
+_ASCII_ID_CHARS = frozenset(string.ascii_letters + string.digits + "_")
+# all ASCII chars that may be the first char of an identifier
+_ASCII_ID_FIRST_CHARS = frozenset(string.ascii_letters + "_")
+
+# lookup table for whether 7-bit ASCII chars are valid in a Python identifier
+_IS_ASCII_ID_CHAR = [(chr(x) in _ASCII_ID_CHARS) for x in range(128)]
+# lookup table for whether 7-bit ASCII chars are valid as the first
+# char in a Python identifier
+_IS_ASCII_ID_FIRST_CHAR = \
+    [(chr(x) in _ASCII_ID_FIRST_CHARS) for x in range(128)]
+
 
 class HyperParser:
-
     def __init__(self, editwin, index):
         "To initialize, analyze the surroundings of the given index."
 
         self.editwin = editwin
         self.text = text = editwin.text
 
-        parser = PyParse.Parser(editwin.indentwidth, editwin.tabwidth)
+        parser = pyparse.Parser(editwin.indentwidth, editwin.tabwidth)
 
         def index2line(index):
             return int(float(index))
         lno = index2line(text.index(index))
 
-        if not editwin.context_use_ps1:
+        if not editwin.prompt_last_line:
             for context in editwin.num_context_lines:
                 startat = max(lno - context, 1)
                 startatindex = repr(startat) + ".0"
@@ -32,7 +44,7 @@ class HyperParser:
                 # at end. We add a space so that index won't be at end
                 # of line, so that its status will be the same as the
                 # char before it, if should.
-                parser.set_str(text.get(startatindex, stopatindex)+' \n')
+                parser.set_code(text.get(startatindex, stopatindex)+' \n')
                 bod = parser.find_good_parse_start(
                           editwin._build_char_in_string_func(startatindex))
                 if bod is not None or startat == 1:
@@ -48,12 +60,12 @@ class HyperParser:
             # We add the newline because PyParse requires it. We add a
             # space so that index won't be at end of line, so that its
             # status will be the same as the char before it, if should.
-            parser.set_str(text.get(startatindex, stopatindex)+' \n')
+            parser.set_code(text.get(startatindex, stopatindex)+' \n')
             parser.set_lo(0)
 
         # We want what the parser has, minus the last newline and space.
-        self.rawtext = parser.str[:-2]
-        # Parser.str apparently preserves the statement we are in, so
+        self.rawtext = parser.code[:-2]
+        # Parser.code apparently preserves the statement we are in, so
         # that stopatindex can be used to synchronize the string with
         # the text box indices.
         self.stopatindex = stopatindex
@@ -143,24 +155,69 @@ class HyperParser:
 
         return beforeindex, afterindex
 
-    # Ascii chars that may be in a white space
-    _whitespace_chars = " \t\n\\"
-    # Ascii chars that may be in an identifier
-    _id_chars = string.ascii_letters + string.digits + "_"
-    # Ascii chars that may be the first char of an identifier
-    _id_first_chars = string.ascii_letters + "_"
+    # the set of built-in identifiers which are also keywords,
+    # i.e. keyword.iskeyword() returns True for them
+    _ID_KEYWORDS = frozenset({"True", "False", "None"})
 
-    # Given a string and pos, return the number of chars in the
-    # identifier which ends at pos, or 0 if there is no such one. Saved
-    # words are not identifiers.
-    def _eat_identifier(self, str, limit, pos):
+    @classmethod
+    def _eat_identifier(cls, str, limit, pos):
+        """Given a string and pos, return the number of chars in the
+        identifier which ends at pos, or 0 if there is no such one.
+
+        This ignores non-identifier eywords are not identifiers.
+        """
+        is_ascii_id_char = _IS_ASCII_ID_CHAR
+
+        # Start at the end (pos) and work backwards.
         i = pos
-        while i > limit and str[i-1] in self._id_chars:
+
+        # Go backwards as long as the characters are valid ASCII
+        # identifier characters. This is an optimization, since it
+        # is faster in the common case where most of the characters
+        # are ASCII.
+        while i > limit and (
+                ord(str[i - 1]) < 128 and
+                is_ascii_id_char[ord(str[i - 1])]
+        ):
             i -= 1
-        if (i < pos and (str[i] not in self._id_first_chars or
-            keyword.iskeyword(str[i:pos]))):
-            i = pos
+
+        # If the above loop ended due to reaching a non-ASCII
+        # character, continue going backwards using the most generic
+        # test for whether a string contains only valid identifier
+        # characters.
+        if i > limit and ord(str[i - 1]) >= 128:
+            while i - 4 >= limit and ('a' + str[i - 4:pos]).isidentifier():
+                i -= 4
+            if i - 2 >= limit and ('a' + str[i - 2:pos]).isidentifier():
+                i -= 2
+            if i - 1 >= limit and ('a' + str[i - 1:pos]).isidentifier():
+                i -= 1
+
+            # The identifier candidate starts here. If it isn't a valid
+            # identifier, don't eat anything. At this point that is only
+            # possible if the first character isn't a valid first
+            # character for an identifier.
+            if not str[i:pos].isidentifier():
+                return 0
+        elif i < pos:
+            # All characters in str[i:pos] are valid ASCII identifier
+            # characters, so it is enough to check that the first is
+            # valid as the first character of an identifier.
+            if not _IS_ASCII_ID_FIRST_CHAR[ord(str[i])]:
+                return 0
+
+        # All keywords are valid identifiers, but should not be
+        # considered identifiers here, except for True, False and None.
+        if i < pos and (
+                iskeyword(str[i:pos]) and
+                str[i:pos] not in cls._ID_KEYWORDS
+        ):
+            return 0
+
         return pos - i
+
+    # This string includes all chars that may be in a white space
+    _whitespace_chars = " \t\n\\"
 
     def get_expression(self):
         """Return a string with the Python expression which ends at the
@@ -180,9 +237,9 @@ class HyperParser:
         last_identifier_pos = pos
         postdot_phase = True
 
-        while 1:
+        while True:
             # Eat whitespaces, comments, and if postdot_phase is False - a dot
-            while 1:
+            while True:
                 if pos>brck_limit and rawtext[pos-1] in self._whitespace_chars:
                     # Eat a whitespace
                     pos -= 1
@@ -251,5 +308,5 @@ class HyperParser:
 
 
 if __name__ == '__main__':
-    import unittest
-    unittest.main('idlelib.idle_test.test_hyperparser', verbosity=2)
+    from unittest import main
+    main('idlelib.idle_test.test_hyperparser', verbosity=2)

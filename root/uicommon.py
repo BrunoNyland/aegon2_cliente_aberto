@@ -35,7 +35,7 @@ class PopupDialog(ui.ScriptWindow):
 	def Close(self):
 		self.Hide()
 		if self.acceptEvent:
-			apply(self.acceptEvent, self.acceptArgs)
+			self.acceptEvent(* self.acceptArgs)
 
 	def Destroy(self):
 		self.Close()
@@ -235,7 +235,7 @@ class ItemQuestionDialog(ui.ScriptWindow):
 		self.vseparator = self.GetChild("vseparator")
 
 		self.slotList = []
-		for i in xrange(3):
+		for i in range(3):
 			slot = ui.ImageBox()
 			slot.LoadImage("interface/controls/common/slot_rectangle/slot.tga")
 			slot.SetParent(self)
@@ -247,10 +247,10 @@ class ItemQuestionDialog(ui.ScriptWindow):
 
 		try:
 			if self.window_type == "inv":
-				metinSlot = [player.GetItemMetinSocket(player.INVENTORY, slot, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
+				metinSlot = [player.GetItemMetinSocket(player.INVENTORY, slot, i) for i in range(player.METIN_SOCKET_MAX_NUM)]
 			elif self.window_type == "shop":
-				metinSlot = [shop.GetItemMetinSocket(slot, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
-		except:
+				metinSlot = [shop.GetItemMetinSocket(slot, i) for i in range(player.METIN_SOCKET_MAX_NUM)]
+		except BaseException:
 			pass
 
 		self.board.SetTitle(item.GetItemName())
@@ -286,7 +286,7 @@ class ItemQuestionDialog(ui.ScriptWindow):
 		else:
 			self.textLine.SetPosition(self.textLine.GetLeft(), self.textLine.GetTop() + (ySlotCount - 1) * 16)
 
-		for i in xrange(min(3, ySlotCount)):
+		for i in range(min(3, ySlotCount)):
 			self.slotList[i].SetPosition(8, 7 + ySlotCount*32 - i*32)
 			if vnum != 1:
 				self.slotList[i].SetOverInEvent(self.OverInItem, slot)
@@ -351,7 +351,7 @@ class ItemQuestionDialog(ui.ScriptWindow):
 		ui.ScriptWindow.SetSize(self, width, height)
 		try:
 			self.UpdatePositions(width, height)
-		except:
+		except BaseException:
 			pass
 
 	def UpdatePositions(self, width, height):
@@ -381,7 +381,7 @@ class ItemQuestionDialog(ui.ScriptWindow):
 
 	def OnPressEscapeKey(self):
 		if self.escapeEventFunc:
-			apply(self.escapeEventFunc, self.escapeEventArgs)
+			self.escapeEventFunc(* self.escapeEventArgs)
 		self.Close()
 		return True
 
@@ -443,7 +443,7 @@ class QuestionDialog(ui.ScriptWindow):
 
 	def OnPressEscapeKey(self):
 		if self.escapeEventFunc:
-			apply(self.escapeEventFunc, self.escapeEventArgs)
+			self.escapeEventFunc(* self.escapeEventArgs)
 		self.Close()
 		return True
 
@@ -547,7 +547,7 @@ class QuestionDialogWithTimeLimit(QuestionDialog2):
 
 	def OnTimeOver(self):
 		if self.timeOverEvent:
-			apply(self.timeOverEvent, self.timeOverEventArgs)
+			self.timeOverEvent(* self.timeOverEventArgs)
 		if self.timeOverMsg:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, self.timeOverMsg)
 

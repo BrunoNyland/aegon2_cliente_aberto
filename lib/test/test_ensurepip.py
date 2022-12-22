@@ -1,33 +1,83 @@
-import unittest
+import contextlib
 import os
 import os.path
-import contextlib
 import sys
-import test._mock_backport as mock
-import test.test_support
+import tempfile
+import test.support
+import unittest
+import unittest.mock
 
 import ensurepip
 import ensurepip._uninstall
 
 
-class TestEnsurePipVersion(unittest.TestCase):
+class TestPackages(unittest.TestCase):
+    def touch(self, directory, filename):
+        fullname = os.path.join(directory, filename)
+        open(fullname, "wb").close()
 
-    def test_returns_version(self):
-        self.assertEqual(ensurepip._PIP_VERSION, ensurepip.version())
+    def test_version(self):
+        # Test version()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.touch(tmpdir, "pip-1.2.3b1-py2.py3-none-any.whl")
+            self.touch(tmpdir, "setuptools-49.1.3-py3-none-any.whl")
+            with (unittest.mock.patch.object(ensurepip, '_PACKAGES', None),
+                  unittest.mock.patch.object(ensurepip, '_WHEEL_PKG_DIR', tmpdir)):
+                self.assertEqual(ensurepip.version(), '1.2.3b1')
+
+    def test_get_packages_no_dir(self):
+        # Test _get_packages() without a wheel package directory
+        with (unittest.mock.patch.object(ensurepip, '_PACKAGES', None),
+              unittest.mock.patch.object(ensurepip, '_WHEEL_PKG_DIR', None)):
+            packages = ensurepip._get_packages()
+
+            # when bundled wheel packages are used, we get _PIP_VERSION
+            self.assertEqual(ensurepip._PIP_VERSION, ensurepip.version())
+
+        # use bundled wheel packages
+        self.assertIsNotNone(packages['pip'].wheel_name)
+        self.assertIsNotNone(packages['setuptools'].wheel_name)
+
+    def test_get_packages_with_dir(self):
+        # Test _get_packages() with a wheel package directory
+        setuptools_filename = "setuptools-49.1.3-py3-none-any.whl"
+        pip_filename = "pip-20.2.2-py2.py3-none-any.whl"
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            self.touch(tmpdir, setuptools_filename)
+            self.touch(tmpdir, pip_filename)
+            # not used, make sure that it's ignored
+            self.touch(tmpdir, "wheel-0.34.2-py2.py3-none-any.whl")
+
+            with (unittest.mock.patch.object(ensurepip, '_PACKAGES', None),
+                  unittest.mock.patch.object(ensurepip, '_WHEEL_PKG_DIR', tmpdir)):
+                packages = ensurepip._get_packages()
+
+            self.assertEqual(packages['setuptools'].version, '49.1.3')
+            self.assertEqual(packages['setuptools'].wheel_path,
+                             os.path.join(tmpdir, setuptools_filename))
+            self.assertEqual(packages['pip'].version, '20.2.2')
+            self.assertEqual(packages['pip'].wheel_path,
+                             os.path.join(tmpdir, pip_filename))
+
+            # wheel package is ignored
+            self.assertEqual(sorted(packages), ['pip', 'setuptools'])
 
 
 class EnsurepipMixin:
 
     def setUp(self):
-        run_pip_patch = mock.patch("ensurepip._run_pip")
+        run_pip_patch = unittest.mock.patch("ensurepip._run_pip")
         self.run_pip = run_pip_patch.start()
         self.run_pip.return_value = 0
         self.addCleanup(run_pip_patch.stop)
 
         # Avoid side effects on the actual os module
         real_devnull = os.devnull
-        os_patch = mock.patch("ensurepip.os")
+        os_patch = unittest.mock.patch("ensurepip.os")
         patched_os = os_patch.start()
+        # But expose os.listdir() used by _find_packages()
+        patched_os.listdir = os.listdir
         self.addCleanup(os_patch.stop)
         patched_os.devnull = real_devnull
         patched_os.path = os.path
@@ -41,10 +91,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
         additional_paths = self.run_pip.call_args[0][1]
@@ -55,11 +105,11 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "--root", "/foo/bar/",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "--root", "/foo/bar/",
                 "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_user(self):
@@ -67,10 +117,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "--user", "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "--user", "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_upgrade(self):
@@ -78,10 +128,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "--upgrade", "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "--upgrade", "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_verbosity_1(self):
@@ -89,10 +139,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "-v", "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "-v", "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_verbosity_2(self):
@@ -100,10 +150,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "-vv", "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "-vv", "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_verbosity_3(self):
@@ -111,10 +161,10 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "-vvv", "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "-vvv", "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
     def test_bootstrapping_with_regular_install(self):
@@ -147,9 +197,8 @@ class TestBootstrap(EnsurepipMixin, unittest.TestCase):
         ensurepip.bootstrap()
         self.assertEqual(self.os_environ["PIP_CONFIG_FILE"], os.devnull)
 
-
 @contextlib.contextmanager
-def fake_pip(version=ensurepip._PIP_VERSION):
+def fake_pip(version=ensurepip.version()):
     if version is None:
         pip = None
     else:
@@ -167,7 +216,6 @@ def fake_pip(version=ensurepip._PIP_VERSION):
         else:
             sys.modules["pip"] = orig_pip
 
-
 class TestUninstall(EnsurepipMixin, unittest.TestCase):
 
     def test_uninstall_skipped_when_not_installed(self):
@@ -177,11 +225,12 @@ class TestUninstall(EnsurepipMixin, unittest.TestCase):
 
     def test_uninstall_skipped_with_warning_for_wrong_version(self):
         with fake_pip("not a valid version"):
-            with test.test_support.captured_stderr() as stderr:
+            with test.support.captured_stderr() as stderr:
                 ensurepip._uninstall_helper()
         warning = stderr.getvalue().strip()
         self.assertIn("only uninstall a matching version", warning)
         self.assertFalse(self.run_pip.called)
+
 
     def test_uninstall(self):
         with fake_pip():
@@ -245,16 +294,15 @@ class TestUninstall(EnsurepipMixin, unittest.TestCase):
 
 # Basic testing of the main functions and their argument parsing
 
-EXPECTED_VERSION_OUTPUT = "pip " + ensurepip._PIP_VERSION
-
+EXPECTED_VERSION_OUTPUT = "pip " + ensurepip.version()
 
 class TestBootstrappingMainFunction(EnsurepipMixin, unittest.TestCase):
 
     def test_bootstrap_version(self):
-        with test.test_support.captured_stderr() as stderr:
+        with test.support.captured_stdout() as stdout:
             with self.assertRaises(SystemExit):
                 ensurepip._main(["--version"])
-        result = stderr.getvalue().strip()
+        result = stdout.getvalue().strip()
         self.assertEqual(result, EXPECTED_VERSION_OUTPUT)
         self.assertFalse(self.run_pip.called)
 
@@ -263,10 +311,10 @@ class TestBootstrappingMainFunction(EnsurepipMixin, unittest.TestCase):
 
         self.run_pip.assert_called_once_with(
             [
-                "install", "--no-index", "--find-links",
-                mock.ANY, "setuptools", "pip",
+                "install", "--no-cache-dir", "--no-index", "--find-links",
+                unittest.mock.ANY, "setuptools", "pip",
             ],
-            mock.ANY,
+            unittest.mock.ANY,
         )
 
         additional_paths = self.run_pip.call_args[0][1]
@@ -279,14 +327,13 @@ class TestBootstrappingMainFunction(EnsurepipMixin, unittest.TestCase):
         self.assertEqual(exit_code, 2)
 
 
-
 class TestUninstallationMainFunction(EnsurepipMixin, unittest.TestCase):
 
     def test_uninstall_version(self):
-        with test.test_support.captured_stderr() as stderr:
+        with test.support.captured_stdout() as stdout:
             with self.assertRaises(SystemExit):
                 ensurepip._uninstall._main(["--version"])
-        result = stderr.getvalue().strip()
+        result = stdout.getvalue().strip()
         self.assertEqual(result, EXPECTED_VERSION_OUTPUT)
         self.assertFalse(self.run_pip.called)
 
@@ -309,5 +356,6 @@ class TestUninstallationMainFunction(EnsurepipMixin, unittest.TestCase):
             exit_code = ensurepip._uninstall._main([])
         self.assertEqual(exit_code, 2)
 
+
 if __name__ == "__main__":
-    test.test_support.run_unittest(__name__)
+    unittest.main()

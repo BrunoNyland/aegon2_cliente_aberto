@@ -328,7 +328,7 @@ class CMouseController(object):
 		self.callbackDict[type] = ui.__mem_func__(event)
 
 	def RunCallBack(self, type):
-		if not self.callbackDict.has_key(type):
+		if not self.callbackDict.__contains__(type):
 			self.DeattachObject()
 			return
 

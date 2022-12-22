@@ -46,11 +46,11 @@ SKILL_INDEX_DICT = {
 
 def RegisterSkill(race, group):
 	job = chr.RaceToJob(race)
-	if SKILL_INDEX_DICT.has_key(job):
-		if SKILL_INDEX_DICT[job].has_key(group):
+	if SKILL_INDEX_DICT.__contains__(job):
+		if SKILL_INDEX_DICT[job].__contains__(group):
 			activeSkillList = SKILL_INDEX_DICT[job][group]
 
-			for i in xrange(len(activeSkillList)):
+			for i in range(len(activeSkillList)):
 				skillIndex = activeSkillList[i]
 
 				if i != 6 and i != 7:
@@ -58,13 +58,13 @@ def RegisterSkill(race, group):
 
 			supportSkillList = SKILL_INDEX_DICT[job]["SUPPORT"]
 
-			for i in xrange(len(supportSkillList)):
+			for i in range(len(supportSkillList)):
 				player.SetSkill(i+100+1, supportSkillList[i])
 
-	for i in xrange(len(PASSIVE_GUILD_SKILL_INDEX_LIST)):
+	for i in range(len(PASSIVE_GUILD_SKILL_INDEX_LIST)):
 		player.SetSkill(200+i, PASSIVE_GUILD_SKILL_INDEX_LIST[i])
 
-	for i in xrange(len(ACTIVE_GUILD_SKILL_INDEX_LIST)):
+	for i in range(len(ACTIVE_GUILD_SKILL_INDEX_LIST)):
 		player.SetSkill(210+i, ACTIVE_GUILD_SKILL_INDEX_LIST[i])
 
 def LoadGameNPC():

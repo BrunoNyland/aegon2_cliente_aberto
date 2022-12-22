@@ -43,7 +43,7 @@ class Potador(ui.ScriptWindow):
 
 	def Pote(self):
 		if (constinfo.POTADOR == 1):
-			for i in xrange(220):
+			for i in range(220):
 				itemVNum = player.GetItemIndex(i)
 				if (itemVNum == int(70020)) or (itemVNum == int(98902)):
 					net.SendItemUsePacket(i)

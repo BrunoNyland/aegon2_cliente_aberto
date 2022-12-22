@@ -1,21 +1,9 @@
-# Skipping test_parser and test_all_fixers
-# because of running
-from lib2to3.tests import (test_fixers, test_pytree, test_util, test_refactor,
-                           test_parser, test_main as test_main_)
 import unittest
-from test.test_support import run_unittest
+from test.support.import_helper import import_fresh_module
+from test.support.warnings_helper import check_warnings
 
-def suite():
-    tests = unittest.TestSuite()
-    loader = unittest.TestLoader()
-    for m in (test_fixers, test_pytree,test_util, test_refactor, test_parser,
-              test_main_):
-        tests.addTests(loader.loadTestsFromModule(m))
-    return tests
-
-def test_main():
-    run_unittest(suite())
-
+with check_warnings(("", DeprecationWarning)):
+    load_tests = import_fresh_module('lib2to3.tests', fresh=['lib2to3']).load_tests
 
 if __name__ == '__main__':
-    test_main()
+    unittest.main()

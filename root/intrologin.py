@@ -275,7 +275,7 @@ class LoginWindow(ui.ScriptWindow):
 			self.connectingDialog.Close()
 		self.connectingDialog = None
 
-		if self.loginFailureMsgDict.has_key(error):
+		if self.loginFailureMsgDict.__contains__(error):
 			loginFailureMsg = self.loginFailureMsgDict[error]
 		else:
 			loginFailureMsg = localeinfo.LOGIN_FAILURE_UNKNOWN + error
@@ -375,7 +375,7 @@ class LoginWindow(ui.ScriptWindow):
 			Get("SaveAccountPassword_EditLine").SetFocus()
 			return
 
-		for index in xrange(0, 12):
+		for index in range(0, 12):
 			if get_reg("%d_id" % index) == "" or get_reg("%d_id" % index) == None:
 				set_reg("%d_id" % index, str(binascii.b2a_base64(acc)))
 				set_reg("%d_pwd" % index, str(binascii.b2a_base64(pwd)))
@@ -433,11 +433,11 @@ class LoginWindow(ui.ScriptWindow):
 		self.onEditFuncDict = []
 		self.onDelFuncDict = []
 
-		for index in xrange(0, 12):
+		for index in range(0, 12):
 			Get("account" + str(index)).Hide()
 
 		i = 0
-		for index in xrange(0, 12):
+		for index in range(0, 12):
 			if get_reg("%d_id" % index):
 				acc = str(binascii.a2b_base64(get_reg("%d_id" % index)))
 

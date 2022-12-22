@@ -11,9 +11,13 @@ def suite():
     for fn in os.listdir(here):
         if fn.startswith("test") and fn.endswith(".py"):
             modname = "unittest.test." + fn[:-3]
-            __import__(modname)
+            try:
+                __import__(modname)
+            except unittest.SkipTest:
+                continue
             module = sys.modules[modname]
             suite.addTest(loader.loadTestsFromModule(module))
+    suite.addTest(loader.loadTestsFromName('unittest.test.testmock'))
     return suite
 
 

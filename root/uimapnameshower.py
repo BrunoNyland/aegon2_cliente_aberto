@@ -116,7 +116,7 @@ class MapNameShower(ui.ExpandedImageBox):
 		return 0
 
 	def ShowMapName(self, mapName, x, y):
-		if not self.MAP_NAME_IMAGE.has_key(mapName):
+		if not self.MAP_NAME_IMAGE.__contains__(mapName):
 			print("[ERROR] - There is no map name image", mapName)
 			return
 

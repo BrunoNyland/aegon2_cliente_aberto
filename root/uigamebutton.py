@@ -29,7 +29,7 @@ class GameButtonWindow(ui.ScriptWindow):
 		self.SetObserverMode(player.IsObserverMode())
 
 		self.online = []
-		for i in xrange(0, 4):
+		for i in range(0, 4):
 			self.online.append(ui.MakeTextRight(self, 8, 200 + 15 * i))
 
 		return True

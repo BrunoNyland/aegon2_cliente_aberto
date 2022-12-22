@@ -2,7 +2,7 @@
 import unittest
 import os
 import sys
-from test.test_support import run_unittest
+from test.support import run_unittest
 
 from distutils.command.build import build
 from distutils.tests import support
@@ -12,6 +12,7 @@ class BuildTestCase(support.TempdirManager,
                     support.LoggingSilencer,
                     unittest.TestCase):
 
+    @unittest.skipUnless(sys.executable, "test requires sys.executable")
     def test_finalize_options(self):
         pkg_dir, dist = self.create_dist()
         cmd = build(dist)
@@ -27,7 +28,7 @@ class BuildTestCase(support.TempdirManager,
         # build_platlib is 'build/lib.platform-x.x[-pydebug]'
         # examples:
         #   build/lib.macosx-10.3-i386-2.7
-        plat_spec = '.%s-%s' % (cmd.plat_name, sys.version[0:3])
+        plat_spec = '.%s-%d.%d' % (cmd.plat_name, *sys.version_info[:2])
         if hasattr(sys, 'gettotalrefcount'):
             self.assertTrue(cmd.build_platlib.endswith('-pydebug'))
             plat_spec += '-pydebug'
@@ -42,14 +43,15 @@ class BuildTestCase(support.TempdirManager,
         self.assertEqual(cmd.build_temp, wanted)
 
         # build_scripts is build/scripts-x.x
-        wanted = os.path.join(cmd.build_base, 'scripts-' +  sys.version[0:3])
+        wanted = os.path.join(cmd.build_base,
+                              'scripts-%d.%d' % sys.version_info[:2])
         self.assertEqual(cmd.build_scripts, wanted)
 
         # executable is os.path.normpath(sys.executable)
         self.assertEqual(cmd.executable, os.path.normpath(sys.executable))
 
 def test_suite():
-    return unittest.makeSuite(BuildTestCase)
+    return unittest.TestLoader().loadTestsFromTestCase(BuildTestCase)
 
 if __name__ == "__main__":
     run_unittest(test_suite())

@@ -13,10 +13,7 @@ the "typical" Unix-style command-line C compiler:
   * link shared library handled by 'cc -shared'
 """
 
-__revision__ = "$Id$"
-
 import os, sys, re
-from types import StringType, NoneType
 
 from distutils import sysconfig
 from distutils.dep_util import newer
@@ -85,11 +82,10 @@ class UnixCCompiler(CCompiler):
     if sys.platform == "cygwin":
         exe_extension = ".exe"
 
-    def preprocess(self, source,
-                   output_file=None, macros=None, include_dirs=None,
-                   extra_preargs=None, extra_postargs=None):
-        ignore, macros, include_dirs = \
-            self._fix_compile_args(None, macros, include_dirs)
+    def preprocess(self, source, output_file=None, macros=None,
+                   include_dirs=None, extra_preargs=None, extra_postargs=None):
+        fixed_args = self._fix_compile_args(None, macros, include_dirs)
+        ignore, macros, include_dirs = fixed_args
         pp_opts = gen_preprocess_options(macros, include_dirs)
         pp_args = self.preprocessor + pp_opts
         if output_file:
@@ -109,8 +105,8 @@ class UnixCCompiler(CCompiler):
                 self.mkpath(os.path.dirname(output_file))
             try:
                 self.spawn(pp_args)
-            except DistutilsExecError, msg:
-                raise CompileError, msg
+            except DistutilsExecError as msg:
+                raise CompileError(msg)
 
     def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
         compiler_so = self.compiler_so
@@ -120,8 +116,8 @@ class UnixCCompiler(CCompiler):
         try:
             self.spawn(compiler_so + cc_args + [src, '-o', obj] +
                        extra_postargs)
-        except DistutilsExecError, msg:
-            raise CompileError, msg
+        except DistutilsExecError as msg:
+            raise CompileError(msg)
 
     def create_static_lib(self, objects, output_libname,
                           output_dir=None, debug=0, target_lang=None):
@@ -144,8 +140,8 @@ class UnixCCompiler(CCompiler):
             if self.ranlib:
                 try:
                     self.spawn(self.ranlib + [output_filename])
-                except DistutilsExecError, msg:
-                    raise LibError, msg
+                except DistutilsExecError as msg:
+                    raise LibError(msg)
         else:
             log.debug("skipping %s (up-to-date)", output_filename)
 
@@ -155,13 +151,14 @@ class UnixCCompiler(CCompiler):
              export_symbols=None, debug=0, extra_preargs=None,
              extra_postargs=None, build_temp=None, target_lang=None):
         objects, output_dir = self._fix_object_args(objects, output_dir)
-        libraries, library_dirs, runtime_library_dirs = \
-            self._fix_lib_args(libraries, library_dirs, runtime_library_dirs)
+        fixed_args = self._fix_lib_args(libraries, library_dirs,
+                                        runtime_library_dirs)
+        libraries, library_dirs, runtime_library_dirs = fixed_args
 
         lib_opts = gen_lib_options(self, library_dirs, runtime_library_dirs,
                                    libraries)
-        if type(output_dir) not in (StringType, NoneType):
-            raise TypeError, "'output_dir' must be a string or None"
+        if not isinstance(output_dir, (str, type(None))):
+            raise TypeError("'output_dir' must be a string or None")
         if output_dir is not None:
             output_filename = os.path.join(output_dir, output_filename)
 
@@ -190,16 +187,23 @@ class UnixCCompiler(CCompiler):
                     if os.path.basename(linker[0]) == "env":
                         i = 1
                         while '=' in linker[i]:
-                            i = i + 1
+                            i += 1
 
-                    linker[i] = self.compiler_cxx[i]
+                    if os.path.basename(linker[i]) == 'ld_so_aix':
+                        # AIX platforms prefix the compiler with the ld_so_aix
+                        # script, so we need to adjust our linker index
+                        offset = 1
+                    else:
+                        offset = 0
+
+                    linker[i+offset] = self.compiler_cxx[i]
 
                 if sys.platform == 'darwin':
                     linker = _osx_support.compiler_fixup(linker, ld_args)
 
                 self.spawn(linker + ld_args)
-            except DistutilsExecError, msg:
-                raise LinkError, msg
+            except DistutilsExecError as msg:
+                raise LinkError(msg)
         else:
             log.debug("skipping %s (up-to-date)", output_filename)
 
@@ -211,7 +215,8 @@ class UnixCCompiler(CCompiler):
         return "-L" + dir
 
     def _is_gcc(self, compiler_name):
-        return "gcc" in compiler_name or "g++" in compiler_name
+        # clang uses same syntax for rpath as gcc
+        return any(name in compiler_name for name in ("gcc", "g++", "clang"))
 
     def runtime_library_dir_option(self, dir):
         # XXX Hackish, at the very least.  See Python bug #445902:
@@ -220,8 +225,9 @@ class UnixCCompiler(CCompiler):
         # Linkers on different platforms need different options to
         # specify that directories need to be added to the list of
         # directories searched for dependencies when a dynamic library
-        # is sought.  GCC has to be told to pass the -R option through
-        # to the linker, whereas other compilers just know this.
+        # is sought.  GCC on GNU systems (Linux, FreeBSD, ...) has to
+        # be told to pass the -R option through to the linker, whereas
+        # other compilers and gcc on other systems just know this.
         # Other compilers may need something slightly different.  At
         # this time, there's no way to determine this information from
         # the configuration data stored in the Python installation, so
@@ -236,12 +242,23 @@ class UnixCCompiler(CCompiler):
             if self._is_gcc(compiler):
                 return ["-Wl,+s", "-L" + dir]
             return ["+s", "-L" + dir]
-        elif sys.platform[:7] == "irix646" or sys.platform[:6] == "osf1V5":
-            return ["-rpath", dir]
-        elif self._is_gcc(compiler):
-            return "-Wl,-R" + dir
         else:
-            return "-R" + dir
+            if self._is_gcc(compiler):
+                # gcc on non-GNU systems does not need -Wl, but can
+                # use it anyway.  Since distutils has always passed in
+                # -Wl whenever gcc was used in the past it is probably
+                # safest to keep doing so.
+                if sysconfig.get_config_var("GNULD") == "yes":
+                    # GNU ld needs an extra option to get a RUNPATH
+                    # instead of just an RPATH.
+                    return "-Wl,--enable-new-dtags,-R" + dir
+                else:
+                    return "-Wl,-R" + dir
+            else:
+                # No idea how --enable-new-dtags would be passed on to
+                # ld if this system was using GNU ld.  Don't know if a
+                # system like this even exists.
+                return "-R" + dir
 
     def library_option(self, lib):
         return "-l" + lib
@@ -272,9 +289,9 @@ class UnixCCompiler(CCompiler):
             # vs
             #   /usr/lib/libedit.dylib
             cflags = sysconfig.get_config_var('CFLAGS')
-            m = re.search(r'-isysroot\s+(\S+)', cflags)
+            m = re.search(r'-isysroot\s*(\S+)', cflags)
             if m is None:
-                sysroot = '/'
+                sysroot = _osx_support._default_sysroot(sysconfig.get_config_var('CC'))
             else:
                 sysroot = m.group(1)
 

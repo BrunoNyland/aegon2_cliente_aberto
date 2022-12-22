@@ -193,7 +193,7 @@ class RefineDialogNew(ui.ScriptWindow):
 			self.__LoadScript()
 		self.__Initialize()
 
-		for i in xrange(1, 6):
+		for i in range(1, 6):
 			self.GetChild("add"+str(i)+"_1").SetText("Sem Atributo")
 			self.GetChild("add"+str(i)+"_2").SetText("0")
 
@@ -216,11 +216,11 @@ class RefineDialogNew(ui.ScriptWindow):
 
 		#TOOLTIPs
 		metinSlot = []
-		for i in xrange(player.METIN_SOCKET_MAX_NUM):
+		for i in range(player.METIN_SOCKET_MAX_NUM):
 			metinSlot.append(player.GetItemMetinSocket(targetItemPos, i))
 
 		attrSlot = []
-		for i in xrange(player.ATTRIBUTE_SLOT_MAX_NUM):
+		for i in range(player.ATTRIBUTE_SLOT_MAX_NUM):
 			attrSlot.append(player.GetItemAttribute(targetItemPos, i))
 		
 		origem_vnum = player.GetItemIndex(targetItemPos)
@@ -329,7 +329,7 @@ class RefineDialogNew(ui.ScriptWindow):
 		return "0"
 
 	def __AppendAffectInformation(self, origem_vnum, nextGradeItemVnum):
-		for i in xrange(3):
+		for i in range(3):
 			item.SelectItem(nextGradeItemVnum)
 			(affectType, affectValue) = item.GetAffect(i)
 			affectString = self.__GetAffectString(affectType, affectValue)
@@ -360,7 +360,7 @@ class RefineDialogNew(ui.ScriptWindow):
 			return "UNKNOWN_TYPE[%s] %s" % (affectType, affectValue)
 
 	def __LevelLimitInfo(self):
-		for i in xrange(item.LIMIT_MAX_NUM):
+		for i in range(item.LIMIT_MAX_NUM):
 			(limitType, limitValue) = item.GetLimit(i)
 			if item.LIMIT_LEVEL == limitType:
 				return limitValue

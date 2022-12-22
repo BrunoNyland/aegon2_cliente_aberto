@@ -160,7 +160,7 @@ class CheckBox(ui.BarWithBox):
 	def OnMouseLeftButtonUp(self):
 		if self.Enable:
 			if self.event:
-				apply(self.event, self.args)
+				self.event(* self.args)
 
 class ChangeGradeNameDialog(ui.ScriptWindow):
 	def __init__(self):
@@ -266,7 +266,7 @@ class CommentSlot(ui.Window):
 			self.LINES = []
 
 			if lines[0] != "":
-				for index in xrange(len(lines)):
+				for index in range(len(lines)):
 					line = ui.TextLine()
 					line.SetParent(self.tip)
 					line.SetText(lines[index])
@@ -419,7 +419,7 @@ class ListBox(ui.Window):
 		self.event = ui.__mem_func__(event)
 
 	def SelectItem(self, line):
-		if not self.keyDict.has_key(line):
+		if not self.keyDict.__contains__(line):
 			return
 
 		if line == self.selectedLine:
@@ -595,7 +595,7 @@ class ComboBox(ui.Window):
 	def OnSelectItem(self, index, name):
 		self.CloseListBox()
 		if self.event:
-			apply(self.event, (index, self.args))
+			self.event(* (index, self.args))
 
 	def CloseListBox(self):
 		self.isListOpened = False
@@ -822,7 +822,7 @@ class GuildWindow(ui.ScriptWindow):
 			for window in self.pageWindow.values():
 				pyScrLoader.LoadScriptFile(window, window.GetScriptFileName())
 
-		except:
+		except BaseException:
 			exception.Abort("GuildWindow.__LoadWindow.LoadScript")
 
 		try:
@@ -874,7 +874,7 @@ class GuildWindow(ui.ScriptWindow):
 			scrollBar.SetScrollEvent(self.OnScrollMemberLine)
 			self.pageWindow["MEMBER"].scrollBar = scrollBar
 
-		except:
+		except BaseException:
 			exception.Abort("GuildWindow.__LoadWindow.BindObject")
 
 		self.__MakeInfoPage()
@@ -935,7 +935,7 @@ class GuildWindow(ui.ScriptWindow):
 			page.GetChild("MessageLeaderSlot").SetMouseLeftButtonDownEvent(page.GetChild("smsg1").SetFocus)
 
 			self.largeMarkBox = page.GetChild("LargeGuildMark")
-		except:
+		except BaseException:
 			exception.Abort("GuildWindow.__MakeInfoPage")
 
 		self.largeMarkBox.AddFlag("not_pick")
@@ -951,7 +951,7 @@ class GuildWindow(ui.ScriptWindow):
 
 		page.boardDict = {}
 
-		for i in xrange(7):
+		for i in range(7):
 
 			yPos = 10 + i * lineStep
 			nameSlotImage = ui.MakeImageBox(page, "interface/controls/special/guild/name_msg_slot.tga", 10, yPos-1)
@@ -996,7 +996,7 @@ class GuildWindow(ui.ScriptWindow):
 		lineStep = 30
 		page.memberDict = {}
 
-		for i in xrange(self.MEMBER_LINE_COUNT):
+		for i in range(self.MEMBER_LINE_COUNT):
 			inverseLineIndex = self.MEMBER_LINE_COUNT - i - 1
 			yPos = 50 + inverseLineIndex*lineStep
 			nameSlotImage = ui.MakeImageBox(page, "interface/controls/special/guild/member/member_slot.tga", 14, yPos)
@@ -1074,7 +1074,7 @@ class GuildWindow(ui.ScriptWindow):
 
 		page.btnHealGSP.SetEvent(self.__OnOpenHealGSPBoard)
 
-		for i in xrange(len(playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST)):
+		for i in range(len(playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST)):
 			slotIndex = page.activeSlot.GetStartIndex() + i
 			skillIndex = playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST[i]
 
@@ -1089,7 +1089,7 @@ class GuildWindow(ui.ScriptWindow):
 		page = self.pageWindow["GRADE"]
 		page.gradeDict = {}
 		page.GetChild("BoardScrollBar").SetScrollEvent(self.RefreshGuildGradePage)
-		for i in xrange(8):
+		for i in range(8):
 			yPos = 50 + i * lineStep
 			index = i + 1
 
@@ -1144,7 +1144,7 @@ class GuildWindow(ui.ScriptWindow):
 			page.gradeDict[index] = gradeSlotList
 
 		masterSlotList = page.gradeDict[1]
-		for x in xrange(len(masterSlotList)-4):
+		for x in range(len(masterSlotList)-4):
 			masterSlotList[x].Disable()
 
 	def CanOpen(self):
@@ -1309,9 +1309,9 @@ class GuildWindow(ui.ScriptWindow):
 			page.declareWarButton.Hide()
 
 		gt = page.GetChild
-		for i in xrange(1, 5):
+		for i in range(1, 5):
 			gt("msg"+str(i)).SetText("")
-		for i in xrange(0, 4):
+		for i in range(0, 4):
 			message = self.__GetGuildLeaderCommentData(i)
 			if not message or message == "Noname":
 				continue
@@ -1367,7 +1367,7 @@ class GuildWindow(ui.ScriptWindow):
 			x = 0
 			page.scroll.Hide()
 
-		for i in xrange(min(int(float(l)*x), l-1), min(7 + int(float(l)*x), l)):
+		for i in range(min(int(float(l)*x), l-1), min(7 + int(float(l)*x), l)):
 			if lineIndex == 7:
 				break
 
@@ -1391,7 +1391,7 @@ class GuildWindow(ui.ScriptWindow):
 			lineIndex += 1
 
 		if lineIndex < 7:
-			for i in xrange(7 - lineIndex):
+			for i in range(7 - lineIndex):
 				slotList = page.boardDict[lineIndex+i]
 				slotList[0].Hide()
 				slotList[1].SetText("")
@@ -1482,7 +1482,7 @@ class GuildWindow(ui.ScriptWindow):
 
 			gradeComboBox.ClearItem()
 			temp = False
-			for i in xrange(self.CAN_CHANGE_GRADE_COUNT):
+			for i in range(self.CAN_CHANGE_GRADE_COUNT):
 				if (guild.GetGradeName(i+2) != "Recruta" and guild.GetGradeName(i+2) != "") and temp == False:
 					gradeComboBox.InsertItem(i+2, guild.GetGradeName(i+2))
 				elif guild.GetGradeName(i+2) in ["Recruta", ""] and temp == False:
@@ -1511,7 +1511,7 @@ class GuildWindow(ui.ScriptWindow):
 		page.skillPoint.SetText("Pontos disponíveis:  |cfff8d090" + str(skillPoint))
 		page.activeSlot.HideAllSlotButton()
 		try:
-			for i in xrange(len(playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST)):
+			for i in range(len(playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST)):
 
 				slotIndex = page.activeSlot.GetStartIndex()+i
 				skillIndex = playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST[i]
@@ -1528,7 +1528,7 @@ class GuildWindow(ui.ScriptWindow):
 				if skillPoint > 0:
 					if skillLevel < skillMaxLevel:
 						page.activeSlot.ShowSlotButton(slotIndex)
-		except:
+		except BaseException:
 			pass
 
 	def RefreshGuildGradePage(self):
@@ -1685,7 +1685,7 @@ class GuildWindow(ui.ScriptWindow):
 			button.SetOverVisual("interface/icons/special/quest_open_hover.tga")
 			button.SetDownVisual("interface/icons/special/quest_open.tga")
 			current = ""
-			for i in xrange(1, 5):
+			for i in range(1, 5):
 				if gt("msg"+str(i)).GetText() != "":
 					if i == 1:
 						current += gt("msg"+str(i)).GetText()
@@ -1703,7 +1703,7 @@ class GuildWindow(ui.ScriptWindow):
 			button.SetDownVisual("interface/icons/special/quest_closed.tga")
 			img.Hide()
 			current = ""
-			for i in xrange(1, 5):
+			for i in range(1, 5):
 				if gt("msg"+str(i)).GetText() != "":
 					if i == 1:
 						current += gt("msg"+str(i)).GetText()
@@ -1719,10 +1719,10 @@ class GuildWindow(ui.ScriptWindow):
 			else:
 				net.SendGuildDeleteLeaderPacket(1)
 
-			for i in xrange(5):
+			for i in range(5):
 				gt("msg"+str(i+1)).SetText("")
 
-			for i in xrange(len(lines)):
+			for i in range(len(lines)):
 				net.SendGuildPostLeaderPacket(lines[len(lines) - i - 1])
 
 			return True
@@ -2135,11 +2135,11 @@ class GuildWindow(ui.ScriptWindow):
 # # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KILLS# # # KIL
 ############################################################################################################
 	def SetKillsScrollBarSize(self, war_id):
-		if not constinfo.WAR_KILL.has_key(war_id):
+		if not constinfo.WAR_KILL.__contains__(war_id):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.winner):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.winner):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.loser):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.loser):
 			return
 
 		page = self.pageWindow["WAR_INFO"]
@@ -2148,11 +2148,11 @@ class GuildWindow(ui.ScriptWindow):
 		Get("War_ScrollBar").SetMiddleBarSize(15.0/max(15.0, float(table_size)))
 
 	def OnKillsScroll(self, war_id):
-		if not constinfo.WAR_KILL.has_key(war_id):
+		if not constinfo.WAR_KILL.__contains__(war_id):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.winner):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.winner):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.loser):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.loser):
 			return
 
 		page = self.pageWindow["WAR_INFO"]
@@ -2163,9 +2163,9 @@ class GuildWindow(ui.ScriptWindow):
 		self.ListTheFuckingKills(war_id, pos)
 
 	def WarKillsAppend(self, war_id, player, killed, died, guild):
-		if not constinfo.WAR_KILL.has_key(war_id):
+		if not constinfo.WAR_KILL.__contains__(war_id):
 			constinfo.WAR_KILL.update({war_id : {}})
-		if not constinfo.WAR_KILL[war_id].has_key(guild):
+		if not constinfo.WAR_KILL[war_id].__contains__(guild):
 			constinfo.WAR_KILL[war_id].update({guild : []})
 
 		constinfo.WAR_KILL[war_id][guild].append([player, killed, died])
@@ -2175,7 +2175,7 @@ class GuildWindow(ui.ScriptWindow):
 	def OpenWarDetails(self, war_id, war_data):
 		if war_id == 0:
 			return
-		if not constinfo.WAR_KILL.has_key(war_id):
+		if not constinfo.WAR_KILL.__contains__(war_id):
 			chat.AppendChat(chat.CHAT_TYPE_INFO, "Carregando informações da database.")
 			constinfo.WAR_KILL.update({war_id : {}})
 			net.SendChatPacket("/war_kills " + war_id)
@@ -2214,11 +2214,11 @@ class GuildWindow(ui.ScriptWindow):
 		self.GetChild("Button_Return").SetEvent(self.SelectPage, "GUILD_INFO")
 
 	def ListTheFuckingKills(self, war_id, init = 0):
-		if not constinfo.WAR_KILL.has_key(war_id):
+		if not constinfo.WAR_KILL.__contains__(war_id):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.winner):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.winner):
 			return
-		if not constinfo.WAR_KILL[war_id].has_key(self.loser):
+		if not constinfo.WAR_KILL[war_id].__contains__(self.loser):
 			return
 
 		winner_table = constinfo.WAR_KILL[war_id][self.winner]
@@ -2558,7 +2558,7 @@ if app.ENABLE_GUILD_SAFEBOX:
 			self.curPageIndex = 0
 			self.pageButtonList = []
 
-			for i in xrange(size):
+			for i in range(size):
 				button = self.GetChild("Tab_0" + str(i+1))
 				button.SetEvent(self.SelectPage, i)
 				button.Show()
@@ -2585,7 +2585,7 @@ if app.ENABLE_GUILD_SAFEBOX:
 			getItemID = safebox.GetGuildItemID
 			getItemCount = safebox.GetGuildItemCount
 			setItemID = self.wndItem.SetItemSlot
-			for i in xrange(88):
+			for i in range(88):
 				slotIndex = self.__LocalPosToGlobalPos(i)
 				itemCount = getItemCount(slotIndex)
 				if itemCount <= 1:

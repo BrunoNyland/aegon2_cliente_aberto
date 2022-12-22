@@ -28,17 +28,17 @@ if app.ENABLE_SWITCH_IMPROVEMENT:
 	INVENTORY_ITENS_UPDATE = {}
 
 	def AddItemToList(slot):
-		if not INVENTORY_ITENS_UPDATE.has_key(slot):
+		if not INVENTORY_ITENS_UPDATE.__contains__(slot):
 			INVENTORY_ITENS_UPDATE.update({slot : 1})
 		else:
 			INVENTORY_ITENS_UPDATE[slot] = 1
 
 	def SetItemUpdated(slot):
-		if INVENTORY_ITENS_UPDATE.has_key(slot):
+		if INVENTORY_ITENS_UPDATE.__contains__(slot):
 			INVENTORY_ITENS_UPDATE[slot] = 1
 
 	def SetItemSwitched(slot):
-		if INVENTORY_ITENS_UPDATE.has_key(slot):
+		if INVENTORY_ITENS_UPDATE.__contains__(slot):
 			INVENTORY_ITENS_UPDATE[slot] = 0
 
 	def CanSwitchItem(slot):

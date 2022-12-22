@@ -98,7 +98,7 @@ class ChestDropWindow(ui.ScriptWindow):
 			return
 
 		x = 1
-		for i in xrange(player.INVENTORY_PAGE_COUNT * player.INVENTORY_PAGE_SIZE):
+		for i in range(player.INVENTORY_PAGE_COUNT * player.INVENTORY_PAGE_SIZE):
 			if (selectedItemVNum == player.GetItemIndex(i)) and (x <= self.openAmount):
 				net.SendItemUsePacket(i)
 				x += 1
@@ -107,13 +107,13 @@ class ChestDropWindow(ui.ScriptWindow):
 		return
 
 	def OnClickPrevPage(self):
-		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].has_key(self.currentPage - 1):
+		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].__contains__(self.currentPage - 1):
 			self.currentPage = self.currentPage - 1
 			self.currentPageText.SetText(str(self.currentPage))
 			self.RefreshItemSlot()
 
 	def OnClickNextPage(self):
-		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].has_key(self.currentPage + 1):
+		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].__contains__(self.currentPage + 1):
 			self.currentPage = self.currentPage + 1
 			self.currentPageText.SetText(str(self.currentPage))
 			self.RefreshItemSlot()
@@ -138,20 +138,20 @@ class ChestDropWindow(ui.ScriptWindow):
 	def RefreshItems(self, chestVnum):
 		if chestVnum:
 			self.currentChest = chestVnum
-		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].has_key(2):
+		if constinfo.CHEST_DROP_INFO_DATA[self.currentChest].__contains__(2):
 			self.EnableMultiPage()
 		else:
 			self.EnableSinglePage()
 		self.RefreshItemSlot()
 
 	def RefreshItemSlot(self):
-		for i in xrange(15 * 5):
+		for i in range(15 * 5):
 			self.wndItem.ClearSlot(i)
-		if not constinfo.CHEST_DROP_INFO_DATA.has_key(self.currentChest):
+		if not constinfo.CHEST_DROP_INFO_DATA.__contains__(self.currentChest):
 			return
-		if not constinfo.CHEST_DROP_INFO_DATA[self.currentChest].has_key(self.currentPage):
+		if not constinfo.CHEST_DROP_INFO_DATA[self.currentChest].__contains__(self.currentPage):
 			return
-		for key, value in constinfo.CHEST_DROP_INFO_DATA[self.currentChest][self.currentPage].iteritems():
+		for key, value in constinfo.CHEST_DROP_INFO_DATA[self.currentChest][self.currentPage].items():
 			itemVnum = value[0]
 			itemCount = value[1]
 
@@ -163,9 +163,9 @@ class ChestDropWindow(ui.ScriptWindow):
 	def OverInItem(self, slotIndex):
 		if mousemodule.mouseController.isAttached():
 			return
-		if not constinfo.CHEST_DROP_INFO_DATA.has_key(self.currentChest):
+		if not constinfo.CHEST_DROP_INFO_DATA.__contains__(self.currentChest):
 			return
-		if not constinfo.CHEST_DROP_INFO_DATA[self.currentChest].has_key(self.currentPage):
+		if not constinfo.CHEST_DROP_INFO_DATA[self.currentChest].__contains__(self.currentPage):
 			return
 		if 0 != self.tooltipItem:
 			self.tooltipItem.SetItemToolTip(constinfo.CHEST_DROP_INFO_DATA[self.currentChest][self.currentPage][slotIndex][0])

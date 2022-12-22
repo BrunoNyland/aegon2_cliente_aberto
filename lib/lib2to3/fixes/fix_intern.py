@@ -6,9 +6,8 @@
 intern(s) -> sys.intern(s)"""
 
 # Local imports
-from .. import pytree
 from .. import fixer_base
-from ..fixer_util import Name, Attr, touch_import
+from ..fixer_util import ImportAndCall, touch_import
 
 
 class FixIntern(fixer_base.BaseFix):
@@ -31,26 +30,10 @@ class FixIntern(fixer_base.BaseFix):
             # PATTERN above but I don't know how to do it so...
             obj = results['obj']
             if obj:
-                if obj.type == self.syms.star_expr:
-                    return  # Make no change.
                 if (obj.type == self.syms.argument and
-                    obj.children[0].value == '**'):
+                    obj.children[0].value in {'**', '*'}):
                     return  # Make no change.
-        syms = self.syms
-        obj = results["obj"].clone()
-        if obj.type == syms.arglist:
-            newarglist = obj.clone()
-        else:
-            newarglist = pytree.Node(syms.arglist, [obj.clone()])
-        after = results["after"]
-        if after:
-            after = [n.clone() for n in after]
-        new = pytree.Node(syms.power,
-                          Attr(Name(u"sys"), Name(u"intern")) +
-                          [pytree.Node(syms.trailer,
-                                       [results["lpar"].clone(),
-                                        newarglist,
-                                        results["rpar"].clone()])] + after)
-        new.prefix = node.prefix
-        touch_import(None, u'sys', node)
+        names = ('sys', 'intern')
+        new = ImportAndCall(node, results, names)
+        touch_import(None, 'sys', node)
         return new

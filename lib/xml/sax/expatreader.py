@@ -93,9 +93,9 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
         self._parser = None
         self._namespaces = namespaceHandling
         self._lex_handler_prop = None
-        self._parsing = 0
+        self._parsing = False
         self._entity_stack = []
-        self._external_ges = 1
+        self._external_ges = 0
         self._interning = None
 
     # XMLReader methods
@@ -118,10 +118,7 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
 
     def prepareParser(self, source):
         if source.getSystemId() is not None:
-            base = source.getSystemId()
-            if isinstance(base, unicode):
-                base = base.encode('utf-8')
-            self._parser.SetBase(base)
+            self._parser.SetBase(source.getSystemId())
 
     # Redefined setContentHandler to allow changing handlers during parsing
 
@@ -206,10 +203,10 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
 
     # IncrementalParser methods
 
-    def feed(self, data, isFinal = 0):
+    def feed(self, data, isFinal=False):
         if not self._parsing:
             self.reset()
-            self._parsing = 1
+            self._parsing = True
             self._cont_handler.startDocument()
 
         try:
@@ -218,7 +215,7 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
             # document. When feeding chunks, they are not normally final -
             # except when invoked from close.
             self._parser.Parse(data, isFinal)
-        except expat.error, e:
+        except expat.error as e:
             exc = SAXParseException(expat.ErrorString(e.code), e, self)
             # FIXME: when to invoke error()?
             self._err_handler.fatalError(exc)
@@ -240,13 +237,13 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
             # If we are completing an external entity, do nothing here
             return
         try:
-            self.feed("", isFinal = 1)
+            self.feed(b"", isFinal=True)
             self._cont_handler.endDocument()
-            self._parsing = 0
+            self._parsing = False
             # break cycle created by expat handlers pointing to our methods
             self._parser = None
         finally:
-            self._parsing = 0
+            self._parsing = False
             if self._parser is not None:
                 # Keep ErrorColumnNumber and ErrorLineNumber after closing.
                 parser = _ClosedParser()
@@ -310,7 +307,7 @@ class ExpatParser(xmlreader.IncrementalParser, xmlreader.Locator):
         self._parser.SetParamEntityParsing(
             expat.XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE)
 
-        self._parsing = 0
+        self._parsing = False
         self._entity_stack = []
 
     # Locator methods

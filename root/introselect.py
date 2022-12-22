@@ -163,7 +163,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 
 	def SetEmpire(self, id):
 		self.empireName.SetText("Reino: %s" % {1:"Shinsoo", 2:"Chunjo", 3:"Jinno"}.get(net.GetEmpireID(), "Nenhum"))
-		if self.flagDict.has_key(id):
+		if self.flagDict.__contains__(id):
 			self.flagDict[id].Show()
 
 	def HideAllFlag(self):
@@ -310,7 +310,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 				self.stream.SetCreateCharacterPhase()
 
 	def __AreAllSlotEmpty(self):
-		for iSlot in xrange(self.SLOT_COUNT):
+		for iSlot in range(self.SLOT_COUNT):
 			if 0 != net.GetAccountCharacterSlotDataInteger(iSlot, net.ACCOUNT_CHARACTER_SLOT_ID):
 				return 0
 		return 1
@@ -471,7 +471,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 
 		try:
 			self.onPressKeyDict[key]()
-		except:
+		except BaseException:
 			pass
 
 		return True
@@ -750,13 +750,13 @@ class SelectCharacterWindow(ui.ScriptWindow):
 				Get("hair_image_" + str(x)).LoadImage(self.hair_icon_folder[race] + str(self.hair_color_list[1][x] + 1) + ".png")
 				Get("hair_btn_" + str(x)).SetEvent(self.SelectHair, self.hair_color_list[1][x])
 
-			for color in xrange(1, 13):
+			for color in range(1, 13):
 				Get("hair_color_btn_" + str(color)).SetEvent(self.SelectHairColor, color)
 
 			chr.SetLoopMotion(chr.MOTION_MODE_GENERAL)
 
 		def SelectHairColor(self, color_number):
-			if not self.hair_color_list.has_key(color_number):
+			if not self.hair_color_list.__contains__(color_number):
 				return
 
 			Get = self.dlgBoard.GetChild

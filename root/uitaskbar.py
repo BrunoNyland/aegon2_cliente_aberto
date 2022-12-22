@@ -142,7 +142,7 @@ class TaskBar(ui.ScriptWindow):
 			pyScrLoader.LoadScriptFile(self, "UIScript/TaskBar.py")
 			pyScrLoader.LoadScriptFile(self.mouseModeButtonList[self.MOUSE_BUTTON_LEFT], "UIScript/MouseButtonWindow.py")
 			pyScrLoader.LoadScriptFile(self.mouseModeButtonList[self.MOUSE_BUTTON_RIGHT], "UIScript/RightMouseButtonWindow.py")
-		except:
+		except BaseException:
 			import exception
 			exception.Abort("TaskBar.LoadWindow.LoadObject")
 
@@ -238,14 +238,14 @@ class TaskBar(ui.ScriptWindow):
 			(mouseLeftButtonEvent, mouseRightButtonEvent) = GetMouseButtonSettings()
 			if not self.__IsInSafeMouseButtonSettingRange(mouseLeftButtonEvent) or not self.__IsInSafeMouseButtonSettingRange(mouseRightButtonEvent):
 				raise(RuntimeError, "INVALID_MOUSE_BUTTON_SETTINGS")
-		except:
+		except BaseException:
 			InitMouseButtonSettings(self.EVENT_MOVE_AND_ATTACK, self.EVENT_CAMERA)
 			(mouseLeftButtonEvent, mouseRightButtonEvent) = GetMouseButtonSettings()
 
 		try:
 			self.SelectMouseButtonEvent(self.MOUSE_BUTTON_LEFT, mouseLeftButtonEvent)
 			self.SelectMouseButtonEvent(self.MOUSE_BUTTON_RIGHT, mouseRightButtonEvent)
-		except:
+		except BaseException:
 			InitMouseButtonSettings(self.EVENT_MOVE_AND_ATTACK, self.EVENT_CAMERA)
 			(mouseLeftButtonEvent, mouseRightButtonEvent) = GetMouseButtonSettings()
 
@@ -384,10 +384,10 @@ class TaskBar(ui.ScriptWindow):
 		if 0 != quarterPoint:
 			FullCount = min(4, curPoint / quarterPoint)
 
-		for i in xrange(4):
+		for i in range(4):
 			self.expGauge[i].Hide()
 
-		for i in xrange(FullCount):
+		for i in range(FullCount):
 			self.expGauge[i].SetRenderingRect(0.0, 0.0, 0.0, 0.0)
 			self.expGauge[i].Show()
 
@@ -407,7 +407,7 @@ class TaskBar(ui.ScriptWindow):
 
 		startNumber = 0
 		for slot in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				slotNumber = i+startNumber
 				(Type, Position) = player.GetLocalQuickSlot(slotNumber)
 
@@ -422,7 +422,7 @@ class TaskBar(ui.ScriptWindow):
 						itemCount = 0
 
 					if constinfo.IS_AUTO_POTION(itemIndex):
-						metinSocket = [player.GetItemMetinSocket(Position, j) for j in xrange(player.METIN_SOCKET_MAX_NUM)]
+						metinSocket = [player.GetItemMetinSocket(Position, j) for j in range(player.METIN_SOCKET_MAX_NUM)]
 						if 0 != int(metinSocket[0]):
 							slot.ActivateSlot(slotNumber)
 						else:
@@ -512,7 +512,7 @@ class TaskBar(ui.ScriptWindow):
 			QUICK_SLOT_SLOT_COUNT = 4
 			slotIndex = 0
 			for slotWindow in self.quickslot:
-				for i in xrange(QUICK_SLOT_SLOT_COUNT):
+				for i in range(QUICK_SLOT_SLOT_COUNT):
 					(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 					if Type == player.SLOT_TYPE_SKILL:
 						if usedSlotIndex == Position:
@@ -525,7 +525,7 @@ class TaskBar(ui.ScriptWindow):
 		slotIndex = 0
 
 		for slotWindow in self.quickslot:
-			for i in xrange(QUICK_SLOT_SLOT_COUNT):
+			for i in range(QUICK_SLOT_SLOT_COUNT):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:
@@ -537,7 +537,7 @@ class TaskBar(ui.ScriptWindow):
 		slotIndex = 0
 
 		for slotWindow in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:
@@ -549,7 +549,7 @@ class TaskBar(ui.ScriptWindow):
 		slotIndex = 0
 
 		for slotWindow in self.quickslot:
-			for i in xrange(4):
+			for i in range(4):
 				(Type, Position) = player.GetLocalQuickSlot(slotIndex)
 				if Type == player.SLOT_TYPE_SKILL:
 					if usedSlotIndex == Position:

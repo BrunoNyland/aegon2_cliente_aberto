@@ -35,40 +35,30 @@ class FunctionTestCase(unittest.TestCase):
         # wasn't checked, and it even crashed Python.
         # Found by Greg Chapman.
 
-        try:
+        with self.assertRaises(TypeError):
             class X(object, Array):
                 _length_ = 5
                 _type_ = "i"
-        except TypeError:
-            pass
-
 
         from _ctypes import _Pointer
-        try:
+        with self.assertRaises(TypeError):
             class X(object, _Pointer):
                 pass
-        except TypeError:
-            pass
 
         from _ctypes import _SimpleCData
-        try:
+        with self.assertRaises(TypeError):
             class X(object, _SimpleCData):
                 _type_ = "i"
-        except TypeError:
-            pass
 
-        try:
+        with self.assertRaises(TypeError):
             class X(object, Structure):
                 _fields_ = []
-        except TypeError:
-            pass
-
 
     @need_symbol('c_wchar')
     def test_wchar_parm(self):
         f = dll._testfunc_i_bhilfd
         f.argtypes = [c_byte, c_wchar, c_int, c_long, c_float, c_double]
-        result = f(1, u"x", 3, 4, 5.0, 6.0)
+        result = f(1, "x", 3, 4, 5.0, 6.0)
         self.assertEqual(result, 139)
         self.assertEqual(type(result), int)
 
@@ -78,7 +68,7 @@ class FunctionTestCase(unittest.TestCase):
         f.argtypes = [c_byte, c_short, c_int, c_long, c_float, c_double]
         f.restype = c_wchar
         result = f(0, 0, 0, 0, 0, 0)
-        self.assertEqual(result, u'\x00')
+        self.assertEqual(result, '\x00')
 
     def test_voidresult(self):
         f = dll._testfunc_v
@@ -138,6 +128,7 @@ class FunctionTestCase(unittest.TestCase):
         self.assertEqual(result, -21)
         self.assertEqual(type(result), float)
 
+    @need_symbol('c_longdouble')
     def test_longdoubleresult(self):
         f = dll._testfunc_D_bhilfD
         f.argtypes = [c_byte, c_short, c_int, c_long, c_float, c_longdouble]
@@ -168,8 +159,8 @@ class FunctionTestCase(unittest.TestCase):
         f = dll._testfunc_p_p
         f.argtypes = None
         f.restype = c_char_p
-        result = f("123")
-        self.assertEqual(result, "123")
+        result = f(b"123")
+        self.assertEqual(result, b"123")
 
         result = f(None)
         self.assertEqual(result, None)
@@ -208,15 +199,6 @@ class FunctionTestCase(unittest.TestCase):
         # of the pointer:
         result = f(byref(c_int(99)))
         self.assertNotEqual(result.contents, 99)
-
-    def test_errors(self):
-        f = dll._testfunc_p_p
-        f.restype = c_int
-
-        class X(Structure):
-            _fields_ = [("y", c_int)]
-
-        self.assertRaises(TypeError, f, X()) #cannot convert parameter
 
     ################################################################
     def test_shorts(self):
@@ -299,7 +281,7 @@ class FunctionTestCase(unittest.TestCase):
         f.argtypes = [c_longlong, MyCallback]
 
         def callback(value):
-            self.assertIsInstance(value, (int, long))
+            self.assertIsInstance(value, int)
             return value & 0x7FFFFFFF
 
         cb = MyCallback(callback)
@@ -389,7 +371,7 @@ class FunctionTestCase(unittest.TestCase):
                 (9*2, 8*3, 7*4, 6*5, 5*6, 4*7, 3*8, 2*9))
 
     def test_sf1651235(self):
-        # see http://www.python.org/sf/1651235
+        # see https://www.python.org/sf/1651235
 
         proto = CFUNCTYPE(c_int, RECT, POINT)
         def callback(*args):

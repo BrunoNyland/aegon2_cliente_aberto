@@ -1,20 +1,21 @@
+import importlib.machinery
 import os
 import sys
-import imp
 
-from idlelib.TreeWidget import TreeItem
-from idlelib.ClassBrowser import ClassBrowser, ModuleBrowserTreeItem
-from idlelib.PyShell import PyShellFileList
+from idlelib.browser import ModuleBrowser, ModuleBrowserTreeItem
+from idlelib.tree import TreeItem
 
 
-class PathBrowser(ClassBrowser):
+class PathBrowser(ModuleBrowser):
 
-    def __init__(self, flist, _htest=False):
+    def __init__(self, master, *, _htest=False, _utest=False):
         """
         _htest - bool, change box location when running htest
         """
+        self.master = master
         self._htest = _htest
-        self.init(flist)
+        self._utest = _utest
+        self.init()
 
     def settitle(self):
         "Set window titles."
@@ -23,6 +24,7 @@ class PathBrowser(ClassBrowser):
 
     def rootnode(self):
         return PathBrowserTreeItem()
+
 
 class PathBrowserTreeItem(TreeItem):
 
@@ -35,6 +37,7 @@ class PathBrowserTreeItem(TreeItem):
             item = DirBrowserTreeItem(dir)
             sublist.append(item)
         return sublist
+
 
 class DirBrowserTreeItem(TreeItem):
 
@@ -51,7 +54,7 @@ class DirBrowserTreeItem(TreeItem):
     def GetSubList(self):
         try:
             names = os.listdir(self.dir or os.curdir)
-        except os.error:
+        except OSError:
             return []
         packages = []
         for name in names:
@@ -70,6 +73,7 @@ class DirBrowserTreeItem(TreeItem):
         return sublist
 
     def ispackagedir(self, file):
+        " Return true for directories that are packages."
         if not os.path.isdir(file):
             return False
         init = os.path.join(file, "__init__.py")
@@ -77,9 +81,11 @@ class DirBrowserTreeItem(TreeItem):
 
     def listmodules(self, allnames):
         modules = {}
-        suffixes = imp.get_suffixes()
+        suffixes = importlib.machinery.EXTENSION_SUFFIXES[:]
+        suffixes += importlib.machinery.SOURCE_SUFFIXES
+        suffixes += importlib.machinery.BYTECODE_SUFFIXES
         sorted = []
-        for suff, mode, flag in suffixes:
+        for suff in suffixes:
             i = -len(suff)
             for name in allnames[:]:
                 normed_name = os.path.normcase(name)
@@ -92,9 +98,9 @@ class DirBrowserTreeItem(TreeItem):
         sorted.sort()
         return sorted
 
+
 def _path_browser(parent):  # htest #
-    flist = PyShellFileList(parent)
-    PathBrowser(flist, _htest=True)
+    PathBrowser(parent, _htest=True)
     parent.mainloop()
 
 if __name__ == "__main__":

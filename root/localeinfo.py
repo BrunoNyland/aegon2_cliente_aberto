@@ -59,7 +59,7 @@ def LoadLocaleFile(srcFileName, localeDict):
 				raise(RuntimeError, "Unknown TokenSize")
 
 			lineIndex += 1
-		except:
+		except BaseException:
 			import dbg
 			dbg.LogBox("%s: line(%d): %s" % (srcFileName, lineIndex, line), "Error")
 			raise
@@ -84,7 +84,7 @@ def GetAuxiliaryWordType(text):
 		if (singleWord >= '0' and singleWord <= '9') or\
 			(singleWord >= 'a' and singleWord <= 'z') or\
 			(singleWord >= 'A' and singleWord <= 'Z'):
-			if not dictSingleWord.has_key(singleWord):
+			if not dictSingleWord.__contains__(singleWord):
 				return 1
 	return 0
 

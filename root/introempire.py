@@ -181,7 +181,7 @@ class SelectEmpireWindow(ui.ScriptWindow):
 		snd.PlaySound("sound/ui/click.wav")
 
 		event.ClearEventSet(self.descIndex)
-		if self.EMPIRE_DESCRIPTION_TEXT_FILE_NAME.has_key(arg):
+		if self.EMPIRE_DESCRIPTION_TEXT_FILE_NAME.__contains__(arg):
 			self.descIndex = event.RegisterEventSet(self.EMPIRE_DESCRIPTION_TEXT_FILE_NAME[arg])
 
 			event.SetFontColor(self.descIndex, 0.7843, 0.7843, 0.7843)

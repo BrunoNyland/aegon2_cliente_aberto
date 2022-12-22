@@ -209,7 +209,7 @@ class CreateCharacterWindow(ui.Window):
 		if musicinfo.createMusic != "":
 			snd.FadeOutMusic("bgm/"+musicinfo.createMusic)
 
-		for id in xrange(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
+		for id in range(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
 			chr.DeleteInstance(id)
 
 		self.btnCancel = 0
@@ -289,8 +289,8 @@ class CreateCharacterWindow(ui.Window):
 		self.genderButton[0].Enable()
 		self.genderButton[1].Enable()
 
-		for page in xrange(PAGE_COUNT):
-			for slot in xrange(SLOT_COUNT):
+		for page in range(PAGE_COUNT):
+			for slot in range(SLOT_COUNT):
 				chr_id = self.__GetSlotChrID(page, slot)
 				chr.SelectInstance(chr_id)
 				chr.BlendLoopMotion(chr.MOTION_INTRO_WAIT, 0.1)
@@ -329,21 +329,21 @@ class CreateCharacterWindow(ui.Window):
 		self.gender = gender
 
 		if gender == MAN:
-			for i in xrange(SLOT_COUNT):
+			for i in range(SLOT_COUNT):
 				chr.SelectInstance(self.__GetSlotChrID(0, i))
 				chr.Show()
-			for i in xrange(SLOT_COUNT):
+			for i in range(SLOT_COUNT):
 				chr.SelectInstance(self.__GetSlotChrID(1, i))
 				chr.Hide()
 		else:
-			for i in xrange(SLOT_COUNT):
+			for i in range(SLOT_COUNT):
 				chr.SelectInstance(self.__GetSlotChrID(0, i))
 				chr.Hide()
-			for i in xrange(SLOT_COUNT):
+			for i in range(SLOT_COUNT):
 				chr.SelectInstance(self.__GetSlotChrID(1, i))
 				chr.Show()
 
-		for id in xrange(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
+		for id in range(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
 			chr.DeleteInstance(id)
 
 		self.__SelectSlot(self.slot)
@@ -417,7 +417,7 @@ class CreateCharacterWindow(ui.Window):
 
 		chr_id = self.__GetSlotChrID(self.gender, slot)
 
-		for id in xrange(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
+		for id in range(BASE_CHR_ID + SLOT_COUNT * PAGE_COUNT):
 			chr.DeleteInstance(id)
 
 		chr.SelectInstance(chr_id)
@@ -469,12 +469,12 @@ class CreateCharacterWindow(ui.Window):
 		return True
 
 	def ResetStat(self):
-		for i in xrange(4):
+		for i in range(4):
 			self.stat[i] = self.START_STAT[self.slot][i]
 		self.lastStatPoint = self.CREATE_STAT_POINT
 
 	def OverInStatButton(self, stat):
-		if not self.STAT_DESCRIPTION.has_key(stat):
+		if not self.STAT_DESCRIPTION.__contains__(stat):
 			return
 
 		self.toolTip.ClearToolTip()
@@ -496,8 +496,8 @@ class CreateCharacterWindow(ui.Window):
 	def OnUpdate(self):
 		chr.Update()
 
-		for page in xrange(PAGE_COUNT):
-			for i in xrange(SLOT_COUNT):
+		for page in range(PAGE_COUNT):
+			for i in range(SLOT_COUNT):
 				chr.SelectInstance(self.__GetSlotChrID(page, i))
 				chr.Show()
 

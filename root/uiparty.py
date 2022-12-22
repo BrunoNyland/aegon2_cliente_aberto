@@ -104,7 +104,7 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/partymemberinfoboardnew.py")
-		except:
+		except BaseException:
 			exception.Abort("PartyMemberInfoBoard.__LoadBoard.LoadScript")
 
 		try:
@@ -121,7 +121,7 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 			self.partyAffectImageList.append(self.GetChild("IncreaseArea150"))
 			self.partyAffectImageList.append(self.GetChild("IncreaseArea200"))
 			self.stateButton.SetEvent(self.OnMouseLeftButtonDown)
-		except:
+		except BaseException:
 			exception.Abort("PartyMemberInfoBoard.__LoadBoard.BindObject")
 
 		self.__SetAffectsMouseEvent()
@@ -145,9 +145,9 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 		self.Hide()
 
 	def __SetAffectsMouseEvent(self):
-		for i in xrange(len(self.partyAffectImageList)):
+		for i in range(len(self.partyAffectImageList)):
 			self.partyAffectImageList[i].SetOverInEvent(self.OnAffectOverIn, i)
-		for i in xrange(len(self.partyAffectImageList)):
+		for i in range(len(self.partyAffectImageList)):
 			self.partyAffectImageList[i].SetOverOutEvent(self.OnAffectOverOut, i)
 
 	def __HideAllAffects(self):
@@ -237,7 +237,7 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 			self.__AppendStateButton(xPos, yPos, player.PARTY_STATE_DEFENDER)
 			xPos += 23
 
-		if self.stateButtonDict.has_key(self.MEMBER_BUTTON_EXPEL):
+		if self.stateButtonDict.__contains__(self.MEMBER_BUTTON_EXPEL):
 			button = self.stateButtonDict[self.MEMBER_BUTTON_EXPEL]
 			button.SetPosition(xPos, yPos)
 			button.Show()
@@ -249,7 +249,7 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 			button.Hide()
 
 	def __GetAffectNumber(self, img):
-		for i in xrange(self.partyAffectImageList):
+		for i in range(self.partyAffectImageList):
 			if img == self.partyAffectImageList[i]:
 				return i
 
@@ -307,7 +307,7 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 			self.GetChild("leader").Hide()
 
 		name = self.MEMBER_BUTTON_IMAGE_FILE_NAME_DICT[self.MEMBER_BUTTON_NORMAL]
-		if self.MEMBER_BUTTON_IMAGE_FILE_NAME_DICT.has_key(state):
+		if self.MEMBER_BUTTON_IMAGE_FILE_NAME_DICT.__contains__(state):
 			name = self.MEMBER_BUTTON_IMAGE_FILE_NAME_DICT[state]
 		
 		self.stateButton.SetUpVisual(self.MEMBER_BUTTON_PATH + name + "_01.tga")
@@ -413,9 +413,9 @@ class PartyMemberInfoBoard(ui.ScriptWindow):
 	def OnAffectOverIn(self, index):
 		if index:
 			self.partyAffectImageList[index].LoadImage(self.interface + "bonus_over.tga")
-		if not self.AFFECT_STRING_DICT.has_key(index):
+		if not self.AFFECT_STRING_DICT.__contains__(index):
 			return
-		if not self.affectValueDict.has_key(index):
+		if not self.affectValueDict.__contains__(index):
 			return
 
 		(x, y) = self.GetGlobalPosition()
@@ -446,7 +446,7 @@ class PartyHideWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "uiscript/partyhide.py")
-		except:
+		except BaseException:
 			exception.Abort("PartyHideWindow.__LoadBoard.LoadScript")
 
 	def Destroy(self):
@@ -570,7 +570,7 @@ class PartyWindow(ui.Window):
 
 		board.SetCharacterState(state)
 		board.SetCharacterHP(hpPercentage)
-		for i in xrange(len(affectsList)):
+		for i in range(len(affectsList)):
 			board.SetAffect(i, affectsList[i])
 
 		vid = board.GetCharacterVID()
@@ -759,14 +759,14 @@ class PartyWindow(ui.Window):
 		self.UpdateRect()
 
 	def __ShowButton(self, name):
-		if not self.buttonDict.has_key(name):
+		if not self.buttonDict.__contains__(name):
 			return
 
 		self.showingButtonList.append(self.buttonDict[name])
 		self.__ArrangeButtons()
 
 	def __HideButton(self, name):
-		if not self.buttonDict.has_key(name):
+		if not self.buttonDict.__contains__(name):
 			return
 
 		searchingButton = self.buttonDict[name]
@@ -816,5 +816,5 @@ class PartyWindow(ui.Window):
 	def ChangePartyParameter(self, distributionMode):
 		try:
 			self.__SetModeButton(distributionMode)
-		except:
+		except BaseException:
 			pass

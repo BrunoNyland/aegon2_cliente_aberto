@@ -50,7 +50,7 @@ def UpdateADBoard():
 		g_offlineShopAdvertisementBoardDict[key].Show()
 
 def DeleteADBoard(vid):
-	if (not g_offlineShopAdvertisementBoardDict.has_key(vid)):
+	if (not g_offlineShopAdvertisementBoardDict.__contains__(vid)):
 		return
 	del g_offlineShopAdvertisementBoardDict[vid]
 
@@ -118,8 +118,8 @@ class OfflineShopBuilder(ui.ScriptWindow):
 		self.tooltipItem = proxy(tooltipItem)
 
 	def Refresh(self):
-		for i in xrange(shop.OFFLINE_SHOP_SLOT_COUNT):
-			if (not self.itemStock.has_key(i)):
+		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
+			if (not self.itemStock.__contains__(i)):
 				self.itemSlot.ClearSlot(i)
 				continue
 			pos = self.itemStock[i]
@@ -246,7 +246,7 @@ class OfflineShopBuilder(ui.ScriptWindow):
 
 	def OnOverInItem(self, slotIndex):
 		if (self.tooltipItem):
-			if (self.itemStock.has_key(slotIndex)):
+			if (self.itemStock.__contains__(slotIndex)):
 				self.tooltipItem.SetOfflineShopBuilderItem(*self.itemStock[slotIndex] + (slotIndex,))
 
 	def OnOverOutItem(self):
