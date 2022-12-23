@@ -51,7 +51,7 @@ class pack_file_iterator(IOBase):
 _chr = builtins.chr
 
 class pack_file(IOBase):
-	def __init__(self, filename:str, mode:str='rb'):
+	def __init__(self, filename:str, mode:str='rb') -> None:
 		if not mode in ('r', 'rb'):
 			raise(IOError, 'system.py:pack_file: Invalid mode: %s' % (mode))
 		if not pack.Exist(filename):
@@ -87,21 +87,16 @@ class pack_file(IOBase):
 
 old_open = open
 def open_modified(filename:str, mode:str='rb'):
-	dbg.TraceError('Testando essa merda')
+	if not mode in ('r', 'rb'):
+		raise(IOError, 'system.py:open: Invalid mode: %s' % (mode))
 
-	# if not mode in ('r', 'rb'):
-	# 	raise(IOError, 'system.py:open: Invalid mode: %s' % (mode))
-
-	# if pack.Exist(filename):
-	# 	return pack_file(filename, mode)
-	# else:
-	# 	return old_open(filename, mode)
+	if pack.Exist(filename):
+		return pack_file(filename, mode)
+	else:
+		return old_open(filename, mode)
 builtins.open = open_modified
 
-file = open('npclist.txt')
-# dbg.TraceError(str(file.readline()))
-
-# _ModuleType = type(sys)
+_ModuleType = type(sys)
 
 # old_import = __import__
 # def _process_result(code, fqname):
