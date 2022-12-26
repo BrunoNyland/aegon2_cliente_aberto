@@ -38,7 +38,7 @@ def LoadLocaleFile(srcFileName, localeDict):
 	lineIndex = 1
 
 	try:
-		lines = pack_open(srcFileName, "r").readlines()
+		lines = open(srcFileName, "r").readlines()
 	except IOError:
 		import dbg
 		dbg.LogBox("LoadLocaleError(%(srcFileName)s)" % locals())

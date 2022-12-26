@@ -69,7 +69,7 @@ def RegisterSkill(race, group):
 
 def LoadGameNPC():
 	try:
-		lines = pack_open("npclist.txt", "r").readlines()
+		lines = open("npclist.txt", "r").readlines()
 	except IOError:
 		import dbg
 		dbg.LogBox("LoadLocaleError(%(srcFileName)s)" % locals())

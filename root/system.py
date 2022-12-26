@@ -13,7 +13,7 @@ import builtins
 import marshal
 
 # imports from lib folder
-import importlib
+import imp
 import os
 from typing import TextIO
 from io import IOBase
@@ -101,8 +101,8 @@ builtins.open = open_modified
 
 _ModuleType = type(sys)
 
-import imp
-old_import = __import__
+old_import = builtins.__import__
+
 def _process_result(code, fqname):
 	is_module = isinstance(code, _ModuleType)
 
@@ -190,7 +190,7 @@ def __LoadTextFile__(sFileName):
 def __LoadCompiledFile__(sFileName):
 	kFile = open(sFileName)
 	if kFile.read(4) != imp.get_magic():
-		raise
+		raise BaseException('__LoadCompiledFile__')
 
 	kFile.read(4)
 
@@ -241,19 +241,18 @@ def RunMainScript(name):
 		dbg.LogBox(msg)
 		app.Abort()
 
-	except:
+	except BaseException:
 		msg = GetExceptionString("Run")
 		dbg.LogBox(msg)
 		app.Abort()
 
-# import debuginfo
-# debuginfo.SetDebugMode(__DEBUG__)
+import debuginfo
+debuginfo.SetDebugMode(__DEBUG__)
 
 
 
-# if __USE_CYTHON__:
-# 	import __main__
-# 	__hybrid_import('Prototype', __main__.__dict__)
-# else:
-# 	RunMainScript("root/prototype.py")
-	
+if __USE_CYTHON__:
+	import __main__
+	__hybrid_import('Prototype', __main__.__dict__)
+else:
+	RunMainScript("root/prototype.py")

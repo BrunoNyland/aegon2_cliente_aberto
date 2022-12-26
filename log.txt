@@ -1,0 +1,24 @@
+1226 01:21:00004 :: 
+1226 01:21:00004 :: ## Network - OffLine Phase ##
+1226 01:21:00004 :: 
+1226 01:21:00099 :: i
+1226 01:21:01315 :: Traceback:
+
+
+
+1226 01:21:01315 :: SYSERR: RunMain Error
+1226 01:21:01327 :: SYSERR: granny_shared_vbs:
+1226 01:21:01327 :: SYSERR: 	0: 0
+1226 01:21:01327 :: SYSERR: 	1: 0
+1226 01:21:01327 :: SYSERR: 	2: 0
+1226 01:21:01327 :: SYSERR: 	3: 0
+1226 01:21:01327 :: SYSERR: 	4: 0
+1226 01:21:01328 :: SYSERR: 	5: 0
+1226 01:21:01328 :: SYSERR: 	6: 0
+1226 01:21:01328 :: SYSERR: 	7: 0
+1226 01:21:01328 :: CResourceManager::__DestroyResourceMap 0
+1226 01:21:01329 :: CResourceManager::__DestroyResourceMap 0
+1226 01:21:01329 :: CPythonBackground Clear
+1226 01:21:01329 :: PythonIME Clear
+1226 01:21:01330 :: PythonNetworkMainStream Clear
+1226 01:21:01330 :: Python Graphic Clear

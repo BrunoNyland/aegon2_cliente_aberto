@@ -5,7 +5,7 @@ CODEPAGE = str(app.GetDefaultCodePage())
 
 def LoadLocaleFile(srcFileName, localeDict):
 	try:
-		lines = pack_open(srcFileName, "r").readlines()
+		lines = open(srcFileName, "r").readlines()
 	except IOError:
 		import dbg
 		dbg.LogBox("Load uiscript/LocaleError(%(srcFileName)s)" % locals())
