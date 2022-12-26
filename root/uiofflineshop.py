@@ -352,7 +352,7 @@ class OfflineShopRemoveItemWindow(ui.ScriptWindow):
 				iCount = iCount + 1
 
 		if (iCount == shop.OFFLINE_SHOP_SLOT_COUNT):
-			chat.AppendChat(chat.CHAT_TYPE_INFO, "VocÍ n„o tem nada na loja offline no momento.")
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "Voc√™ n√£o tem nada na loja offline no momento.")
 			return
 
 		for i in range(shop.OFFLINE_SHOP_SLOT_COUNT):
@@ -539,21 +539,21 @@ class OfflineShopBankDialog(ui.ScriptWindow):
 			if (SacarGold > GoldAtual):
 				SacarGold = GoldAtual
 				self.SacarGoldLine.SetText(str(GoldAtual))
-				chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor solicitado maior que o saldo. Ser· sacado o valor total disponÌvel na conta.")
+				chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor solicitado maior que o saldo. Ser√° sacado o valor total dispon√≠vel na conta.")
 
 			if (GoldAtual <= 0):
-				chat.AppendChat(chat.CHAT_TYPE_INFO, "Sua conta no banco est· sem saldo para sacar.")
+				chat.AppendChat(chat.CHAT_TYPE_INFO, "Sua conta no banco est√° sem saldo para sacar.")
 				return
 
 			if (SacarGold <= 0):
-				chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor de saque inv·lido.")
+				chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor de saque inv√°lido.")
 				return
 
 			net.SendOfflineShopWithdrawMoney(SacarGold)
 
 		except ValueError:
 			self.SacarGoldLine.SetText(str(GoldAtual))
-			chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor de saque indevido. Selecionado o valor m·ximo de saque.")
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "Valor de saque indevido. Selecionado o valor m√°ximo de saque.")
 
 	def UpdateMoneyString(self, value):
 		self.Saldo = value

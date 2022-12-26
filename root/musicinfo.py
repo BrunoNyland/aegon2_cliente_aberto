@@ -9,7 +9,7 @@ def SaveLastPlayFieldMusic():
 	global fieldMusic
 
 	try:
-		lastPlayFile = old_open("miles/lastplay.inf", "w")
+		lastPlayFile = open("miles/lastplay.inf", "w", "folder")
 	except IOError:
 		return
 
@@ -20,7 +20,7 @@ def LoadLastPlayFieldMusic():
 	global fieldMusic
 
 	try:
-		lastPlayFile = old_open("miles/lastplay.inf", "r")
+		lastPlayFile = open("miles/lastplay.inf", "r", "folder")
 	except IOError:
 		return
 

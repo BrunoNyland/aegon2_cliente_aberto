@@ -1774,7 +1774,7 @@ class EmojisListBoard(ui.Window):
 		self.SetOnRunMouseWheelEvent(self.OnScroll)
 
 		if not os.path.exists(EMOJI_FILE_NAME):
-			old_open(EMOJI_FILE_NAME, "w").write("")
+			open(EMOJI_FILE_NAME, "w", "folder").write("")
 
 	def Destroy(self):
 		self.ScrollBar.Destroy()
@@ -1814,7 +1814,7 @@ class EmojisListBoard(ui.Window):
 		self.ScrollBar.SetPos(0)
 
 		if (categoria == 0):
-			lines = old_open(EMOJI_FILE_NAME, "r").readlines()
+			lines = open(EMOJI_FILE_NAME, "r", "folder").readlines()
 			for line in lines:
 				tokens = line[:-1].split("\t")
 				if len(tokens) == 2:

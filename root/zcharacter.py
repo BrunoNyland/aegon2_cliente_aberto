@@ -263,10 +263,10 @@ class CharacterWindow(ui.ScriptWindow):
 		self.tabNameStringDict = {
 			"STATUS"		: "Status do Personagem",
 			"SKILL"			: "Habilidades",
-			"EMOTICON"		: "EmoÁıes",
+			"EMOTICON"		: "Emo√ß√µes",
 			"QUEST"			: "Quests",
-			"BONUS"			: "P·gina de BÙnus",
-			"RANKING"		: "ClassificaÁ„o Geral",
+			"BONUS"			: "P√°gina de B√¥nus",
+			"RANKING"		: "Classifica√ß√£o Geral",
 		}
 
 		self.tabButtonDict = {
@@ -547,19 +547,19 @@ class CharacterWindow(ui.ScriptWindow):
 		self.GetChild("Exp_Value").SetText(str(player.GetEXP())+" de "+str(int(player.GetStatus(player.NEXT_EXP))))
 		self.GetChild("PercentExp").SetText(percent_limited+"%")
 
-		self.GetChild("HP_Value").SetText("Vida M·xima [HP]: |cffB74646" + str(player.GetStatus(player.MAX_HP)))
-		self.GetChild("SP_Value").SetText("M·gia M·xima [MP]: |cff4150CD" + str(player.GetStatus(player.MAX_SP)))
+		self.GetChild("HP_Value").SetText("Vida M√°xima [HP]: |cffB74646" + str(player.GetStatus(player.MAX_HP)))
+		self.GetChild("SP_Value").SetText("M√°gia M√°xima [MP]: |cff4150CD" + str(player.GetStatus(player.MAX_SP)))
 
-		self.GetChild("STR_Value").SetText("ForÁa: |cff42f456" + str(player.GetStatus(player.ST)))
+		self.GetChild("STR_Value").SetText("For√ßa: |cff42f456" + str(player.GetStatus(player.ST)))
 		self.GetChild("DEX_Value").SetText("Destresa: |cff42f456" + str(player.GetStatus(player.DX)))
 		self.GetChild("HTH_Value").SetText("Vitalidade: |cffB74646" + str(player.GetStatus(player.HT)))
-		self.GetChild("INT_Value").SetText("InteligÍncia: |cff4150CD" + str(player.GetStatus(player.IQ)))
+		self.GetChild("INT_Value").SetText("Intelig√™ncia: |cff4150CD" + str(player.GetStatus(player.IQ)))
 
 		self.GetChild("ATT_Value").SetText("Ataque: |cff42f456" + self.__GetTotalAtkText())
 		self.GetChild("DEF_Value").SetText("Defesa: |cffB74646" + self.__GetTotalDefText())
 
-		self.GetChild("MATT_Value").SetText("Ataque M·gico: |cff4150CD" + self.__GetTotalMagAtkText())
-		self.GetChild("MDEF_Value").SetText("Defesa M·gica: |cff4150CD" + str(player.GetStatus(player.MAG_DEF)))
+		self.GetChild("MATT_Value").SetText("Ataque M√°gico: |cff4150CD" + self.__GetTotalMagAtkText())
+		self.GetChild("MDEF_Value").SetText("Defesa M√°gica: |cff4150CD" + str(player.GetStatus(player.MAG_DEF)))
 
 		self.__RefreshStatusPlusButtonList()
 		self.__RefreshStatusMinusButtonList()
@@ -568,7 +568,7 @@ class CharacterWindow(ui.ScriptWindow):
 	def __RefreshStatusPlusButtonList(self):
 		statusPlusPoint = player.GetStatus(player.STAT)
 
-		self.statusPlusValue.SetText("Pontos DisponÌveis:|cfff8d090 "+str(statusPlusPoint))
+		self.statusPlusValue.SetText("Pontos Dispon√≠veis:|cfff8d090 "+str(statusPlusPoint))
 		self.statusPlusValue.Show()
 		self.ShowStatusPlusButtonList()
 
@@ -1122,12 +1122,12 @@ class CharacterWindow(ui.ScriptWindow):
 			return skillSlot
 		return skillSlot % self.ACTIVE_PAGE_SLOT_COUNT
 
-	def __RealSkillSlotToSourceSlot(self, realSkillSlot): # FunÁ„o aparentemente correta
+	def __RealSkillSlotToSourceSlot(self, realSkillSlot): # Fun√ß√£o aparentemente correta
 		if realSkillSlot > 100:
 			return realSkillSlot
 		if self.PAGE_HORSE == self.curSelectedSkillGroup:
 			return realSkillSlot + self.ACTIVE_PAGE_SLOT_COUNT
-		return realSkillSlot % skill.SKILL_GRADE_STEP_COUNT # skill.SKILL_GRADE_STEP_COUNT = 20 -> Resto da divis„o por 20
+		return realSkillSlot % skill.SKILL_GRADE_STEP_COUNT # skill.SKILL_GRADE_STEP_COUNT = 20 -> Resto da divis√£o por 20
 
 	def __GetSkillGradeFromSlot(self, skillSlot):
 		return int(skillSlot / skill.SKILL_GRADE_STEP_COUNT)
@@ -1363,7 +1363,7 @@ class CharacterWindow(ui.ScriptWindow):
 
 		while i < 15 and init < len(self.RANKING_LIST):
 			temp = self.RANKING_LIST[init]
-			Get("RK_" + str(i)).SetText("|cfff8d090%s∫ - |cffa08784%s" % (str(init + 1), str(temp[0])))
+			Get("RK_" + str(i)).SetText("|cfff8d090%s¬∫ - |cffa08784%s" % (str(init + 1), str(temp[0])))
 			Get("PRK_" + str(i)).SetText("|cfff8d090Pontos:|cffa08784 %s " % (str(temp[1])))
 			i += 1
 			init += 1
@@ -1383,7 +1383,7 @@ class CharacterWindow(ui.ScriptWindow):
 		Get("Ranking_ScrollBar").SetMiddleBarSize(15.0/max(15.0, float(len(self.RANKING_LIST))))
 
 	def RankingPosition(self, num):
-		self.GetChild("ranking_position").SetText(str(num) + "∫ Lugar")
+		self.GetChild("ranking_position").SetText(str(num) + "¬∫ Lugar")
 
 	def RankingAddPlayer(self, name, points):
 		self.RANKING_LIST.append([name, points])

@@ -72,7 +72,7 @@ window = {
 						},
 					),
 				},
-				{"name":"message","type":"text","text":"Bruno matou Jo„o","x":45,"y":-1,"fontsize":"LARGE","vertical_align":"center","text_vertical_align":"center",},
+				{"name":"message","type":"text","text":"Bruno matou Jo√£o","x":45,"y":-1,"fontsize":"LARGE","vertical_align":"center","text_vertical_align":"center",},
 			),
 		},
 	),

@@ -46,11 +46,11 @@ window = {
 		{
 			name:'LoginBoard',
 			type:types.board_transparent,
-			'x':(SCREEN_WIDTH/2) - (painel_width/2),
-			'y':(SCREEN_HEIGHT/2) - (painel_height/2) + 20 + 70,
-			'height':painel_height,
-			'width':painel_width,
-			'children':
+			x:(SCREEN_WIDTH/2) - (painel_width/2),
+			y:(SCREEN_HEIGHT/2) - (painel_height/2) + 20 + 70,
+			height:painel_height,
+			width:painel_width,
+			children:
 			(
 				{
 					name:'Logo',

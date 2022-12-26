@@ -98,7 +98,7 @@ class SystemDialog(ui.ScriptWindow):
 
 	def __ClickExitButton(self):
 		questionDialog = uicommon.QuestionDialog()
-		questionDialog.SetText("Você quer fechar o jogo?")
+		questionDialog.SetText("VocÃª quer fechar o jogo?")
 		questionDialog.SetAcceptEvent(self.Yes)
 		questionDialog.SetCancelEvent(self.No)
 		questionDialog.Open()

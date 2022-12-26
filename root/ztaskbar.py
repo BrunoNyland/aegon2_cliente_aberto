@@ -29,7 +29,7 @@ def GetMouseButtonSettings():
 
 def SaveMouseButtonSettings():
 	global MOUSE_SETTINGS
-	old_open("miles/mouse.cfg", "w").write("%s\t%s" % tuple(MOUSE_SETTINGS))
+	open("miles/mouse.cfg", "w", "folder").write("%s\t%s" % tuple(MOUSE_SETTINGS))
 
 def LoadMouseButtonSettings():
 	global MOUSE_SETTINGS
@@ -37,15 +37,15 @@ def LoadMouseButtonSettings():
 	if not os.path.exists("miles/mouse.cfg"):
 		MOUSE_SETTINGS[0] = int(5)
 		MOUSE_SETTINGS[1] = int(3)
-		old_open("miles/mouse.cfg", "w").write("5\t3")
+		open("miles/mouse.cfg", "w", "folder").write("5\t3")
 		return
 
-	tokens = old_open("miles/mouse.cfg", "r").read().split()
+	tokens = open("miles/mouse.cfg", "r", "folder").read().split()
 
 	if len(tokens) != 2:
 		MOUSE_SETTINGS[0] = int(5)
 		MOUSE_SETTINGS[1] = int(3)
-		old_open("miles/mouse.cfg", "w").write("5\t3")
+		open("miles/mouse.cfg", "w", "folder").write("5\t3")
 		return
 
 	MOUSE_SETTINGS[0] = int(tokens[0])
@@ -266,9 +266,9 @@ class TaskBar(ui.ScriptWindow):
 
 		masc = money/100000000
 		if masc < 1:
-			self.TaskBarWindowList["RIGHT"].GetChild("tooltip_gold").SetText("Apróx. %d Máscara da Fortuna" % (masc))
+			self.TaskBarWindowList["RIGHT"].GetChild("tooltip_gold").SetText("AprÃ³x. %d MÃ¡scara da Fortuna" % (masc))
 		else:
-			self.TaskBarWindowList["RIGHT"].GetChild("tooltip_gold").SetText("Apróx. %d Máscaras da Fortuna" % (masc))
+			self.TaskBarWindowList["RIGHT"].GetChild("tooltip_gold").SetText("AprÃ³x. %d MÃ¡scaras da Fortuna" % (masc))
 
 	def ShowTooltip(self, abrev):
 		self.TaskBarWindowList["LEFT"].GetChild("tooltip_" + abrev).Show()

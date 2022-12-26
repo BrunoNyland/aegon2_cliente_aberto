@@ -21,12 +21,12 @@ window = {
 			"type":"new_board_with_titlebar",
 			"x":0,
 			"y":0,
-			"title":"ConfiguraÁıes",
+			"title":"Configura√ß√µes",
 			"width":width,
 			"height":height,
 			"children":
 			(
-###################### SELETOR DE P¿GINA ###################### SELETOR DE P¿GINA ###################### SELETOR DE P¿GINA ######################
+###################### SELETOR DE P√ÅGINA ###################### SELETOR DE P√ÅGINA ###################### SELETOR DE P√ÅGINA ######################
 				{
 					"name":"Options",
 					"type":"window",
@@ -47,7 +47,7 @@ window = {
 							"name":"Tab_Button_01",
 							"type":"redbutton",
 							"width":133,
-							"text":"¡udio",
+							"text":"√Åudio",
 							"x":6,
 							"y":6,
 						},
@@ -55,7 +55,7 @@ window = {
 							"name":"Tab_Button_02",
 							"type":"redbutton",
 							"width":133,
-							"text":"C‚mera",
+							"text":"C√¢mera",
 							"x":6,
 							"y":6+32,
 						},
@@ -115,7 +115,7 @@ window = {
 								{
 									"name":"",
 									"type":"text",
-									"text":"ConfiguraÁıes de A˙dio",
+									"text":"Configura√ß√µes de A√∫dio",
 									"x":0,
 									"y":-5,
 									"all_align":"center",
@@ -153,7 +153,7 @@ window = {
 							"children":
 							(
 								{"name":"music_slider","type":"slider","width":130,"x":0,"y":23,"horizontal_align":"center",},
-								{"name":"music_slider_title","type":"text","text":"|cffa08784Volume da M˙sica","x":(width-156-12)/2,"y":10,"text_horizontal_align":"center",},
+								{"name":"music_slider_title","type":"text","text":"|cffa08784Volume da M√∫sica","x":(width-156-12)/2,"y":10,"text_horizontal_align":"center",},
 								{"name":"music_slider_percent","type":"text","text":"100%","x":width - 156 - 12 - 45,"y":18+3,"fontsize":"LARGE",},
 								{"name":"music_none","type":"image","image":"interface/controls/special/audio/none.tga","x":12,"y":11+4,},
 								{"name":"music_1","type":"image","image":"interface/controls/special/audio/1.tga","x":12,"y":11+4,},
@@ -174,7 +174,7 @@ window = {
 							"children":
 							(
 								{"name":"","type":"expanded_image","x":95+13-5,"y":16+4,"image":CHARACTER+"text_slot_big.tga","x_scale": 1.5, "y_scale":0.8},
-								{"name":"change_music_button","type":"redbutton","text":"Trocar M˙sica","width":95,"x":13+4,"y":7,"vertical_align":"center",},
+								{"name":"change_music_button","type":"redbutton","text":"Trocar M√∫sica","width":95,"x":13+4,"y":7,"vertical_align":"center",},
 								{"name":"nome_musica","type":"text","text":"","x":95+13+10,"y":7+16,},
 								{"name":"","type":"horizontalseparator","width":width-153,"x":7,"y":0,"horizontal_align":"center",},
 								{"name":"","type":"horizontalseparator","width":width-153,"x":7,"y":50,"horizontal_align":"center",},
@@ -204,7 +204,7 @@ window = {
 								{
 									"name":"",
 									"type":"text",
-									"text":"ConfiguraÁıes da C‚mera",
+									"text":"Configura√ß√µes da C√¢mera",
 									"x":0,
 									"y":-5,
 									"all_align":"center",
@@ -221,10 +221,10 @@ window = {
 							"children":
 							(
 								{"name":"camera_max_slider","type":"slider","width":130,"x":0,"y":23,"horizontal_align":"center",},
-								{"name":"camera_max_slider_title","type":"text","text":"|cffa08784Dist‚ncia M·xima","x":(width-156-12)/2,"y":10,"text_horizontal_align":"center",},
+								{"name":"camera_max_slider_title","type":"text","text":"|cffa08784Dist√¢ncia M√°xima","x":(width-156-12)/2,"y":10,"text_horizontal_align":"center",},
 								{"name":"camera_max_slider_percent","type":"text","text":"100%","x":width - 156 - 12 - 45,"y":18+3,"fontsize":"LARGE",},
 								{"name":"neblina_slider","type":"slider","width":90,"x":0,"y":23+30,"horizontal_align":"center",},
-								{"name":"neblina_slider_title","type":"text","text":"|cffa08784NÈvoa","x":(width-156-12)/2,"y":10+30,"text_horizontal_align":"center",},
+								{"name":"neblina_slider_title","type":"text","text":"|cffa08784N√©voa","x":(width-156-12)/2,"y":10+30,"text_horizontal_align":"center",},
 								{"name":"neblina_slider_percent","type":"text","text":"100%","x":width - 156 - 12 - 45,"y":18+3+30,"fontsize":"LARGE",},
 								{"name":"","type":"horizontalseparator","width":width-153,"x":7,"y":70,"horizontal_align":"center",},
 							),
@@ -250,7 +250,7 @@ window = {
 										{
 											"name":"",
 											"type":"text",
-											"text":"Processamento dos Gr·ficos",
+											"text":"Processamento dos Gr√°ficos",
 											"x":0,
 											"y":-5,
 											"all_align":"center",
@@ -281,9 +281,9 @@ window = {
 								},
 								{"name":"sombras_none","type":"newradio_button","x":-60-5,"y":45+75-10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Nenhuma:","x":-5,"y":2,"text_horizontal_align":"right",},),},
 								{"name":"sombras_word","type":"newradio_button", "x":28-5,"y":45+75-10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Baixa:","x":-5,"y":2,"text_horizontal_align":"right",},),},
-								{"name":"sombras_player","type":"newradio_button", "x":120-5,"y":45+75-10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784MÈdia:","x":-5,"y":2,"text_horizontal_align":"right",},),},
+								{"name":"sombras_player","type":"newradio_button", "x":120-5,"y":45+75-10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784M√©dia:","x":-5,"y":2,"text_horizontal_align":"right",},),},
 								{"name":"sombras_all","type":"newradio_button", "x":-15-5,"y":45+75-10+30,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Alta:","x":-5,"y":2,"text_horizontal_align":"right",},),},
-								{"name":"sombras_all_all","type":"newradio_button", "x":-15-5+92,"y":45+75-10+30,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784AltÌssima:","x":-5,"y":2,"text_horizontal_align":"right",},),},
+								{"name":"sombras_all_all","type":"newradio_button", "x":-15-5+92,"y":45+75-10+30,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Alt√≠ssima:","x":-5,"y":2,"text_horizontal_align":"right",},),},
 							),
 						},
 					),
@@ -310,7 +310,7 @@ window = {
 								{
 									"name":"",
 									"type":"text",
-									"text":"ResoluÁ„o do Jogo",
+									"text":"Resolu√ß√£o do Jogo",
 									"x":0,
 									"y":-5,
 									"all_align":"center",
@@ -366,7 +366,7 @@ window = {
 								{
 									"name":"",
 									"type":"text",
-									"text":"ConfiguraÁıes de ExibiÁ„o",
+									"text":"Configura√ß√µes de Exibi√ß√£o",
 									"x":0,
 									"y":-5,
 									"all_align":"center",
@@ -514,7 +514,7 @@ window = {
 							"name":"pvp_peace","type":"newradio_button","x":10+40*1,"y":60+45*0,
 							"children":
 							(
-								{"name":"","type":"text","text":"|cffa08784PacÌfico","x":25,"y":2,"text_horizontal_align":"left",},
+								{"name":"","type":"text","text":"|cffa08784Pac√≠fico","x":25,"y":2,"text_horizontal_align":"left",},
 								{
 									"name":"pvp_peace_descript",
 									"type":"thinboardnew",
@@ -534,7 +534,7 @@ window = {
 							"name":"pvp_revenge","type":"newradio_button","x":10+40*2,"y":60+45*1,
 							"children":
 							(
-								{"name":"","type":"text","text":"|cffa08784VinganÁa","x":25,"y":2,"text_horizontal_align":"left",},
+								{"name":"","type":"text","text":"|cffa08784Vingan√ßa","x":25,"y":2,"text_horizontal_align":"left",},
 								{
 									"name":"pvp_revenge_descript",
 									"type":"thinboardnew",
@@ -566,7 +566,7 @@ window = {
 									"children":
 									(
 										{"name":"pvp_guild_1","type":"text","x":(width - 156 -10)/2,"y":20*1-5,"text_horizontal_align":"center","text":"|cfff98784Permite atacar todos Jogadores","fontsize":"LARGE",},
-										{"name":"pvp_guild_2","type":"text","x":(width - 156 -10)/2,"y":20*2-5,"text_horizontal_align":"center","text":"|cfff98784que n„o forem da sua Guild.","fontsize":"LARGE",},
+										{"name":"pvp_guild_2","type":"text","x":(width - 156 -10)/2,"y":20*2-5,"text_horizontal_align":"center","text":"|cfff98784que n√£o forem da sua Guild.","fontsize":"LARGE",},
 									),
 								},
 							),
@@ -586,7 +586,7 @@ window = {
 									"children":
 									(
 										{"name":"pvp_free_1","type":"text","x":(width - 156 -10)/2,"y":20*1-5,"text_horizontal_align":"center","text":"|cfff98784Permite Atacar a Todos Jogadores","fontsize":"LARGE",},
-										{"name":"pvp_free_2","type":"text","x":(width - 156 -10)/2,"y":20*2-5,"text_horizontal_align":"center","text":"|cfff98784VocÍ pode perder Honra.","fontsize":"LARGE",},
+										{"name":"pvp_free_2","type":"text","x":(width - 156 -10)/2,"y":20*2-5,"text_horizontal_align":"center","text":"|cfff98784Voc√™ pode perder Honra.","fontsize":"LARGE",},
 									),
 								},
 							),
@@ -615,7 +615,7 @@ window = {
 								{
 									"name":"",
 									"type":"text",
-									"text":" Bloquear ou Liberar SolicitaÁıes",
+									"text":" Bloquear ou Liberar Solicita√ß√µes",
 									"x":0,
 									"y":-5,
 									"all_align":"center",
@@ -632,7 +632,7 @@ window = {
 							"children":
 							(
 								{"name":"","type": "expanded_image","image":CHARACTER+"quest.tga","x":-10,"y":0,"x_scale":1.23,"y_scale":1,},
-								{"name":"BlockExchange_text","type":"text","text":"Abrir NegociaÁıes:","x":0,"y":12,},
+								{"name":"BlockExchange_text","type":"text","text":"Abrir Negocia√ß√µes:","x":0,"y":12,},
 								{"name":"BlockExchange_on_button","type":"newradio_button","x":115,"y":10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Liberar","x":-5,"y":2,"text_horizontal_align":"right",},),},
 								{"name":"BlockExchange_off_button","type":"newradio_button","x":45,"y":10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Bloquear","x":-5,"y":2,"text_horizontal_align":"right",},),},
 							),
@@ -692,7 +692,7 @@ window = {
 							"children":
 							(
 								{"name":"","type": "expanded_image","image":CHARACTER+"quest.tga","x":-10,"y":0,"x_scale":1.23,"y_scale":1,},
-								{"name":"BlockFriend_text","type":"text","text":"SolicitaÁ„o de Amizade:","x":0,"y":12,},
+								{"name":"BlockFriend_text","type":"text","text":"Solicita√ß√£o de Amizade:","x":0,"y":12,},
 								{"name":"BlockFriend_on_button","type":"newradio_button","x":115,"y":10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Liberar","x":-5,"y":2,"text_horizontal_align":"right",},),},
 								{"name":"BlockFriend_off_button","type":"newradio_button","x":45,"y":10,"horizontal_align":"center","children":({"name":"","type":"text","text":"|cffa08784Bloquear","x":-5,"y":2,"text_horizontal_align":"right",},),},
 							),

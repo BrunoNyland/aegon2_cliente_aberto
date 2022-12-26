@@ -104,7 +104,7 @@ window = {
 							"y":0,
 							"image": "interface/controls/special/character/exp_gauge_full.tga",
 						},
-						{"name":"","type":"text","color":text_color,"text":"Próximo Nível","x":0,"y":-8,"horizontal_align":"center","text_horizontal_align":"center",},
+						{"name":"","type":"text","color":text_color,"text":"PrÃ³ximo NÃ­vel","x":0,"y":-8,"horizontal_align":"center","text_horizontal_align":"center",},
 						{"name":"Exp_Value","type":"text","color":text_color,"text":"999999 de 999999999","x":0,"y":15,"horizontal_align":"center","text_horizontal_align":"center",},
 					),
 				},
@@ -149,7 +149,7 @@ window = {
 					"width":100,
 					"children":
 					(
-						{"name":"ranking_position","type":"text","text":"1º Lugar","x":0,"y":-1,"color":0xfff8d090,"style":("not_pick",),"all_align":"center",},
+						{"name":"ranking_position","type":"text","text":"1Âº Lugar","x":0,"y":-1,"color":0xfff8d090,"style":("not_pick",),"all_align":"center",},
 					),
 				},
 				{
@@ -196,7 +196,7 @@ window = {
 						{
 							"name":"Tab_Button_03",
 							"type":"redbutton",
-							"text":"Emoções",
+							"text":"EmoÃ§Ãµes",
 							"width":119,
 							"x":0,
 							"y":30*2,
@@ -212,7 +212,7 @@ window = {
 						{
 							"name":"Tab_Button_05",
 							"type":"redbutton",
-							"text":"Pág. de Bônus",
+							"text":"PÃ¡g. de BÃ´nus",
 							"width":119,
 							"x":0,
 							"y":30*4,
@@ -220,7 +220,7 @@ window = {
 						{
 							"name":"Tab_Button_06",
 							"type":"redbutton",
-							"text":"Classificação",
+							"text":"ClassificaÃ§Ã£o",
 							"width":119,
 							"x":0,
 							"y":30*5,
@@ -699,7 +699,7 @@ window = {
 								{
 									"name":"Coletivas_PASSIVAS",
 									"type":"text",
-									"text":"Novas Expressões",
+									"text":"Novas ExpressÃµes",
 									"color":text_color,
 									"x":0,
 									"y":-3,
@@ -913,7 +913,7 @@ window = {
 									"flash_color":hover_color2,
 									"x":1,"y":2,
 								},
-								{"name":"Offensive_Bonus_Title","type":"text","text":"Bônus Ofensivos","x":8,"y":9,"style":("not_pick",),"fontname":"Verdana:16b"},
+								{"name":"Offensive_Bonus_Title","type":"text","text":"BÃ´nus Ofensivos","x":8,"y":9,"style":("not_pick",),"fontname":"Verdana:16b"},
 								{
 									"name": "Offensive_Bonus_Finder",
 									"type": "barwithbox",
@@ -976,7 +976,7 @@ window = {
 									"flash_color":hover_color2,
 									"x":1,"y":2,
 								},
-								{"name":"Defensive_Bonus_Title","type":"text","text":"Bônus Defensivos","x":8,"y":9,"style":("not_pick",), "fontname":"Verdana:16b"},
+								{"name":"Defensive_Bonus_Title","type":"text","text":"BÃ´nus Defensivos","x":8,"y":9,"style":("not_pick",), "fontname":"Verdana:16b"},
 								{
 									"name": "Defensive_Bonus_Finder",
 									"type": "barwithbox",
@@ -1039,7 +1039,7 @@ window = {
 									"flash_color":hover_color2,
 									"x":1,"y":2,
 								},
-								{"name":"PVM_Bonus_Title","type":"text","text":"Bônus PVM","x":8,"y":9,"style":("not_pick",),"fontname":"Verdana:16b"},
+								{"name":"PVM_Bonus_Title","type":"text","text":"BÃ´nus PVM","x":8,"y":9,"style":("not_pick",),"fontname":"Verdana:16b"},
 								{
 									"name": "PVM_Bonus_Finder",
 									"type": "barwithbox",

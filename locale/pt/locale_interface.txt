@@ -1,4 +1,4 @@
-ACCEPT	Confirmar	
+ÔªøACCEPT	Confirmar	
 ATTACH_METIN_INFO	Quer mesmo combinar?	
 ATTACH_METIN_TITLE	Combinar itens	
 CANCEL	Cancelar	
@@ -6,11 +6,11 @@ CHANGE_PASSWORD_CONFIRM	Confirme a nova senha
 CHANGE_PASSWORD_NEW	Nova senha	
 CHANGE_PASSWORD_OLD	Senha original	
 CHANGE_PASSWORD_TITLE	Troca de senha	
-CHARACTER_ACTION	AÁıes	
+CHARACTER_ACTION	A√ß√µes	
 CHARACTER_EMOTICON	Emoticons	
 CHARACTER_MAIN	Status	
-CHARACTER_MUTUAL_ACTION	Expressıes interativas	
-CHARACTER_NORMAL_ACTION	Expressıes	
+CHARACTER_MUTUAL_ACTION	Express√µes interativas	
+CHARACTER_NORMAL_ACTION	Express√µes	
 CHARACTER_QUEST	Quests	
 CHARACTER_SKILL	Skills	
 CLOSE	Fechar	
@@ -23,7 +23,7 @@ CREATE_HP	VIT
 CREATE_LAST_POINT	Pontos	
 CREATE_MAN	Masculino	
 CREATE_NAME	Nome	
-CREATE_NEXT	PrÛximo	
+CREATE_NEXT	Pr√≥ximo	
 CREATE_PREV	Anterior	
 CREATE_SEX	Sexo	
 CREATE_SHAPE	Vestimenta	
@@ -32,7 +32,7 @@ CREATE_STAT_RESET	Reiniciar
 CREATE_WOMAN	Feminino	
 DO_REFINE	Refinar	
 EMPIRE_EXIT	Voltar	
-EMPIRE_NEXT	PrÛximo	
+EMPIRE_NEXT	Pr√≥ximo	
 EMPIRE_PREV	Anterior	
 EMPIRE_SELECT	Selecionar	
 EXCHANGE_ACCEPT	Aceitar	
@@ -42,71 +42,71 @@ GAME_HELP	Ajuda
 GAME_QUEST	Quests	
 GAME_SKILL_UP	Ponto de Skill	
 GAME_STAT_UP	Ponto de Status	
-GAMEOPTION_TITLE	OpÁıes de jogo	
+GAMEOPTION_TITLE	Op√ß√µes de jogo	
 GRADE	Classe	
 GRADE_SELECT	Classe	
 GUILD_BASENAME	Nome	
 GUILD_BOARD_ID	Personagem	
 GUILD_BOARD_REFRESH	Atualizar <F5>	
 GUILD_BOARD_TEXT	Mensagem	
-GUILD_BUILDING_CATEGORY_TITLE	ClassificaÁ„o	
+GUILD_BUILDING_CATEGORY_TITLE	Classifica√ß√£o	
 GUILD_BUILDING_CHANGE	Mover	
-GUILD_BUILDING_DIRECTION	DireÁ„o	
-GUILD_BUILDING_GRADE	PosiÁ„o	
-GUILD_BUILDING_INFO	InformaÁıes	
-GUILD_BUILDING_LIST_TITLE	Unidades de construÁ„o	
+GUILD_BUILDING_DIRECTION	Dire√ß√£o	
+GUILD_BUILDING_GRADE	Posi√ß√£o	
+GUILD_BUILDING_INFO	Informa√ß√µes	
+GUILD_BUILDING_LIST_TITLE	Unidades de constru√ß√£o	
 GUILD_BUILDING_LOG	Tronco	
 GUILD_BUILDING_NAME	Nome	
 GUILD_BUILDING_OPERATE	Operar	
 GUILD_BUILDING_PLY	Compensado	
-GUILD_BUILDING_POSITION	LocalizaÁ„o	
+GUILD_BUILDING_POSITION	Localiza√ß√£o	
 GUILD_BUILDING_PREVIEW	Visualizar	
-GUILD_BUILDING_PRICE	PreÁo	
+GUILD_BUILDING_PRICE	Pre√ßo	
 GUILD_BUILDING_REFRESH	Atualizar <F5>	
 GUILD_BUILDING_STONE	Pedra	
-GUILD_BUILDING_TITLE	ConstruÁıes da Guilda	
+GUILD_BUILDING_TITLE	Constru√ß√µes da Guilda	
 GUILD_CRYSTAL	Cristal	
 GUILD_DEPOSIT	Doar	
 GUILD_DROP_RESOURCE1	Recursos de Drop	
 GUILD_DROP_RESOURCE2	Aqui	
 GUILD_GEM	Pedra	
-GUILD_GRADE_CHANGE_GRADE_NAME	Alterar tÌtulo	
-GUILD_GRADE_NUM	PosiÁ„o	
+GUILD_GRADE_CHANGE_GRADE_NAME	Alterar t√≠tulo	
+GUILD_GRADE_NUM	Posi√ß√£o	
 GUILD_GRADE_PERMISSION_DELETE	Expulsar	
 GUILD_GRADE_PERMISSION_JOIN	Recrutar	
 GUILD_GRADE_PERMISSION_NOTICE	Mensagens	
 GUILD_GRADE_PERMISSION_SKILL	 Skills	
-GUILD_GRADE_RANK	TÌtulo	
+GUILD_GRADE_RANK	T√≠tulo	
 GUILD_GRADE_WRITE	Enviar	
-GUILD_INFO	InformaÁıes da guilda	
-GUILD_INFO_CUR_EXP	ExperiÍncia	
+GUILD_INFO	Informa√ß√µes da guilda	
+GUILD_INFO_CUR_EXP	Experi√™ncia	
 GUILD_INFO_DECALRE_WAR	Declarar guerra	
 GUILD_INFO_ENEMY_GUILD	Guildas inimigas	
 GUILD_INFO_ENEMY_GUILD_EMPTY	Nenhuma	
-GUILD_INFO_LEVEL	NÌvel	
+GUILD_INFO_LEVEL	N√≠vel	
 GUILD_INFO_MARK	Emblema	
-GUILD_INFO_MASTER	LÌder	
-GUILD_INFO_MASTER_VALUE	LÌder	
-GUILD_INFO_MEMBER_AVG_LEVEL	NÌvel mÈdio	
+GUILD_INFO_MASTER	L√≠der	
+GUILD_INFO_MASTER_VALUE	L√≠der	
+GUILD_INFO_MEMBER_AVG_LEVEL	N√≠vel m√©dio	
 GUILD_INFO_MEMBER_NUM	Membros	
 GUILD_INFO_NAME	Nome	
 GUILD_INFO_NAME_VALUE	Nome	
 GUILD_INFO_OFFER_EXP	Investir	
-GUILD_INFO_REST_EXP	PrÛximo nÌvel	
+GUILD_INFO_REST_EXP	Pr√≥ximo n√≠vel	
 GUILD_INFO_UPLOAD_MARK	Escolher emblema	
 GUILD_INFO_UPLOAD_SYMBOL	Selecionar bandeira	
 GUILD_MARK	Emblema da guilda	
 GUILD_MEMBER_JOB	Classe	
-GUILD_MEMBER_KNIGHT	LÌder	
-GUILD_MEMBER_LEVEL	NÌvel	
+GUILD_MEMBER_KNIGHT	L√≠der	
+GUILD_MEMBER_LEVEL	N√≠vel	
 GUILD_MEMBER_NAME	Personagem	
-GUILD_MEMBER_RANK	TÌtulo	
+GUILD_MEMBER_RANK	T√≠tulo	
 GUILD_MEMBER_SPECIFIC_GRAVITY	Exp %	
 GUILD_METIN_STONE	Pedra Espiritual	
 GUILD_MINENAL	Mineral	
 GUILD_MONEY	Gold da Guilda	
 GUILD_NAME	Guilda	
-GUILD_RESOURCE_INFO	InformaÁıes de recursos	
+GUILD_RESOURCE_INFO	Informa√ß√µes de recursos	
 GUILD_SKILL_ACTIVE	Skills Ativas	
 GUILD_SKIlL_HEAL_GSP	Restaurar GSP	
 GUILD_SKILL_PASSIVE	Skills Passivas	
@@ -120,17 +120,17 @@ GUILD_WAR_DECLARE	Declarar guerra entre guildas
 GUILD_WAR_ENEMY	Guilda inimiga	
 GUILD_WAR_NORMAL	Batalha	
 GUILD_WAR_WARP	Arena	
-GUILD_WATER	¡gua	
-GUILD_WATER_STONE	Pedra d'·gua	
+GUILD_WATER	√Ågua	
+GUILD_WATER_STONE	Pedra d'√°gua	
 GUILD_WITHDRAW	Retirar	
-INVENTORY_PAGE_BUTTON_TOOLTIP_1	Invent·rio I
-INVENTORY_PAGE_BUTTON_TOOLTIP_2	Invent·rio II
-INVENTORY_PAGE_BUTTON_TOOLTIP_3	Invent·rio III
-INVENTORY_PAGE_BUTTON_TOOLTIP_4	Invent·rio IV	
-INVENTORY_TITLE	Invent·rio
+INVENTORY_PAGE_BUTTON_TOOLTIP_1	Invent√°rio I
+INVENTORY_PAGE_BUTTON_TOOLTIP_2	Invent√°rio II
+INVENTORY_PAGE_BUTTON_TOOLTIP_3	Invent√°rio III
+INVENTORY_PAGE_BUTTON_TOOLTIP_4	Invent√°rio IV	
+INVENTORY_TITLE	Invent√°rio
 BUTTON_CHANGEQUIP CHANGEQUIP
 ITEM_MALL	Item Shop	
-LOAD_ERROR	Os dados est„o corrompidos. Por favor reinstale o Metin 2. Pressione Esc para sair.	
+LOAD_ERROR	Os dados est√£o corrompidos. Por favor reinstale o Metin 2. Pressione Esc para sair.	
 LOGIN_CONNECT	Conectar	
 LOGIN_CONNECTING	Conectando...	
 LOGIN_CREDITS	The producer	
@@ -161,38 +161,38 @@ MESSENGER_TITLE	Lista de contatos
 MESSENGER_USE_GUILD_MOVE_SKILL	Usar skill de mover a guilda	
 MESSENGER_WHISPER	Mensagem Particular	
 MINIMIZE	Minimizar	
-MODE_FANTOME	Mode fantÙme
+MODE_FANTOME	Mode fant√¥me
 MOUSEBUTTON_ATTACK	Atacar	
-MOUSEBUTTON_AUTO_ATTACK	Ataque Autom·tico	
-MOUSEBUTTON_CAMERA	C‚mera	
+MOUSEBUTTON_AUTO_ATTACK	Ataque Autom√°tico	
+MOUSEBUTTON_CAMERA	C√¢mera	
 MOUSEBUTTON_SKILL	Skill	
 MUSICLIST_TITLE	Lista de BGM	
-NO	N„o	
+NO	N√£o	
 OK	Ok	
 OPTION_ALWAYS_SHOW_NAME	Nome	
 OPTION_ALWAYS_SHOW_NAME_OFF	Tecla <Alt>	
 OPTION_ALWAYS_SHOW_NAME_ON	Sempre	
 OPTION_BLOCK	Bloquear	
-OPTION_BLOCK_EXCHANGE	NegociaÁ„o	
+OPTION_BLOCK_EXCHANGE	Negocia√ß√£o	
 OPTION_BLOCK_FRIEND	Contato	
 OPTION_BLOCK_GUILD	Guilda	
 OPTION_BLOCK_PARTY	Grupo	
 OPTION_BLOCK_PARTY_REQUEST	Participar	
 OPTION_BLOCK_WHISPER	Mensagens	
-OPTION_CAMERA_DISTANCE	C‚mera	
+OPTION_CAMERA_DISTANCE	C√¢mera	
 OPTION_CAMERA_DISTANCE_LONG	Longe	
 OPTION_CAMERA_DISTANCE_SHORT	Perto	
-OPTION_DELETE_MOBILE_BUTTON	Remover n˙mero de celular	
+OPTION_DELETE_MOBILE_BUTTON	Remover n√∫mero de celular	
 OPTION_EFFECT	Dano	
 OPTION_FOG	Neblina	
 OPTION_FOG_DENSE	Alta	
 OPTION_FOG_LIGHT	Baixa	
-OPTION_FOG_MIDDLE	MÈdia	
-OPTION_INPUT_MOBILE_BUTTON	Inserir n˙mero de celular	
-OPTION_MOBILE	N˙mero de celular	
+OPTION_FOG_MIDDLE	M√©dia	
+OPTION_INPUT_MOBILE_BUTTON	Inserir n√∫mero de celular	
+OPTION_MOBILE	N√∫mero de celular	
 OPTION_MUSIC	BGM	
 OPTION_MUSIC_CHANGE	Alterar	
-OPTION_MUSIC_DEFAULT_THEMA	BGM Padr„o	
+OPTION_MUSIC_DEFAULT_THEMA	BGM Padr√£o	
 OPTION_NAME_COLOR	Cor nome	
 OPTION_NAME_COLOR_EMPIRE	Reino	
 OPTION_NAME_COLOR_NORMAL	Normal	
@@ -201,8 +201,8 @@ OPTION_PVPMODE_FREE	Livre
 OPTION_PVPMODE_FREE_TOOLTIP	Permite atacar todos os jogadores	
 OPTION_PVPMODE_GUILD	Guilda	
 OPTION_PVPMODE_GUILD_TOOLTIP	Permite atacar todos os jogadores, exceto membros da guilda	
-OPTION_PVPMODE_PEACE	PacÌfico	
-OPTION_PVPMODE_PEACE_TOOLTIP	N„o ataca outros jogadores, mas È possÌvel contra-atacar	
+OPTION_PVPMODE_PEACE	Pac√≠fico	
+OPTION_PVPMODE_PEACE_TOOLTIP	N√£o ataca outros jogadores, mas √© poss√≠vel contra-atacar	
 OPTION_PVPMODE_REVENGE	Honra	
 OPTION_PVPMODE_REVENGE_TOOLTIP	Ataca somente personagens com Classe de Honra oposta	
 OPTION_SALESTEXT	Loja	
@@ -212,37 +212,37 @@ OPTION_SOUND	SFX
 OPTION_TARGET_BOARD	Alvo	
 OPTION_TARGET_BOARD_NO_VIEW	Ocultar	
 OPTION_TARGET_BOARD_VIEW	Exibir	
-OPTION_TILING	Gr·ficos	
+OPTION_TILING	Gr√°ficos	
 OPTION_TILING_APPLY	Aplicar	
 OPTION_TILING_CPU	CPU	
 OPTION_TILING_GPU	GPU	
-OPTION_TITLE	OpÁıes	
+OPTION_TITLE	Op√ß√µes	
 OPTION_VIEW_CHAT	Chat	
 OPTION_VIEW_CHAT_OFF	Ocultar	
 OPTION_VIEW_CHAT_ON	Exibir	
 PARTY_MEMBER_INFO_NAME	Membro	
 PASSWORD_DESC_1	Insira sua senha	
 PASSWORD_DESC_2	para abrir o Item Mall	
-PASSWORD_DESC_3	Se ainda n„o alterou sua senha,	
-PASSWORD_DESC_4	sua senha padr„o È: "000000".	
+PASSWORD_DESC_3	Se ainda n√£o alterou sua senha,	
+PASSWORD_DESC_4	sua senha padr√£o √©: "000000".	
 PASSWORD_DESC_5	Mude sua senha no campo.	
-PASSWORD_TITLE	Senha do ArmazÈm	
+PASSWORD_TITLE	Senha do Armaz√©m	
 PICK_MONEY_TITLE	Quantia	
 PRIVATE_SHOP_CLOSE_BUTTON	Fechar	
 PRIVATE_SHOP_NAME	Nome da loja	
 PRIVATE_SHOP_TITLE	Loja particular	
 OFFLINE_SHOP_TITLE	Open offline shop
-REFINE_COST	Custo da RefinaÁ„o: 0 Gold	
-REFINE_INFO	Chance de RefinaÁ„o: 100%	
-REFINE_MONEY	Custo da RefinaÁ„o	
-REFINE_SELECT	Selecionar RefinaÁ„o	
-REFINE_TTILE	RefinaÁ„o	
+REFINE_COST	Custo da Refina√ß√£o: 0 Gold	
+REFINE_INFO	Chance de Refina√ß√£o: 100%	
+REFINE_MONEY	Custo da Refina√ß√£o	
+REFINE_SELECT	Selecionar Refina√ß√£o	
+REFINE_TTILE	Refina√ß√£o	
 REPORT_VIOLENT_WHISPER	test	
 RESTART_HERE	Retornar aqui
 RESTART_HERE_NOW	Retornar aqui agora
-RESTART_TOWN	Retornar ao InÌcio
+RESTART_TOWN	Retornar ao In√≠cio
 SAFE_CHANGE_PASSWORD	Alterar senha	
-SAFE_TITLE	ArmazÈm	
+SAFE_TITLE	Armaz√©m	
 SELECT_ATT_GRADE	FOR	
 SELECT_CREATE	Novo Personagem	
 SELECT_DELETE	Excluir	
@@ -250,14 +250,14 @@ SELECT_DEX_GRADE	DES
 SELECT_EMPIRE_NAME	Reino	
 SELECT_EXIT	Voltar	
 SELECT_HP	VIT	
-SELECT_LEVEL	NÌvel	
+SELECT_LEVEL	N√≠vel	
 SELECT_METIN_STONE_TITLE	Escolha a gema	
 SELECT_NAME	Nome	
 SELECT_NO_GUILD	Sem guilda	
 SELECT_PLAYTIME	Tempo de jogo	
 SELECT_SELECT	Selecionar Personagem	
 SELECT_SP	INT	
-SELECT_TITLE	TÌtulo	
+SELECT_TITLE	T√≠tulo	
 SHOP_BUY	Comprar	
 SHOP_SELL	Vender	
 SHOP_TITLE	Loja	
@@ -272,8 +272,8 @@ SYSTEM_EXIT	Fechar o jogo
 SYSTEM_HELP	Ajuda	
 SYSTEM_LOGOUT	Logout	
 SYSTEM_MALL	Loja de itens	
-SYSTEM_OPTION	OpÁıes de sistema	
-SYSTEMOPTION_TITLE	OpÁıes de sistema	
+SYSTEM_OPTION	Op√ß√µes de sistema	
+SYSTEMOPTION_TITLE	Op√ß√µes de sistema	
 WHISPER_BAN	Bloquear	
 WHISPER_NAME	Mensagem Particular com	
 WHISPER_REPORT	test
@@ -281,11 +281,11 @@ WHISPER_SEND	Enviar
 YES	Sim	
 ZONE_MAP	Mapa Completo
 TASKBAR_PET_INFO	Pet Info
-PET_INFORMATION_TITLE	InformaÁ„o do Pet
+PET_INFORMATION_TITLE	Informa√ß√£o do Pet
 PET_FEED_TITLE	Alimentar
 PET_FFED_BUTTON_TEXT	Alimentar
 PET_INFORMATION_ABILITIES	Habilidades
-PET_INFORMATION_LEVEL	NÌvel
+PET_INFORMATION_LEVEL	N√≠vel
 PET_INFORMATION_EXP	EXP
 PET_INFORMATION_AGE	Idade
 PET_INFORMATION_LIFE	Vida
@@ -293,32 +293,32 @@ PET_INFORMATION_DEFENCE	Defesa
 PET_INFORMATION_SP	MP
 PET_INFORMATION_HP	HP
 PET_INFORMATION_SKILL	Habilidades
-PET_INFORMATION_LIFE_TIME	DuraÁ„o
+PET_INFORMATION_LIFE_TIME	Dura√ß√£o
 PET_HATCHING_WINDOW_TITLE	Incubadora
 PET_HATCHING_BUTTON	Incubar
 PET_HATCHING_NIK	Nickname
 PET_INFORMATION_LIFETIME_BUTTON	Alimentar
 PET_INFORMATION_EVOL_BUTTON	Evoluir
 PET_INFORMATION_EXP_BUTTON	EXP de Item
-COMB_TITLE	Janela de CombinaÁ„o
+COMB_TITLE	Janela de Combina√ß√£o
 COMB_APPEARANCE	Traje 1
 COMB_ATTRIBUTE	Traje 2
 COMB_SKILLBOOK_TILE	Trocar Livros
-Nome_Raca	RaÁa
-SEARCH_BOX_TITLE	EnciclopÈdia dos Tesouros
-POTADOR_ACTIVE	|cff00ccff[Mt2Supremo] |cffff8784Pote Autom·tico Ativado!
-POTADOR_DESACTIVE	|cff00ccff[Mt2Supremo] |cffff8784Pote Autom·tico Desativado!
-POTADOR_NO_POTION	|cff00ccff[Mt2Supremo] |cffff8784Suas PoÁıes Regeneradoras acabaram!
-POTADOR_IS_ENDING	|cff00ccff[Mt2Supremo] |cffff8784Suas PoÁıes Regeneradoras est„o acabando!
-GUILD_MEETING_REQUEST	VocÍ foi convocado para a Reuni„o da Guild!
-PRICE PreÁo:
-NATION	NaÁ„o
-LOGIN_NOACCOUNT	N„o tem conta?
-SAVE_SUCCES	As informaÁıes foram salvas
-SAVE_FAIL	As informaÁıes n„o foram salvas
-DELETE_FAIL	As informaÁıes n„o foram deletadas
-SAVE_BUTTON	Primeiro vocÍ precisa inserir os dados, depois pressione este bot„o para salvar.
-DELETE_BUTTON	Necess·rio que tenha uma conta salva para poder limpar o espaÁo novamente.
-PRESS_KEY	Aperte o bot„o indicado para conectar-se automaticamente.
+Nome_Raca	Ra√ßa
+SEARCH_BOX_TITLE	Enciclop√©dia dos Tesouros
+POTADOR_ACTIVE	|cff00ccff[Mt2Supremo] |cffff8784Pote Autom√°tico Ativado!
+POTADOR_DESACTIVE	|cff00ccff[Mt2Supremo] |cffff8784Pote Autom√°tico Desativado!
+POTADOR_NO_POTION	|cff00ccff[Mt2Supremo] |cffff8784Suas Po√ß√µes Regeneradoras acabaram!
+POTADOR_IS_ENDING	|cff00ccff[Mt2Supremo] |cffff8784Suas Po√ß√µes Regeneradoras est√£o acabando!
+GUILD_MEETING_REQUEST	Voc√™ foi convocado para a Reuni√£o da Guild!
+PRICE Pre√ßo:
+NATION	Na√ß√£o
+LOGIN_NOACCOUNT	N√£o tem conta?
+SAVE_SUCCES	As informa√ß√µes foram salvas
+SAVE_FAIL	As informa√ß√µes n√£o foram salvas
+DELETE_FAIL	As informa√ß√µes n√£o foram deletadas
+SAVE_BUTTON	Primeiro voc√™ precisa inserir os dados, depois pressione este bot√£o para salvar.
+DELETE_BUTTON	Necess√°rio que tenha uma conta salva para poder limpar o espa√ßo novamente.
+PRESS_KEY	Aperte o bot√£o indicado para conectar-se automaticamente.
 DEFANCE_WAWE_MAST_TEXT	Navio
 DEFANCE_WAWE_GAUGE_TOOLTIP	HP:  5000000 /5000000

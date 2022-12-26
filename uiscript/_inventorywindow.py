@@ -30,7 +30,7 @@ window = {
 			"name":"board",
 			"type":"new_board_with_titlebar",
 			"style":("attach",),
-			"title":"Invent·rio",
+			"title":"Invent√°rio",
 			"x":0,
 			"y":0,
 			"width":WIDTH,

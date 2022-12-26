@@ -155,7 +155,7 @@ MAX_NUM_FOR_BONUS_RARE = {
 ###################################################################################################################################################
 ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES ### CORES #######
 ###################################################################################################################################################
-# Proporção das cores do Paint.Net para converter para Metin2: [% 2,54]
+# ProporÃ§Ã£o das cores do Paint.Net para converter para Metin2: [% 2,54]
 COLOR_BG = grp.GenerateColor(0.0, 0.0, 0.0, 0.5)
 COLOR_INACTIVE = grp.GenerateColor(1.0, 0.0, 0.0, 0.2)
 COLOR_ACTIVE   = grp.GenerateColor(1.0, 0.6, 0.1, 0.2)
@@ -189,11 +189,11 @@ proposals = {
 
 def ReturnSavedOptions():
 	if not os.path.exists("miles/bonus.cfg"):
-		file = old_open("miles/bonus.cfg", "w")
+		file = open("miles/bonus.cfg", "w", "file")
 		file.write("")
 		file.close()
 
-	lines = old_open("miles/bonus.cfg", "r").readlines()
+	lines = open("miles/bonus.cfg", "r", "folder").readlines()
 	return lines
 
 def RemoveLine(line_to_remove):
@@ -206,7 +206,7 @@ def RemoveLine(line_to_remove):
 		if line_to_remove != line:
 			temp.append(line)
 
-	writer = old_open("miles/bonus.cfg", "w")
+	writer = open("miles/bonus.cfg", "w", "folder")
 	writer.write("")
 	for line in temp:
 		writer.write(line)
@@ -258,7 +258,7 @@ def RemoveSavedOption(name):
 			temp.append(line)
 
 	open
-	writer = old_open("miles/bonus.cfg", "w")
+	writer = open("miles/bonus.cfg", "w", "folder")
 	writer.write("")
 
 	for line in temp:
@@ -275,7 +275,7 @@ def AddNewOption(type, subtype, name, options):
 		new_line += str(it)
 
 	lines = ReturnSavedOptions()
-	writer = old_open("miles/bonus.cfg", "w")
+	writer = open("miles/bonus.cfg", "w", "folder")
 	for line in lines:
 		writer.write(line)
 		if (len(line) > 0 and line[-1:] != "\n") or len(line) == 0:
@@ -389,10 +389,10 @@ class BonusSelector(ui.Window):
 		self.Box3 = ui.MakeImageBox(self, "interface/controls/special/boot/box2.tga", 8, 6 + 150 + 2)
 		self.Box4 = ui.MakeImageBox(self, "interface/controls/special/boot/box3.tga", 8 + 241 + 2, 6 + 150 + 2 + 28)
 
-		self.EnableRareBoni = MakeCheckBox("Ativar 6º e 7º Bônus", self.Box3, 1, 1, self.disable_rare_boni, self.enable_rare_boni)
-		self.EnableSecondOption = MakeCheckBox("Ativar 2º Opção de Bônus", self.Box2, 1, 1, self.disable_extra, self.enable_extra)
+		self.EnableRareBoni = MakeCheckBox("Ativar 6Âº e 7Âº BÃ´nus", self.Box3, 1, 1, self.disable_rare_boni, self.enable_rare_boni)
+		self.EnableSecondOption = MakeCheckBox("Ativar 2Âº OpÃ§Ã£o de BÃ´nus", self.Box2, 1, 1, self.disable_extra, self.enable_extra)
 
-		self.but_propose = DropDown(self, "Opções Salvas")
+		self.but_propose = DropDown(self, "OpÃ§Ãµes Salvas")
 		self.but_propose.SetParent(self)
 		self.but_propose.SetPosition(self.Box4.GetLeft() + 7, self.Box4.GetTop() + 13)
 		self.but_propose.OnChange = ui.__mem_func__(self.change_boni)
@@ -435,7 +435,7 @@ class BonusSelector(ui.Window):
 		for i in range(7, 5, -1):
 			vas = i
 			self.boni[vas] = {}
-			self.boni[vas][0] = DropDown(self.Box3, "Escolha o "+ str(vas) +"º Bônus")
+			self.boni[vas][0] = DropDown(self.Box3, "Escolha o "+ str(vas) +"Âº BÃ´nus")
 			self.boni[vas][0].SetPosition(7, 22 + 25 * (vas -6))
 			for x in AFFECT_DICT:
 				if x in BONI_RARE_AVAIL:
@@ -467,7 +467,7 @@ class BonusSelector(ui.Window):
 		for i in range(0, 5):
 			vas = 5 - i
 			self.boni[vas] = {}
-			self.boni[vas][0] = DropDown(self.Box1, "Escolha o "+ str(vas) +"º Bônus")
+			self.boni[vas][0] = DropDown(self.Box1, "Escolha o "+ str(vas) +"Âº BÃ´nus")
 			self.boni[vas][0].SetPosition(7, 22 + 25 * (vas -1))
 			for x in AFFECT_DICT:
 				if x in BONUS_LIST:
@@ -490,7 +490,7 @@ class BonusSelector(ui.Window):
 		for i in range(0, 5):
 			vas = 5 - i
 			self.boni_extra[vas] = {}
-			self.boni_extra[vas][0] = DropDown(self.Box2, "Escolha o "+ str(vas) +"º Bônus")
+			self.boni_extra[vas][0] = DropDown(self.Box2, "Escolha o "+ str(vas) +"Âº BÃ´nus")
 			self.boni_extra[vas][0].SetPosition(7, 22 + 25 * (vas -1))
 			for x in AFFECT_DICT:
 				if x in BONUS_LIST:
@@ -529,7 +529,7 @@ class BonusSelector(ui.Window):
 		self.BlockText.SetWindowHorizontalAlignCenter()
 		self.BlockText.SetHorizontalAlignCenter()
 		self.BlockText.SetPosition(0, 140)
-		self.BlockText.SetText("Este item não pode ser melhorado.")
+		self.BlockText.SetText("Este item nÃ£o pode ser melhorado.")
 		self.BlockText.Show()
 
 		self.Block2 = ui.Bar()
@@ -554,7 +554,7 @@ class BonusSelector(ui.Window):
 
 	def Delete_Pre(self):
 		question_dialog = uicommon.QuestionDialog()
-		question_dialog.SetText("Tem certeza que deseja excluir essa opção?")
+		question_dialog.SetText("Tem certeza que deseja excluir essa opÃ§Ã£o?")
 		question_dialog.SetAcceptEvent(self.DeleteOption, True)
 		question_dialog.SetCancelEvent(self.DeleteOption, False)
 		question_dialog.Open()
@@ -664,7 +664,7 @@ class BonusSelector(ui.Window):
 		LoadSavedOptions()
 		self.but_propose.DropList.RemoveAllItems()
 		self.but_propose.SetCountItem(1)
-		self.but_propose.AppendItemAndSelect("Opções Salvas")
+		self.but_propose.AppendItemAndSelect("OpÃ§Ãµes Salvas")
 		self.but_propose.AppendItem("Limpar", [])
 
 		try:
@@ -780,19 +780,19 @@ class ItemTabBar(ui.ScriptWindow):
 			attachedSlotVnum = mousemodule.mouseController.GetAttachedItemIndex()
 
 			if attachedSlotPos >= (player.INVENTORY_PAGE_COUNT*player.INVENTORY_PAGE_SIZE):
-				chat.AppendChat(2, "Não pode adicionar itens equipados.")
+				chat.AppendChat(2, "NÃ£o pode adicionar itens equipados.")
 				return
 
 			item.SelectItem(attachedSlotVnum)
 			if item.GetItemType() != 1 and item.GetItemType() != 2:
 				mousemodule.mouseController.DeattachObject()
-				chat.AppendChat(2, "Este item não pode ser rodado.")
+				chat.AppendChat(2, "Este item nÃ£o pode ser rodado.")
 				return
 
 			for a in self.tabList:
 				if self.tabList[a].index == attachedSlotPos:
 					mousemodule.mouseController.DeattachObject()
-					chat.AppendChat(2, "Esse Slot já foi inserido!")
+					chat.AppendChat(2, "Esse Slot jÃ¡ foi inserido!")
 					return
 
 			if player.SLOT_TYPE_INVENTORY == attachedSlotType:
@@ -816,7 +816,7 @@ class ItemTabBar(ui.ScriptWindow):
 				self.plusBar.SetPosition(x + self.ItemTab.width + self.ItemTab.dist, 0)
 				self.GetChild("Explain").Hide()
 		else:
-			chat.AppendChat(2, "Item não adicionado. Máximo atingido.")
+			chat.AppendChat(2, "Item nÃ£o adicionado. MÃ¡ximo atingido.")
 
 		if self.tabCount >= 5:
 			self.plusBar.Hide()
@@ -1017,7 +1017,7 @@ class ItemTabBar(ui.ScriptWindow):
 					return
 
 			self.bonusSelector.Deactivate_rare()
-			chat.AppendChat(2,"Slot %d: 6/7 Cancelado -> Você está sem pergaminho para rodar!" % (self.index+1))
+			chat.AppendChat(2,"Slot %d: 6/7 Cancelado -> VocÃª estÃ¡ sem pergaminho para rodar!" % (self.index+1))
 
 		def Switch(self):
 			for i in range(0, 200):
@@ -1028,7 +1028,7 @@ class ItemTabBar(ui.ScriptWindow):
 					return
 
 			self.bonusSelector.Deactivate()
-			chat.AppendChat(2,"Slot %d: 6/7 Cancelado -> Você está sem pergaminho para rodar!" % (self.index+1))
+			chat.AppendChat(2,"Slot %d: 6/7 Cancelado -> VocÃª estÃ¡ sem pergaminho para rodar!" % (self.index+1))
 
 		def checkSwitch(self):
 			if app.ENABLE_SWITCH_IMPROVEMENT:
@@ -1150,11 +1150,11 @@ class ItemTabBar(ui.ScriptWindow):
 			list_bonuses = self.GenList()
 
 			if list_bonuses == {}:
-				chat.AppendChat(1,"Slot %d: nenhum bônus selecionado na primeira opção." % (self.index + 1))
+				chat.AppendChat(1,"Slot %d: nenhum bÃ´nus selecionado na primeira opÃ§Ã£o." % (self.index + 1))
 				self.bonusSelector.Deactivate()
 				if self.parentWindow.parentWindow.configs[0].checked == 1:
 					app.FlashApplication()
-					dbg.TrLogBox("Slot %d: nenhum bônus selecionado na primeira opção." % (self.index + 1))
+					dbg.TrLogBox("Slot %d: nenhum bÃ´nus selecionado na primeira opÃ§Ã£o." % (self.index + 1))
 				if self.parentWindow.parentWindow.configs[1].checked == 1:
 					snd.PlaySound("sound/ui/metinstone_insert.wav")
 				return
@@ -1176,11 +1176,11 @@ class ItemTabBar(ui.ScriptWindow):
 			list_bonuses = self.GenListExtra()
 
 			if list_bonuses == {}:
-				chat.AppendChat(1,"Slot %d: nenhum bônus selecionado na segunda opção." % (self.index + 1))
+				chat.AppendChat(1,"Slot %d: nenhum bÃ´nus selecionado na segunda opÃ§Ã£o." % (self.index + 1))
 				self.bonusSelector.Deactivate()
 				if self.parentWindow.parentWindow.configs[0].checked == 1:
 					app.FlashApplication()
-					dbg.TrLogBox("Slot %d: nenhum bônus selecionado na segunda opção." % (self.index + 1))
+					dbg.TrLogBox("Slot %d: nenhum bÃ´nus selecionado na segunda opÃ§Ã£o." % (self.index + 1))
 				if self.parentWindow.parentWindow.configs[1].checked == 1:
 					snd.PlaySound("sound/ui/metinstone_insert.wav")
 				return
@@ -1293,9 +1293,9 @@ class Bot(ui.ScriptWindow):
 		self.On_but_speed_Move()
 
 		self.configs = [
-			MakeCheckBox("Ativar Notificações do Windows", self.Options_Page, 20, 20, self.ChangeConfigs, self.ChangeConfigs),
-			MakeCheckBox("Ativar Aúdio e Sons", self.Options_Page, 20, 20*2, self.ChangeConfigs, self.ChangeConfigs),
-			MakeCheckBox("Segunda Opção de Bônus Ativa como Padrão", self.Options_Page, 20, 20*3, self.ChangeConfigs, self.ChangeConfigs),
+			MakeCheckBox("Ativar NotificaÃ§Ãµes do Windows", self.Options_Page, 20, 20, self.ChangeConfigs, self.ChangeConfigs),
+			MakeCheckBox("Ativar AÃºdio e Sons", self.Options_Page, 20, 20*2, self.ChangeConfigs, self.ChangeConfigs),
+			MakeCheckBox("Segunda OpÃ§Ã£o de BÃ´nus Ativa como PadrÃ£o", self.Options_Page, 20, 20*3, self.ChangeConfigs, self.ChangeConfigs),
 		]
 
 		self.LoadConfigs()
@@ -1305,7 +1305,7 @@ class Bot(ui.ScriptWindow):
 		self.GetChild("slider_number").SetText(text[:5]+"%")
 
 	def MakeConfigs(self):
-		file = old_open("miles/boot.cfg", "w")
+		file = open("miles/boot.cfg", "w", "folder")
 		string = ""
 		for i in range(3):
 			string += "1\n"
@@ -1316,7 +1316,7 @@ class Bot(ui.ScriptWindow):
 	def ReturnConfigs(self):
 		if not os.path.exists("miles/boot.cfg"):
 			self.MakeConfigs()
-		lines = old_open("miles/boot.cfg", "r").readlines()
+		lines = open("miles/boot.cfg", "r", "folder").readlines()
 		if len(lines) != int(4):
 			self.MakeConfigs()
 		return lines
@@ -1342,7 +1342,7 @@ class Bot(ui.ScriptWindow):
 			else:
 				string += "0\n"
 		string += str(self.but_speed.GetSliderPos())
-		file = old_open("miles/boot.cfg", "w")
+		file = open("miles/boot.cfg", "w", "folder")
 		file.write(string)
 		file.close()
 

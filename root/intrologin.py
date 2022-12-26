@@ -14,7 +14,7 @@ import ime
 import os
 import time
 import binascii
-import _winreg
+import winreg
 import loadFiles
 import constinfo
 
@@ -570,19 +570,19 @@ class LoginWindow(ui.ScriptWindow):
 
 	def Set_WinReg(self, name, value):
 		try:
-			_winreg.CreateKey(_winreg.HKEY_CURRENT_USER, REG_PATH)
-			registry_key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, REG_PATH, 0, _winreg.KEY_WRITE)
-			_winreg.SetValueEx(registry_key, name, 0, _winreg.REG_SZ, value)
-			_winreg.CloseKey(registry_key)
+			winreg.CreateKey(winreg.HKEY_CURRENT_USER, REG_PATH)
+			registry_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REG_PATH, 0, winreg.KEY_WRITE)
+			winreg.SetValueEx(registry_key, name, 0, winreg.REG_SZ, value)
+			winreg.CloseKey(registry_key)
 			return True
 		except WindowsError:
 			return False
 
 	def Get_WinReg(self, name):
 		try:
-			registry_key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, REG_PATH, 0, _winreg.KEY_READ)
-			value, regtype = _winreg.QueryValueEx(registry_key, name)
-			_winreg.CloseKey(registry_key)
+			registry_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, REG_PATH, 0, winreg.KEY_READ)
+			value, regtype = winreg.QueryValueEx(registry_key, name)
+			winreg.CloseKey(registry_key)
 			return value
 		except WindowsError:
 			return None

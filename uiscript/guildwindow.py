@@ -50,7 +50,7 @@ window = {
 						{
 							"name":"Tab_Button_01",
 							"type":"redbutton",
-							"text":"Informações",
+							"text":"InformaÃ§Ãµes",
 							"width":119,
 							"x":0,
 							"y":0,
@@ -90,7 +90,7 @@ window = {
 						{
 							"name":"Tab_Button_06",
 							"type":"redbutton",
-							"text":"Baú de Guild",
+							"text":"BaÃº de Guild",
 							"width":119,
 							"x":0,
 							"y":30*5,
@@ -106,7 +106,7 @@ window = {
 						{
 							"name":"Tab_Button_08",
 							"type":"redbutton",
-							"text":"Histórico de War",
+							"text":"HistÃ³rico de War",
 							"width":119,
 							"x":0,
 							"y":30*7,

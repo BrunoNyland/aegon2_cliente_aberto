@@ -101,7 +101,7 @@ window = {
 			),
 		},
 ###################################################################################################
-### MASCARA DAS OPÇÕES DE MOUSE ### MASCARA DAS OPÇÕES DE MOUSE ### MASCARA DAS OPÇÕES DE MOUSE ###
+### MASCARA DAS OPÃ‡Ã•ES DE MOUSE ### MASCARA DAS OPÃ‡Ã•ES DE MOUSE ### MASCARA DAS OPÃ‡Ã•ES DE MOUSE ###
 ###################################################################################################
 		{
 			"name":"mask_left",
@@ -123,7 +123,7 @@ window = {
 					"vertical_align":"center",
 					"children":
 					(
-						{"name":"","type":"ballon","width":70,"text":"Girar Câmera","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
+						{"name":"","type":"ballon","width":70,"text":"Girar CÃ¢mera","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
 					),
 				},
 				{
@@ -151,7 +151,7 @@ window = {
 					"vertical_align":"center",
 					"children":
 					(
-						{"name":"","type":"ballon","width":70,"text":"Ataque Automático","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
+						{"name":"","type":"ballon","width":70,"text":"Ataque AutomÃ¡tico","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
 					),
 				},
 			),
@@ -250,7 +250,7 @@ window = {
 			"horizontal_align":"center",
 			"children":
 			(
-				{"name":"","type":"ballon","width":70,"text":"Páginas de Slots","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
+				{"name":"","type":"ballon","width":70,"text":"PÃ¡ginas de Slots","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
 			),
 		},
 		{
@@ -264,7 +264,7 @@ window = {
 			"horizontal_align":"center",
 			"children":
 			(
-				{"name":"","type":"ballon","width":70,"text":"Ação do Mouse","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
+				{"name":"","type":"ballon","width":70,"text":"AÃ§Ã£o do Mouse","x":0,"y":-40,"horizontal_align":"center","istooltip":1,"hide":1,},
 			),
 		},
 	),

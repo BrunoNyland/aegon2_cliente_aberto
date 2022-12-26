@@ -425,7 +425,7 @@ class InventoryWindow(ui.ScriptWindow):
 				self.RemoveQuestion.count = itemCount
 				self.RemoveQuestion.SetCancelEvent(self.Borrar_cancel)
 				self.RemoveQuestion.SetAcceptEvent(self.Borrar_Item, attachedSlotPos)
-				self.RemoveQuestion.SetText("Deseja remover este item permanentemente do seu inventário?")
+				self.RemoveQuestion.SetText("Deseja remover este item permanentemente do seu inventÃ¡rio?")
 				self.RemoveQuestion.Open(attachedSlotVnum, attachedSlotPos)
 			mousemodule.mouseController.DeattachObject()
 		else:
@@ -524,9 +524,9 @@ class InventoryWindow(ui.ScriptWindow):
 
 		# masc = money/100000000
 		# if masc < 1:
-		# 	self.GetChild("tooltip_gold").SetText("Apróx. %d Máscara da Fortuna" % (masc))
+		# 	self.GetChild("tooltip_gold").SetText("AprÃ³x. %d MÃ¡scara da Fortuna" % (masc))
 		# else:
-		# 	self.GetChild("tooltip_gold").SetText("Apróx. %d Máscaras da Fortuna" % (masc))
+		# 	self.GetChild("tooltip_gold").SetText("AprÃ³x. %d MÃ¡scaras da Fortuna" % (masc))
 
 	def RefreshBagSlotWindow(self):
 		is_activated = 0

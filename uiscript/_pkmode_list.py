@@ -44,7 +44,7 @@ window = {
 							"name":"text1", "type":"text",
 							"color":0xffa07970,
 							# "color":0xfff8d090,
-							"text":"Modo Pacífico",
+							"text":"Modo PacÃ­fico",
 							"x":5, "y":-2,
 							"vertical_align":"center",
 							"text_vertical_align":"center",

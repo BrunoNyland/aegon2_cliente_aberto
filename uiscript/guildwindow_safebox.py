@@ -35,7 +35,7 @@ window = {
 				{
 					"name":"text1", "type":"text",
 					"color":0xffa07970,
-					"text":"Digite a senha para abrir o Baú de Guild:",
+					"text":"Digite a senha para abrir o BaÃº de Guild:",
 					"x":0, "y":12,
 					"horizontal_align":"center",
 					"text_horizontal_align":"center",
@@ -135,7 +135,7 @@ window = {
 						{
 							"name":"new_password_text", "type":"text",
 							"color":0xffa07970,
-							"text":"Digite a nova senha com 6 dígitos:",
+							"text":"Digite a nova senha com 6 dÃ­gitos:",
 							"x":0, "y":12,
 							"horizontal_align":"center",
 							"text_horizontal_align":"center",

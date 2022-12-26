@@ -25,7 +25,7 @@ window = {
 				{
 					"name":"text1", "type":"text",
 					"color":0xffa07970,
-					"text":"Digite os números abaixo para continuar jogando",
+					"text":"Digite os nÃºmeros abaixo para continuar jogando",
 					"x":0, "y":23,
 					"horizontal_align":"center",
 					"text_horizontal_align":"center",

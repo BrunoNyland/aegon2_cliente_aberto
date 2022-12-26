@@ -383,7 +383,7 @@ class QuestDialog(ui.ScriptWindow):
 
 	def AddOnCloseEvent(self, f):
 		if self.OnCloseEvent:
-			self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:map(apply,z)
+			self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:map(apply, z)
 		else:
 			self.OnCloseEvent = f
 

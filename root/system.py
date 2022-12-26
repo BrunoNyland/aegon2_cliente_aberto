@@ -88,13 +88,29 @@ class pack_file(IOBase):
 		return [x for x in self]
 
 old_open = open
-def open_modified(filename:str, mode:str='rb'):
-	if pack.Exist(filename):
+def open_modified(filename:str, mode:str='rb', dir:str='find'):
+	if not dir in ['find', 'pack', 'folder']:
+		raise BaseException('system.py:open_modified: inválid argument dir: %s' % (dir))
+
+
+	if dir == 'find':
+		if pack.Exist(filename):
+			if not mode in ('r', 'rb'):
+				raise BaseException('system.py:open: Invalid mode: %s' % (mode))
+			dbg.TraceError('Carregando arquivo via pack: %s' % filename)
+			return pack_file(filename, mode)
+		else:
+			dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
+			return old_open(filename, mode)
+
+	elif dir == 'pack':
 		if not mode in ('r', 'rb'):
-			raise(IOError, 'system.py:open: Invalid mode: %s' % (mode))
-		dbg.TraceError('Carregando arquivo via pack: %s' % filename)
-		return pack_file(filename, mode)
+			raise BaseException('system.py:open: Invalid mode: %s' % (mode))
+		if not pack.Exist(filename):
+			dbg.TraceError('Carregando arquivo via pack: %s' % filename)
+			return pack_file(filename, mode)
 	else:
+		dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
 		return old_open(filename, mode)
 
 builtins.open = open_modified
@@ -126,9 +142,9 @@ if __USE_CYTHON__:
 	import rootlib
 
 if app.BLOCK_CHANGE_NAME_BIN:
-	if str(sys.executable)[-14:] != "mt2supremo.bin":
+	if str(sys.executable)[-14:] != "aegon2.bin":
 		try:
-			os.Execute("start Mt2Supremo.exe")
+			os.system("start aegon2.exe")
 		except BaseException:
 			pass
 

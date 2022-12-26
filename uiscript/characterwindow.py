@@ -228,7 +228,7 @@ window = {
 								{
 									"name" : "Guild_Name",
 									"type":"text",
-									"text":"±æµå ÀÌ¸§",
+									"text":"ê¸¸ë“œ ì´ë¦„",
 									"x":0,
 									"y":0,
 									"r":1.0,
@@ -253,7 +253,7 @@ window = {
 								{
 									"name" : "Character_Name",
 									"type":"text",
-									"text":"Ä³¸¯ÅÍ ÀÌ¸§",
+									"text":"ìºë¦­í„° ì´ë¦„",
 									"x":0,
 									"y":0,
 									"r":1.0,
@@ -305,16 +305,16 @@ window = {
 						{ "name" : "Face_Image", "type" : "image", "x" : 11, "y" : 11, "image" : "d:/ymir work/ui/game/windows/face_warrior.sub" },
 						{ "name" : "Face_Slot", "type" : "image", "x" : 7, "y" : 7, "image" : FACE_SLOT_FILE, },
 
-						## ±âº» ´É·Â
+						## ê¸°ë³¸ ëŠ¥ë ¥
 						{
 							"name":"Status_Standard", "type":"window", "x":3, "y":100, "width":200, "height":250,
 							"children" :
 							(
-								## ±âº» ´É·Â Á¦¸ñ
+								## ê¸°ë³¸ ëŠ¥ë ¥ ì œëª©
 								{ "name":"Character_Bar_01", "type":"horizontalbar", "x":12, "y":8, "width":223, },
 								{ "name":"Character_Bar_01_Text", "type" : "image", "x" : 13, "y" : 9, "image" : LOCALE_PATH+"label_std.sub", },
 								
-								## ´É·Â ¼ö·Ã ¼öÄ¡
+								## ëŠ¥ë ¥ ìˆ˜ë ¨ ìˆ˜ì¹˜
 								{ 
 									"name":"Status_Plus_Label", 
 									"type":"image", 
@@ -327,7 +327,7 @@ window = {
 									),
 								},
 
-								## ±âº» ´É·Â ¾ÆÀÌÅÛ ¸®½ºÆ®
+								## ê¸°ë³¸ ëŠ¥ë ¥ ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸
 								{"name":"Status_Standard_ItemList1", "type" : "image", "x":17, "y":31, "image" : LOCALE_PATH+"label_std_item1.sub", },
 								{"name":"Status_Standard_ItemList2", "type" : "image", "x":100, "y":30, "image" : LOCALE_PATH+"label_std_item2.sub", },
 
@@ -418,21 +418,21 @@ window = {
 							),
 						},
 						
-						## ºÎ°¡ ´É·Â
+						## ë¶€ê°€ ëŠ¥ë ¥
 						{ 
 							"name":"Status_Extent", "type":"window", "x":3, "y":221, "width":200, "height":50, 
 							"children" :
 							(
 
-								## ºÎ°¡ ´É·Â Á¦¸ñ
+								## ë¶€ê°€ ëŠ¥ë ¥ ì œëª©
 								{ "name":"Status_Extent_Bar", "type":"horizontalbar", "x":12, "y":6, "width":223, },
 								{ "name":"Status_Extent_Label", "type" : "image", "x" : 13, "y" : 8, "image" : LOCALE_PATH+"label_ext.sub", },
 
-								## ±âº» ´É·Â ¾ÆÀÌÅÛ ¸®½ºÆ®
+								## ê¸°ë³¸ ëŠ¥ë ¥ ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸
 								{"name":"Status_Extent_ItemList1", "type" : "image", "x":11, "y":31, "image" : LOCALE_PATH+"label_ext_item1.sub", },
 								{"name":"Status_Extent_ItemList2", "type" : "image", "x":128, "y":32, "image" : LOCALE_PATH+"label_ext_item2.sub", },
 
-								## MSPD - ÀÌµ¿ ¼Óµµ
+								## MSPD - ì´ë™ ì†ë„
 								{
 									"name":"MOV_Label", "type":"window", "x":66, "y":33, "width":50, "height":20, 
 									"children" :
@@ -442,7 +442,7 @@ window = {
 									)
 								},
 
-								## ASPD - °ø°İ ¼Óµµ
+								## ASPD - ê³µê²© ì†ë„
 								{
 									"name":"ASPD_Label", "type":"window", "x":66, "y":33+23, "width":50, "height":20, 
 									"children" :
@@ -452,7 +452,7 @@ window = {
 									)
 								},
 
-								## CSPD - ÁÖ¹® ¼Óµµ
+								## CSPD - ì£¼ë¬¸ ì†ë„
 								{
 									"name":"CSPD_Label", "type":"window", "x":66, "y":33+23*2, "width":50, "height":20, 
 									"children" :
@@ -462,7 +462,7 @@ window = {
 									)
 								},
 
-								## MATT - ¸¶¹ı °ø°İ·Â
+								## MATT - ë§ˆë²• ê³µê²©ë ¥
 								{
 									"name":"MATT_Label", "type":"window", "x":183, "y":33, "width":50, "height":20, 
 									"children" :
@@ -472,7 +472,7 @@ window = {
 									)
 								},
 
-								## MDEF - ¸¶¹ı ¹æ¾î·Â
+								## MDEF - ë§ˆë²• ë°©ì–´ë ¥
 								{
 									"name":"MDEF_Label", "type":"window", "x":183, "y":33+23, "width":50, "height":20, 
 									"children" :
@@ -482,7 +482,7 @@ window = {
 									)
 								},
 
-								## È¸ÇÇÀ²
+								## íšŒí”¼ìœ¨
 								{
 									"name":"ER_Label", "type":"window", "x":183, "y":33+23*2, "width":50, "height":20, 
 									"children" :
@@ -679,7 +679,7 @@ window = {
 
 					"children" :
 					(
-						## ±âº» ¾×¼Ç Á¦¸ñ
+						## ê¸°ë³¸ ì•¡ì…˜ ì œëª©
 						{ "name":"Action_Bar", "type":"horizontalbar", "x":12, "y":11, "width":223, },
 						{ "name":"Action_Bar_Text", "type":"text", "x":15, "y":13, "text":uiscriptlocale.CHARACTER_NORMAL_ACTION },
 
@@ -700,7 +700,7 @@ window = {
 							"image" : ICON_SLOT_FILE,
 						},
 
-						## »óÈ£ ¾×¼Ç Á¦¸ñ
+						## ìƒí˜¸ ì•¡ì…˜ ì œëª©
 						{ "name":"Reaction_Bar", "type":"horizontalbar", "x":12, "y":8+150, "width":223, },
 						{ "name":"Reaction_Bar_Text", "type":"text", "x":15, "y":10+150, "text":uiscriptlocale.CHARACTER_MUTUAL_ACTION },
 
@@ -758,25 +758,25 @@ window = {
 							"horizontal_align" : "right",
 						},
 
-						{ "name" : "Quest_Name_00", "type" : "text", "text" : "ÀÌ¸§ÀÔ´Ï´Ù", "x" : 60, "y" : 14 },
-						{ "name" : "Quest_LastTime_00", "type" : "text", "text" : "³²Àº ½Ã°£ ÀÔ´Ï´Ù", "x" : 60, "y" : 30 },
-						{ "name" : "Quest_LastCount_00", "type" : "text", "text" : "³²Àº °³¼ö ÀÔ´Ï´Ù", "x" : 60, "y" : 46 },
+						{ "name" : "Quest_Name_00", "type" : "text", "text" : "ì´ë¦„ì…ë‹ˆë‹¤", "x" : 60, "y" : 14 },
+						{ "name" : "Quest_LastTime_00", "type" : "text", "text" : "ë‚¨ì€ ì‹œê°„ ì…ë‹ˆë‹¤", "x" : 60, "y" : 30 },
+						{ "name" : "Quest_LastCount_00", "type" : "text", "text" : "ë‚¨ì€ ê°œìˆ˜ ì…ë‹ˆë‹¤", "x" : 60, "y" : 46 },
 
-						{ "name" : "Quest_Name_01", "type" : "text", "text" : "ÀÌ¸§ÀÔ´Ï´Ù", "x" : 60, "y" : 74 },
-						{ "name" : "Quest_LastTime_01", "type" : "text", "text" : "³²Àº ½Ã°£ ÀÔ´Ï´Ù", "x" : 60, "y" : 90 },
-						{ "name" : "Quest_LastCount_01", "type" : "text", "text" : "³²Àº °³¼ö ÀÔ´Ï´Ù", "x" : 60, "y" : 106 },
+						{ "name" : "Quest_Name_01", "type" : "text", "text" : "ì´ë¦„ì…ë‹ˆë‹¤", "x" : 60, "y" : 74 },
+						{ "name" : "Quest_LastTime_01", "type" : "text", "text" : "ë‚¨ì€ ì‹œê°„ ì…ë‹ˆë‹¤", "x" : 60, "y" : 90 },
+						{ "name" : "Quest_LastCount_01", "type" : "text", "text" : "ë‚¨ì€ ê°œìˆ˜ ì…ë‹ˆë‹¤", "x" : 60, "y" : 106 },
 
-						{ "name" : "Quest_Name_02", "type" : "text", "text" : "ÀÌ¸§ÀÔ´Ï´Ù", "x" : 60, "y" : 134 },
-						{ "name" : "Quest_LastTime_02", "type" : "text", "text" : "³²Àº ½Ã°£ ÀÔ´Ï´Ù", "x" : 60, "y" : 150 },
-						{ "name" : "Quest_LastCount_02", "type" : "text", "text" : "³²Àº °³¼ö ÀÔ´Ï´Ù", "x" : 60, "y" : 166 },
+						{ "name" : "Quest_Name_02", "type" : "text", "text" : "ì´ë¦„ì…ë‹ˆë‹¤", "x" : 60, "y" : 134 },
+						{ "name" : "Quest_LastTime_02", "type" : "text", "text" : "ë‚¨ì€ ì‹œê°„ ì…ë‹ˆë‹¤", "x" : 60, "y" : 150 },
+						{ "name" : "Quest_LastCount_02", "type" : "text", "text" : "ë‚¨ì€ ê°œìˆ˜ ì…ë‹ˆë‹¤", "x" : 60, "y" : 166 },
 
-						{ "name" : "Quest_Name_03", "type" : "text", "text" : "ÀÌ¸§ÀÔ´Ï´Ù", "x" : 60, "y" : 194 },
-						{ "name" : "Quest_LastTime_03", "type" : "text", "text" : "³²Àº ½Ã°£ ÀÔ´Ï´Ù", "x" : 60, "y" : 210 },
-						{ "name" : "Quest_LastCount_03", "type" : "text", "text" : "³²Àº °³¼ö ÀÔ´Ï´Ù", "x" : 60, "y" : 226 },
+						{ "name" : "Quest_Name_03", "type" : "text", "text" : "ì´ë¦„ì…ë‹ˆë‹¤", "x" : 60, "y" : 194 },
+						{ "name" : "Quest_LastTime_03", "type" : "text", "text" : "ë‚¨ì€ ì‹œê°„ ì…ë‹ˆë‹¤", "x" : 60, "y" : 210 },
+						{ "name" : "Quest_LastCount_03", "type" : "text", "text" : "ë‚¨ì€ ê°œìˆ˜ ì…ë‹ˆë‹¤", "x" : 60, "y" : 226 },
 
-						{ "name" : "Quest_Name_04", "type" : "text", "text" : "ÀÌ¸§ÀÔ´Ï´Ù", "x" : 60, "y" : 254 },
-						{ "name" : "Quest_LastTime_04", "type" : "text", "text" : "³²Àº ½Ã°£ ÀÔ´Ï´Ù", "x" : 60, "y" : 270 },
-						{ "name" : "Quest_LastCount_04", "type" : "text", "text" : "³²Àº °³¼ö ÀÔ´Ï´Ù", "x" : 60, "y" : 286 },
+						{ "name" : "Quest_Name_04", "type" : "text", "text" : "ì´ë¦„ì…ë‹ˆë‹¤", "x" : 60, "y" : 254 },
+						{ "name" : "Quest_LastTime_04", "type" : "text", "text" : "ë‚¨ì€ ì‹œê°„ ì…ë‹ˆë‹¤", "x" : 60, "y" : 270 },
+						{ "name" : "Quest_LastCount_04", "type" : "text", "text" : "ë‚¨ì€ ê°œìˆ˜ ì…ë‹ˆë‹¤", "x" : 60, "y" : 286 },
 
 					),
 				},

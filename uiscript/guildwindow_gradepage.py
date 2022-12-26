@@ -27,10 +27,10 @@ window = {
 		},
 		{"name":"", "type":"horizontalseparator", "width":width+2, "x":-1, "y":33,},
 		{
-			"name":"GradeNumber", "type":"text", "color":box_color, "x":12, "y":y-(x/2), "text":"N°.","fontsize":"LARGE","outline":1,
+			"name":"GradeNumber", "type":"text", "color":box_color, "x":12, "y":y-(x/2), "text":"NÂ°.","fontsize":"LARGE","outline":1,
 		},
 		{
-			"name":"GradeName", "type":"text", "color":box_color, "x":45, "y":y-(x/2), "text":"Posição","fontsize":"LARGE","outline":1,
+			"name":"GradeName", "type":"text", "color":box_color, "x":45, "y":y-(x/2), "text":"PosiÃ§Ã£o","fontsize":"LARGE","outline":1,
 		},
 		{
 			"name":"InviteAuthority", "type":"text", "color":box_color, "x":108, "y":y-x, "text":"Recrutar","fontsize":"LARGE","outline":1,
@@ -48,7 +48,7 @@ window = {
 			"name":"WarAuthority", "type":"text", "color":box_color, "x":265, "y":y-x, "text":"War","fontsize":"LARGE","outline":1,
 		},
 		{
-			"name":"SafeboxAuthority", "type":"text", "color":box_color, "x":299, "y":y, "text":"Baú","fontsize":"LARGE","outline":1,
+			"name":"SafeboxAuthority", "type":"text", "color":box_color, "x":299, "y":y, "text":"BaÃº","fontsize":"LARGE","outline":1,
 		},
 	),
 }

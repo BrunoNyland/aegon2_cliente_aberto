@@ -410,7 +410,7 @@ class GameWindow(ui.ScriptWindow):
 	def __PressQuickSlot(self, localSlotIndex):
 		if localSlotIndex == 7 and app.IsPressed(app.DIK_LALT):
 			questionDialog = uicommon.QuestionDialog()
-			questionDialog.SetText("Você quer fechar o jogo?")
+			questionDialog.SetText("VocÃª quer fechar o jogo?")
 			questionDialog.SetAcceptEvent(self.Yes)
 			questionDialog.SetCancelEvent(self.No)
 			questionDialog.Open()
@@ -1215,7 +1215,7 @@ class GameWindow(ui.ScriptWindow):
 			return
 
 		if background.GetCurrentMapName() == "maps/113_ox":
-			chat.AppendChat(chat.CHAT_TYPE_INFO, "Não permitido neste mapa")
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "NÃ£o permitido neste mapa")
 			return
 
 		net.SendItemDropPacket(itemInvenType, itemVNum, itemCount)
@@ -1661,11 +1661,11 @@ class GameWindow(ui.ScriptWindow):
 
 	def RefineFailedMessage(self):
 		snd.PlaySound("sound/ui/jaeryun_fail.wav")
-		chat.AppendChat(chat.CHAT_TYPE_INFO, "Não foi dessa vez tente novamente!")
+		chat.AppendChat(chat.CHAT_TYPE_INFO, "NÃ£o foi dessa vez tente novamente!")
 
 	def Open_Remote_Exchange_Question(self, name, level): 
 		remote_exchange_question = uicommon.QuestionDialog()
-		remote_exchange_question.SetText("|cffFDD017|H|h" + str(name)+ "|cff00ccff" + "(Lv."+str(level)+")"+ "|h|r" + " Quer negociar com você.")
+		remote_exchange_question.SetText("|cffFDD017|H|h" + str(name)+ "|cff00ccff" + "(Lv."+str(level)+")"+ "|h|r" + " Quer negociar com vocÃª.")
 		remote_exchange_question.SetAcceptEvent(self.Accept_Remote_Exchange, name)
 		remote_exchange_question.SetCancelEvent(self.Deny_Remote_Exchange, name)
 		remote_exchange_question.Open()
@@ -1947,7 +1947,7 @@ class GameWindow(ui.ScriptWindow):
 
 	def __ViewEquipRequestDenied(self, vid):
 		vid = int(vid)
-		self.PopupMessage("Pedido negado pelo usuário " + chr.GetNameByVID(vid) + ".")
+		self.PopupMessage("Pedido negado pelo usuÃ¡rio " + chr.GetNameByVID(vid) + ".")
 
 	#Amigos System
 	def __ShowPopup(self, arg):

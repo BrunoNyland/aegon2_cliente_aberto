@@ -32,7 +32,7 @@ window = {
 		},
 		{"name":"","type":"horizontalseparator", "width":width+2, "x":-1, "y":30,},
 		{
-			"name":"","type":"text", "color":box_color, "x":2, "y":y, "text":"N°.","fontsize":"LARGE","outline":1,
+			"name":"","type":"text", "color":box_color, "x":2, "y":y, "text":"NÂ°.","fontsize":"LARGE","outline":1,
 		},
 		{
 			"name":"","type":"text", "color":box_color, "x":33, "y":y, "text":"Nome","fontsize":"LARGE","outline":1,
@@ -41,7 +41,7 @@ window = {
 			"name":"","type":"text", "color":box_color, "x":134+15+6, "y":y+3, "text":"Pontos","outline":1,
 		},
 		{
-			"name":"","type":"text", "color":box_color, "x":178+15+4, "y":y+3, "text":"Vitórias","outline":1,
+			"name":"","type":"text", "color":box_color, "x":178+15+4, "y":y+3, "text":"VitÃ³rias","outline":1,
 		},
 		{
 			"name":"","type":"text", "color":box_color, "x":227+15+2, "y":y+3, "text":"Empates","outline":1,

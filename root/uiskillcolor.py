@@ -17,11 +17,11 @@ HEX_CODE_LENGTH = 7
 ## GLOBAL FUNC
 def ReturnSavedColors():
 	if not os.path.exists("miles/skill_color.cfg"):
-		file = old_open("miles/skill_color.cfg", "w")
+		file = open("miles/skill_color.cfg", "w", "folder")
 		file.write("")
 		file.close()
 
-	lines = old_open("miles/skill_color.cfg", "r").readlines()
+	lines = open("miles/skill_color.cfg", "r", "folder").readlines()
 	return lines
 
 def RemoveLine(line_to_remove):
@@ -37,7 +37,7 @@ def RemoveLine(line_to_remove):
 		if line_to_remove != line:
 			temp.append(line)
 
-	writer = old_open("miles/skill_color.cfg", "w")
+	writer = open("miles/skill_color.cfg", "w", "folder")
 	writer.write("")
 
 	for line in temp:
@@ -67,10 +67,10 @@ def AddNewColor(color):
 	lines = ReturnSavedColors()
 
 	if new_line in lines:
-		chat.AppendChat(chat.CHAT_TYPE_INFO, "Esta cor j· foi salva.")
+		chat.AppendChat(chat.CHAT_TYPE_INFO, "Esta cor j√° foi salva.")
 		return
 
-	writer = old_open("miles/skill_color.cfg", "w")
+	writer = open("miles/skill_color.cfg", "w", "folder")
 	for line in lines:
 		writer.write(line)
 	writer.write(new_line)
@@ -283,7 +283,7 @@ class SkillColorWindow(ui.ScriptWindow):
 
 		skillColorCfg = GetSavedColors()
 		if len(skillColorCfg) >= 20:
-			self.popup.SetText("N„o pode salvar mais cores.")
+			self.popup.SetText("N√£o pode salvar mais cores.")
 			self.popup.Open()
 			return
 
@@ -529,7 +529,7 @@ class SkillColorWindow(ui.ScriptWindow):
 
 	def OnClickDefaultButton(self):
 		questionDialog = uicommon.QuestionDialog()
-		questionDialog.SetText("Deseja voltar a cor padr„o da sua Habilidade?")
+		questionDialog.SetText("Deseja voltar a cor padr√£o da sua Habilidade?")
 		questionDialog.SetAcceptEvent(self.OnAcceptQuestionDialog, 0)
 		questionDialog.SetCancelEvent(self.OnCloseQuestionDialog)
 		questionDialog.Open()
@@ -683,7 +683,7 @@ class SkillColorWindow(ui.ScriptWindow):
 						try:
 							r, g, b = self.GetRGBColor()
 							hexCode = "#{:02x}{:02x}{:02x}".format(int(r), int(g), int(b))
-							toolTipText = "Escolha a cor desejada para %s. (CÛdigo HEX : %s)" % (skill.GetSkillName(self.skillIndex, 0), hexCode)
+							toolTipText = "Escolha a cor desejada para %s. (C√≥digo HEX : %s)" % (skill.GetSkillName(self.skillIndex, 0), hexCode)
 							arglen = len(str(toolTipText))
 							self.toolTip.ClearToolTip()
 							self.toolTip.SetThinBoardSize(5 * arglen)

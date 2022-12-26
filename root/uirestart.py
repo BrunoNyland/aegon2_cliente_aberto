@@ -77,7 +77,7 @@ class RestartDialog(ui.ScriptWindow):
 			return
 
 		if left < 1:
-			self.restartTownButton.SetText("Retornar ao Início")
+			self.restartTownButton.SetText("Retornar ao InÃ­cio")
 			self.restartTownButton.Enable()
 		else:
 			self.restartTownButton.SetText("Liberado em %s segundos" % self.SecondsFormat(left))

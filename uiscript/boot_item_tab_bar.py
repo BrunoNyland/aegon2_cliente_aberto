@@ -30,7 +30,7 @@ window = {
 			"children":
 			(
 				{
-					"name":"", "type":"text", "text":"Arraste o Õtem que voce Deseja Melhorar",
+					"name":"", "type":"text", "text":"Arraste o √çtem que voce Deseja Melhorar",
 					"color":0xfff88f90, "x":0, "y":-10,
 					"text_vertical_align":"center", "vertical_align":"center",
 					"text_horizontal_align":"center", "horizontal_align":"center",

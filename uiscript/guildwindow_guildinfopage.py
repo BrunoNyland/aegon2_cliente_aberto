@@ -206,7 +206,7 @@ window = {
 			"text":"Convocar",
 			"children":
 			(
-				{"name":"","type":"text","text":"Reuni„o de Guild","color": text_color,"x":0,"y":-20,"horizontal_align":"center","text_horizontal_align":"center",},
+				{"name":"","type":"text","text":"Reuni√£o de Guild","color": text_color,"x":0,"y":-20,"horizontal_align":"center","text_horizontal_align":"center",},
 			),
 		},
 		{
@@ -223,7 +223,7 @@ window = {
 				{
 					"name":"",
 					"type":"text",
-					"text":"Mensagem do LÌder:",
+					"text":"Mensagem do L√≠der:",
 					"color":text_color,
 					"x":0,
 					"y":-5,

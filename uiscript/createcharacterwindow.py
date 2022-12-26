@@ -110,7 +110,7 @@ window = {
 								{
 									"name" 	: 	"Sexo_Title",
 									"type"	:	"text",
-									"text"	:	"|cfff8d090Defina o Gênero",
+									"text"	:	"|cfff8d090Defina o GÃªnero",
 									"x"		:	0,
 									"y"		:	-5,
 									"all_align":"center",
@@ -169,7 +169,7 @@ window = {
 							"x":40, "y":265+x,
 							"width":80,
 							"horizontal_align":"center",
-							"text":"Próximo",
+							"text":"PrÃ³ximo",
 						},
 		### FINALIZAR/CANCELAR### FINALIZAR/CANCELAR### FINALIZAR/CANCELAR### FINALIZAR/CANCELAR### FINALIZAR/CANCELAR### FINALIZAR/CANCELAR
 						{

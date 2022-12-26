@@ -778,7 +778,7 @@ class TargetBoard(ui.ThinBoard):
 
 	def __OnEmotionAllow(self):
 		net.SendChatPacket("/emotion_allow %d" % (self.vid))
-		net.SendWhisperPacket((self.nameString), player.GetName() + " aceita ter emoções com você.")
+		net.SendWhisperPacket((self.nameString), player.GetName() + " aceita ter emoÃ§Ãµes com vocÃª.")
 
 	if app.ENABLE_INVENTORY_VIEWER:
 		def __OnRequestInventory(self):
@@ -887,7 +887,7 @@ class TargetBoard(ui.ThinBoard):
 					self.RefreshButton()
 
 class Component:
-	def TextLine(self, parent, textlineText, x, y, color):
+	def TextLine(self, parent:ui.Window, textlineText:str, x:int, y:int, color:list):
 		textline = ui.TextLine()
 		if parent != None:
 			textline.SetParent(parent)
@@ -898,10 +898,10 @@ class Component:
 		textline.Show()
 		return textline
 
-	def RGB(self, r, g, b):
+	def RGB(self, r:float, g:float, b:float):
 		return (r*255, g*255, b*255)
 
-	def ExpandedImage(self, parent, x, y, img):
+	def ExpandedImage(self, parent:ui.Window, x:int, y:int, img:str):
 		image = ui.ExpandedImageBox()
 		if parent != None:
 			image.SetParent(parent)

@@ -60,7 +60,7 @@ class RentTimeDialog(ui.ScriptWindow):
 			if m > 1:
 				txt = txt + str(m) + " meses "
 			else:
-				txt = txt + str(m) + " mês "
+				txt = txt + str(m) + " mÃªs "
 		if d > 0:
 			if d > 1:
 				txt = txt + str(d) + " dias "

@@ -267,18 +267,18 @@ def GetCameraSettings():
 
 def SaveCameraSettings():
 	global CAMERA_SETTINGS
-	old_open("miles/camera.cfg", "w").write("%s\t%s" % tuple(CAMERA_SETTINGS))
+	open("miles/camera.cfg", "w", "folder").write("%s\t%s" % tuple(CAMERA_SETTINGS))
 
 def LoadCameraSettings():
 	global CAMERA_SETTINGS
 
 	if not os.path.exists("miles/camera.cfg"):
-		old_open("miles/camera.cfg", "w").write("3500.00\t5000.00")
+		open("miles/camera.cfg", "w", "folder").write("3500.00\t5000.00")
 		CAMERA_SETTINGS[0] = 3500.00
 		CAMERA_SETTINGS[1] = 5000.00
 		return
 
-	tokens = old_open("miles/camera.cfg", "r").read().split()
+	tokens = open("miles/camera.cfg", "r", "folder").read().split()
 
 	if len(tokens) != 2:
 		CAMERA_SETTINGS[0] = 3500.00
@@ -319,7 +319,7 @@ def SetAmountSetting(value):
 
 def SaveAmountSettings():
 	global AMOUNT
-	old_open("miles/amount.cfg", "w").write("%s" % AMOUNT)
+	open("miles/amount.cfg", "w", "folder").write("%s" % AMOUNT)
 
 def LoadShopAmountConfig():
 	global AMOUNT
@@ -328,11 +328,11 @@ def LoadShopAmountConfig():
 		os.mkdir("miles")
 
 	if not os.path.exists("miles/amount.cfg"):
-		old_open("miles/amount.cfg", "w").write("1")
+		open("miles/amount.cfg", "w", "folder").write("1")
 		AMOUNT = 1
 		return
 
-	tokens = old_open("miles/amount.cfg", "r").read().split()
+	tokens = open("miles/amount.cfg", "r", "folder").read().split()
 
 	if len(tokens) != 1:
 		AMOUNT = 1

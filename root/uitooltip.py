@@ -901,7 +901,7 @@ class ItemToolTip(ToolTip):
 			if (item.GetItemType() == item.ITEM_TYPE_ARMOR or (item.GetItemType() == item.ITEM_TYPE_WEAPON and item.GetItemSubType() != item.WEAPON_ARROW)):
 				if attrDisp > 0:
 					self.AppendSpace(2)
-					self.AppendTextLine("Voce pode adicinar +%d B鬾us" % (attrDisp), self.SPECIAL_POSITIVE_COLOR)
+					self.AppendTextLine("Voce pode adicinar +%d B么nus" % (attrDisp), self.SPECIAL_POSITIVE_COLOR)
 					self.AppendSpace(2)
 
 			rareDisp = 2
@@ -921,11 +921,11 @@ class ItemToolTip(ToolTip):
 			if (item.GetItemType() == item.ITEM_TYPE_ARMOR or (item.GetItemType() == item.ITEM_TYPE_WEAPON and item.GetItemSubType() != item.WEAPON_ARROW)):
 				if rareDisp == 1:
 					self.AppendSpace(2)
-					self.AppendTextLine("Pode ser adicinado +%d B鬾us Raro" % (rareDisp), self.SPECIAL_POSITIVE_COLOR)
+					self.AppendTextLine("Pode ser adicinado +%d B么nus Raro" % (rareDisp), self.SPECIAL_POSITIVE_COLOR)
 					self.AppendSpace(2)
 				elif rareDisp == 2:
 					self.AppendSpace(2)
-					self.AppendTextLine("Podem ser adicinados +%d B鬾us Raros" % (rareDisp), self.SPECIAL_POSITIVE_COLOR)
+					self.AppendTextLine("Podem ser adicinados +%d B么nus Raros" % (rareDisp), self.SPECIAL_POSITIVE_COLOR)
 					self.AppendSpace(2)
 
 	def __GetAttributeColor(self, index, value):
@@ -1656,7 +1656,7 @@ class ItemToolTip(ToolTip):
 			[item.ITEM_ANTIFLAG_DROP, "Dropar"],
 			[item.ITEM_ANTIFLAG_SELL, "Vender"],
 			[item.ITEM_ANTIFLAG_MYSHOP, "Loja"],
-			[item.ITEM_ANTIFLAG_SAFEBOX , "Armaz閙"],
+			[item.ITEM_ANTIFLAG_SAFEBOX , "Armaz茅m"],
 		]
 
 		antiflagNames = ""
@@ -1667,7 +1667,7 @@ class ItemToolTip(ToolTip):
 
 		if antiflagNames != "":
 			self.AppendSpace(5)
-			self.AppendTextLine("[ Imposs韛el Descartar ]", self.DISABLE_COLOR)
+			self.AppendTextLine("[ Imposs铆vel Descartar ]", self.DISABLE_COLOR)
 			textLine = self.AppendTextLine(antiflagNames[:-1], self.DISABLE_COLOR, True)
 			textLine.SetFeather()
 
@@ -1706,7 +1706,7 @@ class ItemToolTip(ToolTip):
 	def AppendPrice(self, price):
 		self.AppendSpace(5)
 		if price == 0:
-			self.AppendTextLine("Gr醫is", self.GetPriceColor(price))
+			self.AppendTextLine("Gr谩tis", self.GetPriceColor(price))
 		else:
 			self.AppendTextLine(localeinfo.TOOLTIP_BUYPRICE  % (localeinfo.NumberToMoneyString(price)), self.GetPriceColor(price))
 		self.AppendPriceDescritpion(price)
@@ -1724,11 +1724,11 @@ class ItemToolTip(ToolTip):
 		mascs = int(price/100000000)
 		if mascs > 1:
 			self.AppendSpace(5)
-			self.AppendTextLine("Apr髕. " + localeinfo.NumberToMoneyString(mascs) + " M醩caras", self.MIDDLE_PRICE_COLOR)
+			self.AppendTextLine("Apr贸x. " + localeinfo.NumberToMoneyString(mascs) + " M谩scaras", self.MIDDLE_PRICE_COLOR)
 			self.AppendSpace(5)
 		elif mascs == 1:
 			self.AppendSpace(5)
-			self.AppendTextLine("Apr髕. " + localeinfo.NumberToMoneyString(mascs) + " M醩cara da Fortuna", self.MIDDLE_PRICE_COLOR)
+			self.AppendTextLine("Apr贸x. " + localeinfo.NumberToMoneyString(mascs) + " M谩scara da Fortuna", self.MIDDLE_PRICE_COLOR)
 			self.AppendSpace(5)
 
 	def AppendMetinInformation(self):
@@ -2080,7 +2080,7 @@ if app.ENABLE_FLAGS_CHAT:
 		FLAG_LANG = {
 			"br" : 'Brasil',
 			"hu" : 'Hungaro',
-			"pl" : 'Pol鬾ia',
+			"pl" : 'Pol么nia',
 			"cz" : 'Theco',
 			"de" : 'Alemanha',
 			"ro" : 'Rom?nia',
@@ -2088,7 +2088,7 @@ if app.ENABLE_FLAGS_CHAT:
 			"es" : 'Espanha',
 			"en" : 'Inglaterra',
 			"pt" : 'Portugal',
-			"it" : 'It醠ia',
+			"it" : 'It谩lia',
 		}
 
 		FLAG_REINO = {

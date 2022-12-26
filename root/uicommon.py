@@ -600,7 +600,7 @@ class PriceInputDialog(ui.ScriptWindow):
 		self.GetChild("ItemIcon").SetWindowVerticalAlignCenter()
 		self.GetChild("ItemIcon").Show()
 		self.GetChild("NameItem").SetTextLimited(str(count) + "x " + str(item.GetItemName()), 140)
-		self.GetChild("AveragePrice").SetText("Carregando Informa�?es...")
+		self.GetChild("AveragePrice").SetText("Carregando Informações...")
 
 		self.__OnValueUpdate()
 		self.SetCenterPosition()
@@ -625,7 +625,7 @@ class PriceInputDialog(ui.ScriptWindow):
 		if price > 0:
 			self.GetChild("AveragePrice").SetTextLimited(localeinfo.NumberToMoneyString(price*self.count)+" Gold", 140)
 		else:
-			self.GetChild("AveragePrice").SetTextLimited("Sem Informa�?es Ainda", 140)
+			self.GetChild("AveragePrice").SetTextLimited("Sem Informações Ainda", 140)
 
 	def SetFocus(self):
 		self.inputValue.SetFocus()

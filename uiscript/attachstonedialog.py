@@ -45,7 +45,7 @@ window = {
 				{
 					"name":"Question",
 					"type":"text",
-					"text":"Deseja inserir a Jóia?",
+					"text":"Deseja inserir a JÃ³ia?",
 					"horizontal_align":"center",
 					"vertical_align":"bottom",
 					"text_horizontal_align":"center",
@@ -76,7 +76,7 @@ window = {
 					"x":35,
 					"y":43,
 					"width":60,
-					"text":"Não",
+					"text":"NÃ£o",
 					"horizontal_align":"center",
 					"vertical_align":"bottom",
 				},
