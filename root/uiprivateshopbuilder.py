@@ -308,7 +308,7 @@ class PrivateShopBuilder(ui.ScriptWindow):
 		if not text.isdigit():
 			return True
 
-		if long(text) <= 0:
+		if int(text) <= 0:
 			return True
 
 		attachedInvenType = self.priceInputBoard.sourceWindowType

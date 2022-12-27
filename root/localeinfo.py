@@ -98,7 +98,7 @@ def CutMoneyString(sourceText, startIndex, endIndex, insertingText, backText):
 	if not text:
 		return backText
 
-	if long(text) <= 0:
+	if int(text) <= 0:
 		return backText
 
 	text = str(int(text))

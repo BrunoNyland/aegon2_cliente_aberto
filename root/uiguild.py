@@ -835,8 +835,8 @@ class GuildWindow(ui.ScriptWindow):
 				"MEMBER"		: localeinfo.GUILD_TILE_MEMBER,
 				"SKILL"			: localeinfo.GUILD_TILE_SKILL,
 				"GRADE"			: localeinfo.GUILD_TILE_GRADE,
-				"RANKING"		: "ClassificaÁ„o de Guilds",
-				"WAR_LIST"			: "HistÛrico de Guerras",
+				"RANKING"		: "Classifica–∑–≥o de Guilds",
+				"WAR_LIST"			: "Hist—Érico de Guerras",
 			}
 			if app.ENABLE_GUILD_SAFEBOX:
 				self.pageName.update({ "SAFEBOX" : localeinfo.GUILD_TILE_SAFEBOX})
@@ -1281,7 +1281,7 @@ class GuildWindow(ui.ScriptWindow):
 		else:
 			percent_limited = percent
 		page.gaugeExp.SetPercentageNew(min(int(fpercent), 100))
-		page.Exp.SetText("ExperiÍncia: " + str(curExp) + " de " + str(lastExp))
+		page.Exp.SetText("Experi–∫ncia: " + str(curExp) + " de " + str(lastExp))
 		page.PercentExp.SetText(percent_limited + "%")
 
 		curMemberCount, maxMemberCount = guild.GetGuildMemberCount()
@@ -1336,7 +1336,7 @@ class GuildWindow(ui.ScriptWindow):
 
 	def RequestMeeting(self):
 		question = uicommon.QuestionDialog()
-		question.SetText("Deseja solicitar Reuni„o da Guild?")
+		question.SetText("Deseja solicitar Reuni–≥o da Guild?")
 		question.SetAcceptEvent(self.RequestMeetingYes)
 		question.SetCancelEvent(self.RequestMeetingNo)
 		question.Open()
@@ -1508,7 +1508,7 @@ class GuildWindow(ui.ScriptWindow):
 		page.gpGauge.SetPercentage(int(percentage), 100)
 
 		skillPoint = guild.GetGuildSkillPoint()
-		page.skillPoint.SetText("Pontos disponÌveis:  |cfff8d090" + str(skillPoint))
+		page.skillPoint.SetText("Pontos dispon–Ωveis:  |cfff8d090" + str(skillPoint))
 		page.activeSlot.HideAllSlotButton()
 		try:
 			for i in range(len(playersettingmodule.ACTIVE_GUILD_SKILL_INDEX_LIST)):
@@ -1809,7 +1809,7 @@ class GuildWindow(ui.ScriptWindow):
 		lines = self.SplitText(text, 50)
 
 		if lines[0] == "":
-			self.__PopupMessage("N„o È permitido palavras com mais de 50 letras.")
+			self.__PopupMessage("N–≥o –π permitido palavras com mais de 50 letras.")
 			return False
 
 		net.SendGuildPostCommentPacket(text[:97])
@@ -1859,8 +1859,8 @@ class GuildWindow(ui.ScriptWindow):
 		gradeNumber = self.changeGradeNameDialog.GetGradeNumber()
 		gradeName = self.changeGradeNameDialog.GetGradeName()
 
-		if gradeName == "Lider" or gradeName == "LÌder":
-			chat.AppendChat(chat.CHAT_TYPE_INFO, "Nome inv·lido de patente.")
+		if gradeName == "Lider" or gradeName == "L–Ωder":
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "Nome inv–±lido de patente.")
 			return True
 
 		if len(gradeName) == 0:
@@ -2176,7 +2176,7 @@ class GuildWindow(ui.ScriptWindow):
 		if war_id == 0:
 			return
 		if not constinfo.WAR_KILL.__contains__(war_id):
-			chat.AppendChat(chat.CHAT_TYPE_INFO, "Carregando informaÁıes da database.")
+			chat.AppendChat(chat.CHAT_TYPE_INFO, "Carregando informa–∑—Öes da database.")
 			constinfo.WAR_KILL.update({war_id : {}})
 			net.SendChatPacket("/war_kills " + war_id)
 		self.OpenWarDetailsWindow(war_id, war_data)
@@ -2471,9 +2471,9 @@ if app.ENABLE_GUILD_SAFEBOX:
 			if rings < 1:
 				self.GetChild("tipmoney_text").SetText("(Click Aqui Para Depositar)")
 			elif rings == 1:
-				self.GetChild("tipmoney_text").SetText("AprÛx. 1 M·scara da Fortuna")
+				self.GetChild("tipmoney_text").SetText("Apr—Éx. 1 M–±scara da Fortuna")
 			else:
-				self.GetChild("tipmoney_text").SetText("AprÛx. " + localeinfo.NumberToMoneyString(rings) + " M·scaras da Fortuna")
+				self.GetChild("tipmoney_text").SetText("Apr—Éx. " + localeinfo.NumberToMoneyString(rings) + " M–±scaras da Fortuna")
 			self.GetChild("tipmoney").SetSize(self.GetChild("tipmoney_text").GetTextSize()[0] + 30, 44)
 			self.GetChild("tipmoney").SetWindowHorizontalAlignCenter()
 			self.GetChild("tipmoney").Show()

@@ -43,7 +43,7 @@ window = {
 				{
 					"name":"restart_town_desc",
 					"type":"text",
-					"text":"Retorno autom·tico em",
+					"text":"Retorno autom√°tico em",
 					"fontsize":"LARGE",
 					"x":0,
 					"y":20+35+30,

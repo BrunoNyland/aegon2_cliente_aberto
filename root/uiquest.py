@@ -3,12 +3,13 @@ import ui
 import dbg
 import enszxc3467hc3kokdueq as app
 import grp
-import grpImage
 import event
 import time
 import wndMgr
 import zn94xlgo573hf8xmddzq as net
 import localeinfo
+
+function = type(lambda:1+2)
 
 QUEST_BOARD_IMAGE_DIR = "d:/ymir work/ui/game/questboard/"
 cur_questpage_number = 1
@@ -381,9 +382,11 @@ class QuestDialog(ui.ScriptWindow):
 					self.titleState = self.TITLE_STATE_NONE
 					self.titleShowTime = curTime
 
-	def AddOnCloseEvent(self, f):
+	def RunFunc(self, f:function) -> None: f()
+
+	def AddOnCloseEvent(self, f:function):
 		if self.OnCloseEvent:
-			self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:map(apply, z)
+			self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:map(self.RunFunc, z)
 		else:
 			self.OnCloseEvent = f
 

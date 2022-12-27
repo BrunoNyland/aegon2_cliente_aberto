@@ -24,7 +24,7 @@ class PopupMsg(ui.Window):
 		self.Board.Show()
 		self.comp = component.Component()
 
-		self.text_title = self.comp.LargeTextLine(self.Board, "Informações sobre os amigos", 45, 8, SPECIAL_TITLE_COLOR)
+		self.text_title = self.comp.LargeTextLine(self.Board, "InformaÃ§Ãµes sobre os amigos", 45, 8, SPECIAL_TITLE_COLOR)
 		self.textline = self.comp.TextLine(self.Board, "Seu amigo Entrou!", 45, 25, self.comp.RGB(255, 255, 255))
 
 		self.TimeToClose = wait.WaitingDialog()
@@ -45,10 +45,10 @@ class PopupMsg(ui.Window):
 
 	def SetType(self, type, add = ""):
 		if type == 1:
-			self.text_title.SetText("Informações sobre os amigos")
+			self.text_title.SetText("InformaÃ§Ãµes sobre os amigos")
 		elif type == 2:
-			self.text_title.SetText("Informações do Biologo")
+			self.text_title.SetText("InformaÃ§Ãµes do Biologo")
 			self.img = self.comp.ExpandedImage(self.Board, 8, 8, 'icon/item/%s.tga'%str(add))
 		elif type == 4:
-			self.text_title.SetText("Preparação de Objetos")
+			self.text_title.SetText("PreparaÃ§Ã£o de Objetos")
 			self.img = self.comp.ExpandedImage(self.Board, 8, 8, 'icon/item/%s.tga'%str(add))

@@ -185,7 +185,7 @@ window = {
 													"type":"text",
 													"x":0,
 													"y":-10,
-													"text":"CÓDIGO DA COR",
+													"text":"CÃ“DIGO DA COR",
 													"fontname":"Verdana:12b",
 													"all_align":"center"
 												},
@@ -209,7 +209,7 @@ window = {
 									"width":148,
 									"x":70 + 1.5,
 									"y":THINBOARD_HEIGHT - 85,
-									"text":"Usar cor padrão",
+									"text":"Usar cor padrÃ£o",
 								},
 							),
 						},

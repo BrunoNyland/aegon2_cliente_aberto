@@ -103,7 +103,7 @@ window = {
 					"horizontal_align":"center",
 					"x":0,
 					"y":button_start + category_space*3 + 240,
-					"text":"Invent·rio [I]",
+					"text":"Invent√°rio [I]",
 					"width":button_width,
 				},
 				{

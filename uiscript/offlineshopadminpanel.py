@@ -56,7 +56,7 @@ window = {
 					"x":button_x,
 					"y":button_y+y_step*2,
 					"width":button_w,
-					"text":"Alterar Preço",
+					"text":"Alterar PreÃ§o",
 					"horizontal_align":"center",
 				},
 				# Remove Item

@@ -14,7 +14,7 @@ import uiprivateshopbuilder
 import uiofflineshopbuilder
 import sys
 
-import _subprocess
+import subprocess
 
 class GameOptions(ui.ScriptWindow):
 	def __init__(self):
@@ -141,7 +141,7 @@ class GameOptions(ui.ScriptWindow):
 				resolution_index = i
 				break
 		if resolution_index == -1:
-			self.GetChild("resolucao_slider_title").SetText("|cfff8d090ResoluÁ„o Fora do Pad„o! "+str(self.cur_width)+":"+str(self.cur_height))
+			self.GetChild("resolucao_slider_title").SetText("|cfff8d090Resolu–∑–≥o Fora do Pad–≥o! "+str(self.cur_width)+":"+str(self.cur_height))
 		else:
 			self.GetChild("resolucao_slider").SetSliderPos((1.0/float(len_res))*float(resolution_index))
 
@@ -312,11 +312,13 @@ class GameOptions(ui.ScriptWindow):
 		else:
 			app.Exit()
 			startupinfo = STARTUPINFO()
-			startupinfo.dwFlags |= _subprocess.STARTF_USESTDHANDLES
+			startupinfo.dwFlags |= subprocess.STARTF_USESTDHANDLES
 			if app.START_WITH_ARGUMENT:
-				_subprocess.CreateProcess(sys.executable, "Adoaksdaj5siodq94jow123e", None, None, 1, 0, None, None, startupinfo)
+				# _subprocess.CreateProcess(sys.executable, "Adoaksdaj5siodq94jow123e", None, None, 1, 0, None, None, startupinfo)
+				subprocess.Popen([sys.executable, 'Adoaksdaj5siodq94jow123e'], stdout=subprocess.PIPE, startupinfo=startupinfo)
 			else:
-				_subprocess.CreateProcess(sys.executable, "", None, None, 1, 0, None, None, startupinfo)
+				# _subprocess.CreateProcess(sys.executable, "", None, None, 1, 0, None, None, startupinfo)
+				subprocess.Popen([sys.executable, ''], stdout=subprocess.PIPE, startupinfo=startupinfo)
 
 ### PLAYER FUNCOES ### PLAYER FUNCOES ### PLAYER FUNCOES ### PLAYER FUNCOES ### PLAYER FUNCOES ### PLAYER FUNCOES ###
 	def __CheckPvPProtectedLevelPlayer(self):
@@ -498,7 +500,7 @@ class GameOptions(ui.ScriptWindow):
 				resolution_index = i
 				break
 		if resolution_index == -1:
-			self.GetChild("resolucao_slider_title").SetText("|cfff8d090ResoluÁ„o Fora do Pad„o! "+str(self.cur_width)+":"+str(self.cur_height))
+			self.GetChild("resolucao_slider_title").SetText("|cfff8d090Resolu–∑–≥o Fora do Pad–≥o! "+str(self.cur_width)+":"+str(self.cur_height))
 		else:
 			self.GetChild("resolucao_slider").SetSliderPos((1.0/float(len_res))*float(resolution_index))
 ### REGULA A EXIBICAO DA IMAGEM

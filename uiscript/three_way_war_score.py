@@ -117,7 +117,7 @@ window = {
 				{
 					"name":"Dead",
 					"type":"text",
-					"text":"Você morreu 0 / 10",
+					"text":"VocÃª morreu 0 / 10",
 					"x":0,
 					"y":128,
 					"horizontal_align":"center",

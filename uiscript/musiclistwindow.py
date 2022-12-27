@@ -19,7 +19,7 @@ window = {
 			"y":0,
 			"width":width,
 			"height":height,
-			"title":"Lista de Músicas",
+			"title":"Lista de MÃºsicas",
 			"children":
 			(
 				{

@@ -34,7 +34,7 @@ window = {
 				{
 					"name":"Portoes",
 					"type":"text",
-					"text":"A entrada ser· fechada",
+					"text":"A entrada ser√° fechada",
 					"x":0,
 					"y":30,
 					"horizontal_align":"center",

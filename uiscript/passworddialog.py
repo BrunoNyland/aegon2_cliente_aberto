@@ -34,14 +34,14 @@ window = {
 				{
 					"name":"text_senha",
 					"type":"text",
-					"text":"Caso você ainda não tenha alterado",
+					"text":"Caso vocÃª ainda nÃ£o tenha alterado",
 					"x":23,
 					"y":95,
 				},
 				{
 					"name":"text_senha2",
 					"type":"text",
-					"text":"sua senha, a senha padrão é 000000.",
+					"text":"sua senha, a senha padrÃ£o Ã© 000000.",
 					"x":20,
 					"y":110,
 				},

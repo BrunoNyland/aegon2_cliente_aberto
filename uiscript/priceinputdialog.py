@@ -66,7 +66,7 @@ window = {
 							"vertical_align":"center",
 							"children":
 							(
-								{"name":"","type":"ballon","width":60,"text":"Copiar Preço Médio","x":0,"y":-38,"horizontal_align":"center","hide":1,"istooltip":1,},
+								{"name":"","type":"ballon","width":60,"text":"Copiar PreÃ§o MÃ©dio","x":0,"y":-38,"horizontal_align":"center","hide":1,"istooltip":1,},
 							),
 						},
 					),
@@ -139,7 +139,7 @@ window = {
 							"x":50,
 							"y":5+12*2,
 							"color":0xffa08784,
-							"text":"Preço Médio de Venda:",
+							"text":"PreÃ§o MÃ©dio de Venda:",
 							"text_limited":140,
 						},
 						{
@@ -149,7 +149,7 @@ window = {
 							"x":50,
 							"y":5+12*3,
 							"color":0xfff8d090,
-							"text":"Carregando Informações...",
+							"text":"Carregando InformaÃ§Ãµes...",
 							"text_limited":140,
 						},
 					),

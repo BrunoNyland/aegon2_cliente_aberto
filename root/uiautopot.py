@@ -26,7 +26,7 @@ class Potador(ui.ScriptWindow):
 	def Active(self):
 		constinfo.POTADOR = 1
 		self.Have_Pote = 1
-		chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Pote Automático Ativado!")
+		chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Pote AutomÃ¡tico Ativado!")
 		self.Verificador()
 		self.Pote()
 
@@ -34,9 +34,9 @@ class Potador(ui.ScriptWindow):
 		if (constinfo.POTADOR != 1):
 			return
 		if (player.GetItemCountByVnum(70020) == 0) and (player.GetItemCountByVnum(98902) == 0):
-			chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Suas Poções Regeneradoras acabaram!")
+			chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Suas PoÃ§Ãµes Regeneradoras acabaram!")
 		elif (player.GetItemCountByVnum(70020) < 200) and (player.GetItemCountByVnum(98902) == 0):
-			chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Suas Poções Regeneradoras estão acabando!")
+			chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Suas PoÃ§Ãµes Regeneradoras estÃ£o acabando!")
 		self.DelayVerificador = wait.WaitingDialog()
 		self.DelayVerificador.Open(float(20))
 		self.DelayVerificador.SetTimeOverEvent(self.Verificador)
@@ -53,7 +53,7 @@ class Potador(ui.ScriptWindow):
 			self.Delay.SetTimeOverEvent(self.Pote)
 
 	def Desactive(self):
-		chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Pote Automático Desativado!")
+		chat.AppendChat(chat.CHAT_TYPE_NOTICE, "|cff00ccff[Aegon2] |cffff8784Pote AutomÃ¡tico Desativado!")
 		constinfo.POTADOR = 0
 
 	def __Close(self):

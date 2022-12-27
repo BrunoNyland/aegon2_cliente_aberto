@@ -19,7 +19,7 @@ window = {
 			"y":0,
 			"width":width,
 			"height":height,
-			"title": "Painel de Administração",
+			"title": "Painel de AdministraÃ§Ã£o",
 			"children":
 			(
 				{
@@ -82,7 +82,7 @@ window = {
 						{
 							"name":"Tab_Button_05",
 							"type":"redbutton",
-							"text":"Punições",
+							"text":"PuniÃ§Ãµes",
 							"width":119,
 							"x":0,
 							"y":30*4,
@@ -90,7 +90,7 @@ window = {
 						{
 							"name":"Tab_Button_06",
 							"type":"redbutton",
-							"text":"Histórico de Guerras",
+							"text":"HistÃ³rico de Guerras",
 							"width":119,
 							"x":0,
 							"y":30*5,
@@ -98,7 +98,7 @@ window = {
 						{
 							"name":"Tab_Button_07",
 							"type":"redbutton",
-							"text":"Histórico de Eventos",
+							"text":"HistÃ³rico de Eventos",
 							"width":119,
 							"x":0,
 							"y":30*6,
@@ -106,7 +106,7 @@ window = {
 						{
 							"name":"Tab_Button_08",
 							"type":"redbutton",
-							"text":"Histórico de Torneios",
+							"text":"HistÃ³rico de Torneios",
 							"width":119,
 							"x":0,
 							"y":30*7,
@@ -114,7 +114,7 @@ window = {
 						{
 							"name":"Tab_Button_09",
 							"type":"redbutton",
-							"text":"Histórico de Sistemas",
+							"text":"HistÃ³rico de Sistemas",
 							"width":119,
 							"x":0,
 							"y":30*8,
@@ -122,7 +122,7 @@ window = {
 						{
 							"name":"Tab_Button_10",
 							"type":"redbutton",
-							"text":"Histórico de Punições",
+							"text":"HistÃ³rico de PuniÃ§Ãµes",
 							"width":119,
 							"x":0,
 							"y":30*9,

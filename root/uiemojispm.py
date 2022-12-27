@@ -8,14 +8,14 @@ EMOJI_FILE_NAME = "miles/emoji.cfg"
 EMOJIS_CATEGORIAS_LISTA = [
 	"Recentes",
 	"Emojis",
-	"Ações",
+	"AÃ§Ãµes",
 	"Pessoas",
 	"Animais & Natureza",
 	"Comida & Bebida",
 	"Atividade",
 	"Viagens & Locais",
 	"Objetos",
-	"Símbolos",
+	"SÃ­mbolos",
 	"Bandeiras"
 ]
 
@@ -138,7 +138,7 @@ EMOJIS_CODIGOS_TEXTOS_LISTA = {
 		109 : ( "", "|Ecat01/a00110|e", "", "", "", "", "" ),
 		110 : ( "", "|Ecat01/a00111|e", "", "", "", "", "" ),
 	},
-	## Ações
+	## AÃ§Ãµes
 	2 : {
 		0 : ( "", "|Ecat02/a00001|e", "|Ecat02/a00002|e", "|Ecat02/a00003|e", "|Ecat02/a00004|e", "|Ecat02/a00005|e", "|Ecat02/a00006|e" ),
 		1 : ( "", "|Ecat02/a00007|e", "|Ecat02/a00008|e", "|Ecat02/a00009|e", "|Ecat02/a00010|e", "|Ecat02/a00011|e", "|Ecat02/a00012|e" ),
@@ -1095,7 +1095,7 @@ EMOJIS_CODIGOS_TEXTOS_LISTA = {
 		193 : ( "", "|Ecat08/a00204|e", "", "", "", "", "" ),
 		194 : ( "", "|Ecat08/a00205|e", "", "", "", "", "" ),
 	},
-	## Símbolos
+	## SÃ­mbolos
 	9 : {
 		0 : ( "", "|Ecat09/a00001|e", "", "", "", "", "" ),
 		1 : ( "", "|Ecat09/a00002|e", "", "", "", "", "" ),
@@ -1660,7 +1660,7 @@ class EmojisPMBoard(ui.Window):
 		self.SetPosition(0, 0)
 		self.SetSize(600, 238)
 
-		## Botões do menu emojis
+		## BotÃµes do menu emojis
 		self.btnEmojis = []
 		pos = 20
 		for i in range(len(EMOJIS_CATEGORIAS_LISTA)):

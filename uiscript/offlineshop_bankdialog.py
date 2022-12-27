@@ -43,7 +43,7 @@ window = {
 						{
 							"name":"",
 							"type":"text",
-							"text":"Saldo Disponível",
+							"text":"Saldo DisponÃ­vel",
 							"x":0,
 							"y":-5,
 							"all_align":"center",

@@ -216,7 +216,7 @@ window = {
 			),
 		},
 
-		### Bot„o Salvar - Btn Hair - Btn Shape
+		### Bot√£o Salvar - Btn Hair - Btn Shape
 		{
 			"name":"thinboard_btn_salvar",
 			"type":"thinboard_gold", 
@@ -438,13 +438,13 @@ window = {
 	],
 }
 
-for k in xrange(len(window["children"])):
+for k in range(len(window["children"])):
 	if window["children"][k]["name"] != "character_board":
 		continue
-	for j in xrange(len(window["children"][k]["children"])):
+	for j in range(len(window["children"][k]["children"])):
 		if window["children"][k]["children"][j]["name"] != "SelectJobSlot":
 			continue
-		for i in xrange(app.PLAYER_PER_ACCOUNT):
+		for i in range(app.PLAYER_PER_ACCOUNT):
 			window["children"][k]["children"][j]["children"] = window["children"][k]["children"][j]["children"] + [
 				{
 					"name":"NoneButton_%d" % i, "type":"image", "x":SELECT_BTN_X, "y":SELECT_BTN_Y + SELECT_BTN_GAP * i,

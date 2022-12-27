@@ -24,7 +24,7 @@ window = {
 			"y":0,
 			"width":width,
 			"height":height,
-			"title":"Defina o tempo do empréstimo",
+			"title":"Defina o tempo do emprÃ©stimo",
 			"children":
 			(
 				# {
