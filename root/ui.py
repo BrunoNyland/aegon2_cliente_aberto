@@ -100,7 +100,7 @@ class Window(object):
 	onShowEvent = None
 	onShowArgs = None
 
-	def __init__(self, layer = "UI"):
+	def __init__(self, layer:str="UI") -> None:
 		if constinfo.DETECT_LEAKING_WINDOWS:
 			constinfo.WINDOW_TOTAL_OBJ_COUNT += 1
 			if constinfo.WINDOW_COUNT_OBJ:
@@ -108,7 +108,7 @@ class Window(object):
 				constinfo.WINDOW_OBJ_LIST[id(self)] = ExtendedRef(self) # save trace and other data
 
 		self.hWnd = None
-		self.parentWindow = 0
+		self.parentWindow = None
 		self.RegisterWindow(layer)
 		self.Hide()
 
@@ -119,7 +119,7 @@ class Window(object):
 
 		self.SetWindowName("NONAME_Window")
 
-	def __del__(self):
+	def __del__(self) -> None:
 		if constinfo.DETECT_LEAKING_WINDOWS:
 			constinfo.WINDOW_TOTAL_OBJ_COUNT -= 1
 			if constinfo.WINDOW_COUNT_OBJ and id(self) in constinfo.WINDOW_OBJ_LIST:
@@ -128,14 +128,14 @@ class Window(object):
 
 		wndMgr.Destroy(self.hWnd)
 
-	def RegisterWindow(self, layer):
+	def RegisterWindow(self, layer:str) -> None:
 		self.hWnd = wndMgr.Register(self, layer)
 
-	def Destroy(self):
+	def Destroy(self) -> None:
 		self.InitializeEvents()
 		self.Hide()
 
-	def InitializeEvents(self):
+	def InitializeEvents(self) -> None:
 		#Args Provided by C++
 		self.onRunMouseWheelEvent = None
 		self.moveWindowEvent = None
@@ -180,10 +180,10 @@ class Window(object):
 	def SetWindowName(self, Name):
 		wndMgr.SetName(self.hWnd, Name)
 
-	def GetWindowName(self):
+	def GetWindowName(self) -> str:
 		return wndMgr.GetName(self.hWnd)
 
-	def SetParent(self, parent):
+	def SetParent(self, parent) -> None:
 		if parent:
 			if constinfo.DETECT_LEAKING_WINDOWS: # find our window in the saved obj list and save its parent address
 				if constinfo.WINDOW_COUNT_OBJ and id(self) in constinfo.WINDOW_OBJ_LIST:
@@ -192,10 +192,10 @@ class Window(object):
 		else:
 			wndMgr.SetParent(self.hWnd, 0)
 
-	def SetAttachParent(self, parent):
+	def SetAttachParent(self, parent) -> None:
 		wndMgr.SetAttachParent(self.hWnd, parent.hWnd)
 
-	def SetParentProxy(self, parent):
+	def SetParentProxy(self, parent) -> None:
 		self.parentWindow = proxy(parent)
 		wndMgr.SetParent(self.hWnd, parent.hWnd)
 
@@ -414,28 +414,28 @@ class Window(object):
 		return wndMgr.IsIn(self.hWnd)
 
 class ScriptWindow(Window):
-	def __init__(self, layer = "UI"):
+	def __init__(self, layer:str="UI") -> None:
 		Window.__init__(self, layer)
 		self.Children = []
 		self.ElementDictionary = {}
 
-	def __del__(self):
+	def __del__(self) -> None:
 		Window.__del__(self)
 
-	def ClearDictionary(self):
+	def ClearDictionary(self) -> None:
 		self.Children = []
 		self.ElementDictionary = {}
 
-	def InsertChild(self, name, child):
+	def InsertChild(self, name:str, child:Window) -> None:
 		self.ElementDictionary[name] = child
 
-	def IsChild(self, name):
+	def IsChild(self, name:str) -> bool:
 		return self.ElementDictionary.__contains__(name)
 
-	def GetChild(self, name):
+	def GetChild(self, name:str):
 		return self.ElementDictionary[name]
 
-	def GetChild2(self, name):
+	def GetChild2(self, name:str):
 		return self.ElementDictionary.get(name, None)
 
 ############################################################################################################################################
@@ -447,18 +447,18 @@ class ScriptWindow(Window):
 ############################################################################################################################################
 if app.RENDER_TARGET:
 	class RenderTarget(Window):
-		def __init__(self, layer = "UI"):
+		def __init__(self, layer:str="UI") -> None:
 			Window.__init__(self, layer)
 
 			self.number = -1
 
-		def __del__(self):
+		def __del__(self) -> None:
 			Window.__del__(self)
 
-		def RegisterWindow(self, layer):
+		def RegisterWindow(self, layer:str) -> None:
 			self.hWnd = wndMgr.RegisterRenderTarget(self, layer)
 
-		def SetRenderTarget(self, number):
+		def SetRenderTarget(self, number:int) -> None:
 			self.number = number
 			wndMgr.SetRenderTarget(self.hWnd, self.number)
 
@@ -5667,14 +5667,14 @@ class PythonScriptLoader(object):
 			parent.Children.append(None)
 
 		for ElementValue in ChildrenList:
-			try:
+			if "name" in ElementValue:
 				Name = ElementValue["name"]
-			except KeyError:
+			else:
 				Name = ElementValue["name"] = "NONAME"
 
-			try:
+			if "type" in ElementValue:
 				Type = ElementValue["type"]
-			except KeyError:
+			else:
 				Type = ElementValue["type"] = "window"
 
 			if Type == "window":
