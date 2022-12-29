@@ -11,7 +11,7 @@ class WaitingDialog(ui.ScriptWindow):
 		ui.ScriptWindow.__del__(self)
 
 	def Open(self, waitTime):
-		curTime = time.clock()
+		curTime = time.perf_counter_ns()
 		self.endTime = curTime + waitTime
 		self.Show()
 
@@ -25,7 +25,7 @@ class WaitingDialog(ui.ScriptWindow):
 		self.eventTimeOver = ui.__mem_func__(event)
 
 	def OnUpdate(self):
-		lastTime = max(0, self.endTime - time.clock())
+		lastTime = max(0, self.endTime - time.perf_counter_ns())
 		if 0 == lastTime:
 			self.Close()
 			if self.eventTimeOver:

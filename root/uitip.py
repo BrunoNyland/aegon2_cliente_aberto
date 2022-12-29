@@ -340,7 +340,7 @@ class GrandeAvisoBoard(ui.Bar):
 		self.curPos = 0
 		self.dstPos = 0
 		self.nextScrollTime = 0
-		self.lastclock = time.clock()
+		self.lastclock = time.perf_counter_ns()
 		self.width = wndMgr.GetScreenWidth()
 
 		self.SetPosition(0, 70)
@@ -396,7 +396,7 @@ class GrandeAvisoBoard(ui.Bar):
 			self.Show()
 		return
 	def Refresca(self):
-		dt = time.clock() - self.lastclock
+		dt = time.perf_counter_ns() - self.lastclock
 		ca = int(wndMgr.GetScreenWidth()-dt*15)
 		cas = 0.0
 		if int(ca)==int(cas):
@@ -414,7 +414,7 @@ class GrandeAvisoBoard(ui.Bar):
 		self.textBar.ClearBar()
 
 		index = 0
-		dt = time.clock() - self.lastclock
+		dt = time.perf_counter_ns() - self.lastclock
 		for tip in self.tipList:
 			text = tip[1]
 

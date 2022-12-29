@@ -16,7 +16,7 @@ import dbg
 import exception
 import os
 
-from _weakref import proxy
+from weakref import proxy, WeakMethod
 
 BACKGROUND_COLOR = grp.GenerateColor(0.0, 0.0, 0.0, 1.0)
 DARK_COLOR = grp.GenerateColor(0.2, 0.2, 0.2, 1.0)
@@ -84,10 +84,10 @@ class __mem_func__:
 			return self.func(self.obj, *arg)
 
 	def __init__(self, mfunc):
-		if mfunc.im_func.func_code.co_argcount > 1:
-			self.call = __mem_func__.__arg_call__(mfunc.im_class, mfunc.im_self, mfunc.im_func)
+		if mfunc.__code__.co_argcount > 1:
+			self.call = __mem_func__.__arg_call__(mfunc.__class__, mfunc.__self__, mfunc.__func__)
 		else:
-			self.call = __mem_func__.__noarg_call__(mfunc.im_class, mfunc.im_self, mfunc.im_func)
+			self.call = __mem_func__.__noarg_call__(mfunc.__class__, mfunc.__self__, mfunc.__func__)
 
 	def __call__(self, *arg):
 		return self.call(*arg)
@@ -249,7 +249,7 @@ class Window(object):
 		wndMgr.UpdateRect(self.hWnd)
 
 	def SetSize(self, width, height):
-		wndMgr.SetWindowSize(self.hWnd, width, height)
+		wndMgr.SetWindowSize(self.hWnd, int(width), int(height))
 
 	def GetWidth(self):
 		return wndMgr.GetWindowWidth(self.hWnd)
@@ -292,7 +292,7 @@ class Window(object):
 		return self.GetTop() + self.GetHeight()
 
 	def SetLeft(self, x):
-		wndMgr.SetWindowPosition(self.hWnd, x, self.GetTop())
+		wndMgr.SetWindowPosition(self.hWnd, int(x), self.GetTop())
 
 	def SavePosition(self):
 		self.baseX = self.GetLeft()
@@ -393,7 +393,7 @@ class Window(object):
 			self.Hide()
 
 	def SetPosition(self, x, y):
-		wndMgr.SetWindowPosition(self.hWnd, x, y)
+		wndMgr.SetWindowPosition(self.hWnd, int(x), int(y))
 
 	def SetCenterPosition(self, x = 0, y = 0):
 		self.SetPosition((wndMgr.GetScreenWidth() - self.GetWidth()) / 2 + x, (wndMgr.GetScreenHeight() - self.GetHeight()) / 2 + y)
@@ -5662,7 +5662,10 @@ class PythonScriptLoader(object):
 		Index = 0
 
 		ChildrenList = dicChildren["children"]
-		parent.Children = range(len(ChildrenList))
+		parent.Children = []
+		for i in range(len(ChildrenList)):
+			parent.Children.append(None)
+
 		for ElementValue in ChildrenList:
 			try:
 				Name = ElementValue["name"]

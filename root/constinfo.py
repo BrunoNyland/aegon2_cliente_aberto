@@ -277,8 +277,9 @@ def LoadCameraSettings():
 		CAMERA_SETTINGS[0] = 3500.00
 		CAMERA_SETTINGS[1] = 5000.00
 		return
-
-	tokens = open("miles/camera.cfg", "r", "folder").read().split()
+	f = open("miles/camera.cfg", "r", "folder")
+	tokens = f.read().split()
+	f.close()
 
 	if len(tokens) != 2:
 		CAMERA_SETTINGS[0] = 3500.00
@@ -332,7 +333,9 @@ def LoadShopAmountConfig():
 		AMOUNT = 1
 		return
 
-	tokens = open("miles/amount.cfg", "r", "folder").read().split()
+	f = open("miles/amount.cfg", "r", "folder")
+	tokens = f.read().split()
+	f.close()
 
 	if len(tokens) != 1:
 		AMOUNT = 1

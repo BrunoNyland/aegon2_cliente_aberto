@@ -213,7 +213,7 @@ def __LoadCompiledFile__(sFileName):
 	kData = kFile.read()
 	return marshal.loads(kData)
 
-def execfile(fileName, dict):
+def execfile(fileName:str, dict:dict):
 	if __IsCompiledFile__(fileName):
 		code = __LoadCompiledFile__(fileName)
 	else:
@@ -222,6 +222,7 @@ def execfile(fileName, dict):
 
 __import__ = __hybrid_import
 builtins.__import__ = __hybrid_import
+builtins.execfile = execfile
 
 def GetExceptionString(excTitle):
 	(excType, excMsg, excTraceBack) = sys.exc_info()

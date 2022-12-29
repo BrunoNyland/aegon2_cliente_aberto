@@ -58,7 +58,7 @@ class ConnectingDialog(ui.ScriptWindow):
 		self.countdownMessage = self.GetChild("countdown_message")
 
 	def Open(self, waitTime):
-		curTime = time.clock()
+		curTime = time.perf_counter_ns()
 		self.endTime = curTime + waitTime
 		self.Lock()
 		self.SetCenterPosition()
@@ -83,13 +83,13 @@ class ConnectingDialog(ui.ScriptWindow):
 		self.eventTimeOver = ui.__mem_func__(event)
 
 	def OnUpdate(self):
-		lastTime = max(0, self.endTime - time.clock())
+		lastTime = max(0, self.endTime - time.perf_counter_ns())
 		if 0 == lastTime:
 			self.Close()
 			if self.eventTimeOver:
 				self.eventTimeOver()
 		else:
-			self.SetCountDownMessage(self.endTime - time.clock())
+			self.SetCountDownMessage(self.endTime - time.perf_counter_ns())
 
 class LoginWindow(ui.ScriptWindow):
 	def __init__(self, stream):

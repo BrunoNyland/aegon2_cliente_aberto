@@ -14,6 +14,7 @@ def SaveLastPlayFieldMusic():
 		return
 
 	lastPlayFile.write(fieldMusic)
+	lastPlayFile.close()
 
 
 def LoadLastPlayFieldMusic():
@@ -25,4 +26,5 @@ def LoadLastPlayFieldMusic():
 		return
 
 	fieldMusic = lastPlayFile.read()
+	lastPlayFile.close()
 

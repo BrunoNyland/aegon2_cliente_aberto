@@ -23,9 +23,9 @@ def RunApp():
 	except RuntimeError as msg:
 		msg = str(msg)
 		if "CREATE_DEVICE" == msg:
-			dbg.LogBox("Verifique seu driver de video 3D,\r\Depois tente novamente!")
+			dbg.LogBox("Verifique seu driver de video 3D")
 		else:
-			dbg.LogBox("[ERRO]\r\%s" % msg)
+			dbg.LogBox("[ERRO] %s" % msg)
 		return
 
 	app.SetCamera(1500.0, 30.0, 0.0, 180.0)

@@ -74,7 +74,7 @@ class QuestCurtain(ui.Window):
 
 		self.CurtainMode = 0
 
-		self.lastclock = time.clock()
+		self.lastclock = time.perf_counter()
 
 	def Close(self):
 		self.CurtainMode = 0
@@ -85,8 +85,8 @@ class QuestCurtain(ui.Window):
 		QuestCurtain.OnDoneEventList = []
 
 	def OnUpdate(self):
-		dt = time.clock() - self.lastclock
-		if self.CurtainMode>0:
+		dt = time.perf_counter_ns() - self.lastclock
+		if self.CurtainMode > 0:
 			self.TopBar.SetPosition(0, int(self.TopBar.GetGlobalPosition()[1]+dt*self.CURTAIN_SPEED))
 			self.BottomBar.SetPosition(0, int(self.BottomBar.GetGlobalPosition()[1]-dt*self.CURTAIN_SPEED))
 			if self.TopBar.GetGlobalPosition()[1]>0:
@@ -102,7 +102,7 @@ class QuestCurtain(ui.Window):
 				self.BottomBar.SetPosition(0,wndMgr.GetScreenHeight()+1)
 				self.Close()
 
-		self.lastclock = time.clock()
+		self.lastclock = time.perf_counter_ns()
 
 class EventCurtain(ui.Bar):
 
