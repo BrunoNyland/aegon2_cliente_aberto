@@ -2588,6 +2588,8 @@ if app.ENABLE_GUILD_SAFEBOX:
 			for i in range(88):
 				slotIndex = self.__LocalPosToGlobalPos(i)
 				itemCount = getItemCount(slotIndex)
+				if not itemCount:
+					itemCount = 0
 				if itemCount <= 1:
 					itemCount = 0
 				setItemID(i, getItemID(slotIndex), itemCount)

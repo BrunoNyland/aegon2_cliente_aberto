@@ -30,7 +30,7 @@ class TraceFile(TextIO):
 
 class TraceErrorFile(TextIO):
 	def write(self, msg:str) -> None:
-		dbg.TraceError(msg)
+		dbg.TracePythonError(msg)
 		dbg.RegisterExceptionString(msg)
 
 	def flush(self) -> None:

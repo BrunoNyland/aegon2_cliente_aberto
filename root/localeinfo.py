@@ -70,23 +70,7 @@ LOCALE_FILE_NAME = "%s/locale_game.txt" % app.GetLocalePath()
 
 LoadLocaleFile(LOCALE_FILE_NAME, locals())
 
-dictSingleWord = {
-	"m":1, "n":1, "r":1, "M":1, "N":1, "R":1, "l":1, "L":1, "1":1, "3":1, "6":1, "7":1, "8":1, "0":1,
-}
-
 locale = mapping()
-
-def GetAuxiliaryWordType(text):
-	textLength = len(text)
-	if textLength > 1:
-		singleWord = text[-1]
-
-		if (singleWord >= '0' and singleWord <= '9') or\
-			(singleWord >= 'a' and singleWord <= 'z') or\
-			(singleWord >= 'A' and singleWord <= 'Z'):
-			if not dictSingleWord.__contains__(singleWord):
-				return 1
-	return 0
 
 def CutMoneyString(sourceText, startIndex, endIndex, insertingText, backText):
 	sourceLength = len(sourceText)
@@ -384,12 +368,12 @@ def FISHING_SUCCESS(isFish, fishName) :
 	else:
 		return FISHING_SUCCESS2 % (fishName)
 
-def NumberToMoneyString(n) :
+def NumberToMoneyString(n:int) -> str:
 	if n <= 0:
 		return "0"
 	return "%s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ])) 
 
-def NumberToGoldString(n):
+def NumberToGoldString(n:int) -> str:
 	if n <= 0:
 		return "0 %s" % ("Gold")
 	return "%s %s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]), "Gold")

@@ -21,12 +21,12 @@ class CallBackFunction:
 			return self.func(self.obj, *arg)
 
 	def __init__(self, mfunc):
-		self.argCount = mfunc.im_func.func_code.co_argcount
+		self.argCount = mfunc.__code__.co_argcount
 
 		if self.argCount > 1:
-			self.call = CallBackFunction.__arg_call__(mfunc.im_class, mfunc.im_self, mfunc.im_func)
+			self.call = CallBackFunction.__arg_call__(mfunc.__class__, mfunc.__self__, mfunc.__func__)
 		else:
-			self.call = CallBackFunction.__noarg_call__(mfunc.im_class, mfunc.im_self, mfunc.im_func)
+			self.call = CallBackFunction.__noarg_call__(mfunc.__class__, mfunc.__self__, mfunc.__func__)
 
 	def __call__(self, *arg):
 		return self.call(*arg)

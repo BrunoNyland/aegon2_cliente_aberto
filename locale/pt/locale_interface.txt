@@ -1,4 +1,4 @@
-﻿ACCEPT	Confirmar	
+ACCEPT	Confirmar	
 ATTACH_METIN_INFO	Quer mesmo combinar?	
 ATTACH_METIN_TITLE	Combinar itens	
 CANCEL	Cancelar	

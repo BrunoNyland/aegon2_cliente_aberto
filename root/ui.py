@@ -228,12 +228,12 @@ class Window(object):
 
 	def Show(self):
 		if self.onShowEvent:
-			self.onShowEvent(* self.onShowArgs)
+			self.onShowEvent(*self.onShowArgs)
 		wndMgr.Show(self.hWnd)
 
 	def Hide(self):
 		if self.onHideEvent:
-			self.onHideEvent(* self.onHideArgs)
+			self.onHideEvent(*self.onHideArgs)
 		wndMgr.Hide(self.hWnd)
 
 	def Lock(self):
@@ -312,7 +312,7 @@ class Window(object):
 
 	def OnMouseLeftButtonDown(self):
 		if self.mouseLeftButtonDownEvent:
-			self.mouseLeftButtonDownEvent(* self.mouseLeftButtonDownArgs)
+			self.mouseLeftButtonDownEvent(*self.mouseLeftButtonDownArgs)
 
 	def SetMouseLeftButtonDoubleClickEvent(self, event, *args):
 		self.mouseLeftButtonDoubleClickEvent = __mem_func__(event)
@@ -320,7 +320,7 @@ class Window(object):
 
 	def OnMouseLeftButtonDoubleClick(self):
 		if self.mouseLeftButtonDoubleClickEvent:
-			self.mouseLeftButtonDoubleClickEvent(* self.mouseLeftButtonDoubleClickArgs)
+			self.mouseLeftButtonDoubleClickEvent(*self.mouseLeftButtonDoubleClickArgs)
 
 	def SetMouseRightButtonDownEvent(self, event, *args):
 		self.mouseRightButtonDownEvent = __mem_func__(event)
@@ -328,7 +328,7 @@ class Window(object):
 
 	def OnMouseRightButtonDown(self):
 		if self.mouseRightButtonDownEvent:
-			self.mouseRightButtonDownEvent(* self.mouseRightButtonDownArgs)
+			self.mouseRightButtonDownEvent(*self.mouseRightButtonDownArgs)
 
 	def SetMouseLeftButtonUpEvent(self, event, *args):
 		self.mouseLeftButtonUpEvent = __mem_func__(event)
@@ -336,14 +336,14 @@ class Window(object):
 
 	def OnMouseLeftButtonUp(self):
 		if self.mouseLeftButtonUpEvent:
-			self.mouseLeftButtonUpEvent(* self.mouseLeftButtonUpArgs)
+			self.mouseLeftButtonUpEvent(*self.mouseLeftButtonUpArgs)
 
 	def SetOnRunMouseWheelEvent(self, event):
 		self.onRunMouseWheelEvent = __mem_func__(event)
 
 	def OnRunMouseWheel(self, nLen):
 		if self.onRunMouseWheelEvent:
-			self.onRunMouseWheelEvent(* (bool(nLen < 0), ))
+			self.onRunMouseWheelEvent(*(bool(nLen < 0), ))
 			return True
 		return False
 
@@ -372,11 +372,11 @@ class Window(object):
 
 	def OnMouseOverIn(self):
 		if self.overInEvent:
-			self.overInEvent(* self.overInArgs)
+			self.overInEvent(*self.overInArgs)
 
 	def OnMouseOverOut(self):
 		if self.overOutEvent:
-			self.overOutEvent(* self.overOutArgs)
+			self.overOutEvent(*self.overOutArgs)
 
 	def SetRenderEvent(self, event, *args):
 		self.renderEvent = __mem_func__(event)
@@ -384,7 +384,7 @@ class Window(object):
 
 	def OnRender(self):
 		if self.renderEvent:
-			self.renderEvent(* self.renderArgs)
+			self.renderEvent(*self.renderArgs)
 
 	def SetVisible(self, is_show):
 		if is_show:
@@ -902,11 +902,11 @@ class EditLine(TextLine):
 	def OnIMEUpdate(self):
 		self.SetText(ime.GetText(self.bCodePage))
 		if self.eventIMEUpdate:
-			self.eventIMEUpdate(* self.eventIMEUpdateArgs)
+			self.eventIMEUpdate(*self.eventIMEUpdateArgs)
 			return True
 		return False
 
-	def FormatToMoneyString(self, text):
+	def FormatToMoneyString(self, text:str) -> str:
 		if text in ["k", "K"]:
 			return "1.000"
 		elif text in ["m", "M"]:
@@ -933,25 +933,25 @@ class EditLine(TextLine):
 		else:
 			return ""
 
-		return localeinfo.NumberToMoneyString(text)
+		return localeinfo.NumberToMoneyString(int(text))
 
-	def OnIMETab(self):
+	def OnIMETab(self) -> bool:
 		if self.eventTab:
-			self.eventTab(* self.eventTabArgs) 
+			self.eventTab(*self.eventTabArgs)
 			return True
 		return False
 
-	def OnIMEReturn(self):
+	def OnIMEReturn(self) -> True:
 		if self.eventReturn:
-			self.eventReturn(* self.eventReturnArgs)
+			self.eventReturn(*self.eventReturnArgs)
 		return True
 
-	def OnPressEscapeKey(self):
+	def OnPressEscapeKey(self) -> True:
 		if self.eventEscape:
-			self.eventEscape(* self.eventEscapeArgs)
+			self.eventEscape(*self.eventEscapeArgs)
 		return True
 
-	def OnKeyDown(self, key):
+	def OnKeyDown(self, key) -> bool:
 		if app.DIK_F1 == key:
 			return False
 		if app.DIK_F2 == key:
@@ -1481,7 +1481,7 @@ class Button(Window):
 		snd.PlaySound("sound/ui/click.wav")
 
 		if self.eventFunc:
-			self.eventFunc(* self.eventArgs)
+			self.eventFunc(*self.eventArgs)
 
 	def ShowToolTip(self):
 		if self.ToolTipText:
@@ -1576,11 +1576,11 @@ class ToggleButton(Button):
 
 	def OnToggleUp(self):
 		if self.eventUp:
-			self.eventUp(* self.eventUpArgs)
+			self.eventUp(*self.eventUpArgs)
 
 	def OnToggleDown(self):
 		if self.eventDown:
-			self.eventDown(* self.eventDownArgs)
+			self.eventDown(*self.eventDownArgs)
 
 class DragButton(Button):
 	def __init__(self):
@@ -1952,56 +1952,56 @@ class SlotWindow(Window):
 	def OnSelectEmptySlot(self, slotNumber):
 		if self.eventSelectEmptySlot:
 			if self.eventSelectEmptyArgs:
-				self.eventSelectEmptySlot(* self.eventSelectEmptyArgs)
+				self.eventSelectEmptySlot(*self.eventSelectEmptyArgs)
 			else:
 				self.eventSelectEmptySlot(slotNumber)
 
 	def OnSelectItemSlot(self, slotNumber):
 		if self.eventSelectItemSlot:
 			if self.eventSelectItemArgs:
-				self.eventSelectItemSlot(* self.eventSelectItemArgs)
+				self.eventSelectItemSlot(*self.eventSelectItemArgs)
 			else:
 				self.eventSelectItemSlot(slotNumber)
 
 	def OnUnselectEmptySlot(self, slotNumber):
 		if self.eventUnselectEmptySlot:
 			if self.eventUnselectEmptyArgs:
-				self.eventUnselectEmptySlot(* self.eventUnselectEmptyArgs)
+				self.eventUnselectEmptySlot(*self.eventUnselectEmptyArgs)
 			else:
 				self.eventUnselectEmptySlot(slotNumber)
 
 	def OnUnselectItemSlot(self, slotNumber):
 		if self.eventUnselectItemSlot:
 			if self.eventUnselectItemArgs:
-				self.eventUnselectItemSlot(* self.eventUnselectItemArgs)
+				self.eventUnselectItemSlot(*self.eventUnselectItemArgs)
 			else:
 				self.eventUnselectItemSlot(slotNumber)
 
 	def OnUseSlot(self, slotNumber):
 		if self.eventUseSlot:
 			if self.eventUseArgs:
-				self.eventUseSlot(* self.eventUseArgs)
+				self.eventUseSlot(*self.eventUseArgs)
 			else:
 				self.eventUseSlot(slotNumber)
 
 	def OnOverInItem(self, slotNumber):
 		if self.eventOverInItem:
 			if self.eventOverInArgs:
-				self.eventOverInItem(* self.eventOverInArgs)
+				self.eventOverInItem(*self.eventOverInArgs)
 			else:
 				self.eventOverInItem(slotNumber)
 
 	def OnOverOutItem(self):
 		if self.eventOverOutItem:
 			if self.eventOverOutArgs:
-				self.eventOverOutItem(* self.eventOverOutArgs)
+				self.eventOverOutItem(*self.eventOverOutArgs)
 			else:
 				self.eventOverOutItem()
 
 	def OnPressedSlotButton(self, slotNumber):
 		if self.eventPressedSlotButton:
 			if self.eventPressedSlotArgs:
-				self.eventPressedSlotButton(* self.eventPressedSlotArgs)
+				self.eventPressedSlotButton(*self.eventPressedSlotArgs)
 			else:
 				self.eventPressedSlotButton(slotNumber)
 
@@ -3324,7 +3324,7 @@ class TextLink(Window):
 
 	def OnMouseLeftButtonUp(self):
 		if self.eventFunc:
-			self.eventFunc(* self.eventArgs)
+			self.eventFunc(*self.eventArgs)
 		self.OnMouseOverOut()
 
 	def SetEvent(self, event, *args):
@@ -3426,7 +3426,7 @@ class CoolButton(Window):
 	def OnMouseLeftButtonUp(self):
 		self.isSelected = False
 		if self.eventFunc:
-			self.eventFunc(* self.eventArgs)
+			self.eventFunc(*self.eventArgs)
 
 	def OnUpdate(self):
 		if self.IsIn():
@@ -3669,7 +3669,7 @@ class _BaseButton(Window):
 		snd.PlaySound("sound/ui/click.wav")
 
 		if self.eventFunc:
-			self.eventFunc(* self.eventArgs)
+			self.eventFunc(*self.eventArgs)
 
 	def OnMouseOverIn(self):
 		if self.IsDisabled():
@@ -4445,56 +4445,56 @@ class SlotElipseWindow(Window):
 	def OnSelectEmptySlot(self, slotNumber):
 		if self.eventSelectEmptySlot:
 			if self.eventSelectEmptyArgs:
-				self.eventSelectEmptySlot(* self.eventSelectEmptyArgs)
+				self.eventSelectEmptySlot(*self.eventSelectEmptyArgs)
 			else:
 				self.eventSelectEmptySlot(slotNumber)
 
 	def OnSelectItemSlot(self, slotNumber):
 		if self.eventSelectItemSlot:
 			if self.eventSelectItemArgs:
-				self.eventSelectItemSlot(* self.eventSelectItemArgs)
+				self.eventSelectItemSlot(*self.eventSelectItemArgs)
 			else:
 				self.eventSelectItemSlot(slotNumber)
 
 	def OnUnselectEmptySlot(self, slotNumber):
 		if self.eventUnselectEmptySlot:
 			if self.eventUnselectEmptyArgs:
-				self.eventUnselectEmptySlot(* self.eventUnselectEmptyArgs)
+				self.eventUnselectEmptySlot(*self.eventUnselectEmptyArgs)
 			else:
 				self.eventUnselectEmptySlot(slotNumber)
 
 	def OnUnselectItemSlot(self, slotNumber):
 		if self.eventUnselectItemSlot:
 			if self.eventUnselectItemArgs:
-				self.eventUnselectItemSlot(* self.eventUnselectItemArgs)
+				self.eventUnselectItemSlot(*self.eventUnselectItemArgs)
 			else:
 				self.eventUnselectItemSlot(slotNumber)
 
 	def OnUseSlot(self, slotNumber):
 		if self.eventUseSlot:
 			if self.eventUseArgs:
-				self.eventUseSlot(* self.eventUseArgs)
+				self.eventUseSlot(*self.eventUseArgs)
 			else:
 				self.eventUseSlot(slotNumber)
 
 	def OnOverInItem(self, slotNumber):
 		if self.eventOverInItem:
 			if self.eventOverInArgs:
-				self.eventOverInItem(* self.eventOverInArgs)
+				self.eventOverInItem(*self.eventOverInArgs)
 			else:
 				self.eventOverInItem(slotNumber)
 
 	def OnOverOutItem(self):
 		if self.eventOverOutItem:
 			if self.eventOverOutArgs:
-				self.eventOverOutItem(* self.eventOverOutArgs)
+				self.eventOverOutItem(*self.eventOverOutArgs)
 			else:
 				self.eventOverOutItem()
 
 	def OnPressedSlotButton(self, slotNumber):
 		if self.eventPressedSlotButton:
 			if self.eventPressedSlotArgs:
-				self.eventPressedSlotButton(* self.eventPressedSlotArgs)
+				self.eventPressedSlotButton(*self.eventPressedSlotArgs)
 			else:
 				self.eventPressedSlotButton(slotNumber)
 
@@ -4604,7 +4604,7 @@ class NewRadioButton(Button):
 				return
 
 		if self.eventFunc:
-			self.eventFunc(* self.eventArgs)
+			self.eventFunc(*self.eventArgs)
 
 class Ballon(Window):
 	BASE_PATH = "interface/controls/common/Ballon"
@@ -4792,13 +4792,13 @@ class BarWithBox(Bar):
 		if self.flash_color:
 			wndMgr.SetColor(self.hWnd, self.flash_color)
 		if self.overInEvent:
-			self.overInEvent(* self.overInArgs)
+			self.overInEvent(*self.overInArgs)
 
 	def OnMouseOverOut(self):
 		if self.color:
 			wndMgr.SetColor(self.hWnd, self.color)
 		if self.overOutEvent:
-			self.overOutEvent(* self.overOutArgs)
+			self.overOutEvent(*self.overOutArgs)
 
 	def SetOverInEvent(self, func, *args):
 		self.overInEvent = __mem_func__(func)
@@ -4877,13 +4877,13 @@ class InputBar(Bar):
 		if self.flash_color:
 			wndMgr.SetColor(self.hWnd, self.flash_color)
 		if self.overInEvent:
-			self.overInEvent(* self.overInArgs)
+			self.overInEvent(*self.overInArgs)
 
 	def OnMouseOverOut(self):
 		if self.color:
 			wndMgr.SetColor(self.hWnd, self.color)
 		if self.overOutEvent:
-			self.overOutEvent(* self.overOutArgs)
+			self.overOutEvent(*self.overOutArgs)
 
 	def SetOverInEvent(self, func, *args):
 		self.overInEvent = __mem_func__(func)

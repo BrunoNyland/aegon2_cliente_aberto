@@ -223,17 +223,17 @@ class MessengerGroupItem(MessengerItem):
 		self.memberList = []
 
 	def FindMember(self, key):
-		list = filter(lambda argMember, argKey=key: argMember.IsSameKey(argKey), self.memberList)
-		if list:
-			return list[0]
+		l = list(filter(lambda argMember, argKey=key: argMember.IsSameKey(argKey), self.memberList))
+		if l:
+			return l[0]
 
 		return None
 
-	def GetLoginMemberList(self):
-		return filter(MessengerMemberItem.IsOnline, self.memberList)
+	def GetLoginMemberList(self) -> list:
+		return list(filter(MessengerMemberItem.IsOnline, self.memberList))
 
-	def GetLogoutMemberList(self):
-		return filter(lambda arg: not arg.IsOnline(), self.memberList)
+	def GetLogoutMemberList(self) -> list:
+		return list(filter(lambda arg: not arg.IsOnline(), self.memberList))
 
 	def IsOpen(self):
 		return self.isOpen

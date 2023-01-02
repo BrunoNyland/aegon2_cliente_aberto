@@ -284,7 +284,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 
 		chrSlot = self.stream.GetCharacterSlot()
 		net.DirectEnter(chrSlot)
-		playTime = net.GetAccountCharacterSlotDataInteger(net.GetAccountCharacterSlotDataInteger(self.slot, net.ACCOUNT_CHARACTER_SLOT_PLAYTIME))
+		playTime = net.GetAccountCharacterSlotDataInteger(self.slot, net.ACCOUNT_CHARACTER_SLOT_PLAYTIME)
 		player.SetPlayTime(playTime)
 		chat.Clear()
 
@@ -296,9 +296,9 @@ class SelectCharacterWindow(ui.ScriptWindow):
 		elif 100 == type:
 			self.PopupMessage(localeinfo.SELECT_CHANGE_FAILURE_STRANGE_INDEX)
 		elif 101 == type:
-			self.PopupMessage("Voc? precisa escolher novos visuais.")
+			self.PopupMessage("Você precisa escolher novos visuais.")
 		elif 102 == type:
-			self.PopupMessage("N?o foi poss�vel alterar o visual.")
+			self.PopupMessage("Não foi possível alterar o visual.")
 
 	def CreateCharacter(self):
 		if 0 == self.GetCharacterSlotID(self.slot):
@@ -801,7 +801,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 			self.time = None
 
 		def SelectHair(self, num):
-			chr.ChangeHair(num)
+			chr.ChangeHair(int(num))
 			self.HAIR_STYLE = num
 
 		def ShowAndHideHair(self):
@@ -852,7 +852,7 @@ class SelectCharacterWindow(ui.ScriptWindow):
 			chr.PushOnceMotion(chr.MOTION_SELFIE, 0.1)
 
 			self.PopupMessage("Alterando o visual...")
-			net.SendChangeHairShapePacket(self.slot, self.HAIR_STYLE, self.SHAPE_STYLE)
+			net.SendChangeHairShapePacket(self.slot, int(self.HAIR_STYLE), int(self.SHAPE_STYLE))
 
 			self.SaveBoard.Hide()
 			self.SaveBoard = None

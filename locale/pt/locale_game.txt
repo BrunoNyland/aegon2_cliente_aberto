@@ -1,4 +1,4 @@
-﻿REVIVE_AUTO_TOWN_MESSAGE	Retornar ao início em: {}
+REVIVE_AUTO_TOWN_MESSAGE	Retornar ao início em: {}
 AFF_LOVE_POINT	Pontos de Amor: %d%%				
 CANNOT_ATTACK_DEST_IN_SAFE	Impossível atacar naquele local				
 CANNOT_ATTACK_SELF_IN_SAFE	Impossível atacar desse local				

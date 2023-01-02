@@ -41,7 +41,7 @@ class ChatModeButton(ui.Window):
 
 	def __init__(self):
 		ui.Window.__init__(self)
-		self.state = None
+		self.state = 0
 		self.buttonText = None
 		self.event = None
 		self.SetWindowName("ChatModeButton")
@@ -105,6 +105,9 @@ class ChatModeButton(ui.Window):
 
 		grp.SetColor(self.OUTLINE_COLOR)
 		grp.RenderRoundBox(x, y, self.width, self.height)
+
+		if not self.state:
+			return
 
 		if self.state >= self.BUTTON_STATE_OVER:
 			grp.RenderRoundBox(x+1, y, self.width-2, self.height)
@@ -994,11 +997,11 @@ class ChatWindow(ui.Window):
 
 		if self.boardState == chat.BOARD_STATE_EDIT:
 			grp.SetColor(self.BOARD_MIDDLE_COLOR)
-			grp.RenderBar(self.xBar, self.yBar + (self.heightBar - self.curHeightBar) + 10, self.widthBar, self.curHeightBar)
+			grp.RenderBar(int(self.xBar), int(self.yBar + (self.heightBar - self.curHeightBar) + 10), int(self.widthBar), int(self.curHeightBar))
 			chat.Render(self.chatID)
 		elif self.boardState == chat.BOARD_STATE_VIEW:
 			if systemSetting.IsViewChat():
-				grp.RenderGradationBar(self.xBar, self.yBar + (self.heightBar - self.curHeightBar), self.widthBar, self.curHeightBar, self.BOARD_START_COLOR, self.BOARD_END_COLOR)
+				grp.RenderGradationBar(int(self.xBar), int(self.yBar + (self.heightBar - self.curHeightBar)), int(self.widthBar), int(self.curHeightBar), self.BOARD_START_COLOR, self.BOARD_END_COLOR)
 				chat.Render(self.chatID)
 
 	def OnTop(self):

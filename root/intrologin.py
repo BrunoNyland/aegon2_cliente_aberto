@@ -58,7 +58,7 @@ class ConnectingDialog(ui.ScriptWindow):
 		self.countdownMessage = self.GetChild("countdown_message")
 
 	def Open(self, waitTime):
-		curTime = time.perf_counter_ns()
+		curTime = time.time()
 		self.endTime = curTime + waitTime
 		self.Lock()
 		self.SetCenterPosition()
@@ -77,19 +77,19 @@ class ConnectingDialog(ui.ScriptWindow):
 		self.GetChild("message").SetText(text)
 
 	def SetCountDownMessage(self, waitTime):
-		self.GetChild("countdown_message").SetText("%.0f%s" % (waitTime, localeinfo.SECOND))
+		self.GetChild("countdown_message").SetText("%d%s" % (waitTime, localeinfo.SECOND))
 
 	def SetTimeOverEvent(self, event):
 		self.eventTimeOver = ui.__mem_func__(event)
 
 	def OnUpdate(self):
-		lastTime = max(0, self.endTime - time.perf_counter_ns())
+		lastTime = max(0, self.endTime - time.time())
 		if 0 == lastTime:
 			self.Close()
 			if self.eventTimeOver:
 				self.eventTimeOver()
 		else:
-			self.SetCountDownMessage(self.endTime - time.perf_counter_ns())
+			self.SetCountDownMessage(self.endTime - time.time())
 
 class LoginWindow(ui.ScriptWindow):
 	def __init__(self, stream):
@@ -360,8 +360,8 @@ class LoginWindow(ui.ScriptWindow):
 		get_reg = self.Get_WinReg
 		set_reg = self.Set_WinReg
 
-		acc = Get("SaveAccountID_EditLine").GetText()
-		pwd = Get("SaveAccountPassword_EditLine").GetText()
+		acc = str(Get("SaveAccountID_EditLine").GetText())
+		pwd = str(Get("SaveAccountPassword_EditLine").GetText())
 
 		if len(acc) < 2:
 			self.PopupNotifyMessage("Contas devem possuir pelo menos 2 caracteres.")
@@ -377,8 +377,8 @@ class LoginWindow(ui.ScriptWindow):
 
 		for index in range(0, 12):
 			if get_reg("%d_id" % index) == "" or get_reg("%d_id" % index) == None:
-				set_reg("%d_id" % index, str(binascii.b2a_base64(acc)))
-				set_reg("%d_pwd" % index, str(binascii.b2a_base64(pwd)))
+				set_reg("%d_id" % index, binascii.b2a_base64(bytes(acc, 'utf-8')).decode('utf-8'))
+				set_reg("%d_pwd" % index, binascii.b2a_base64(bytes(pwd, 'utf-8')).decode('utf-8'))
 				self.PopupNotifyMessage("Conta salva com sucesso")
 				break
 
@@ -439,7 +439,7 @@ class LoginWindow(ui.ScriptWindow):
 		i = 0
 		for index in range(0, 12):
 			if get_reg("%d_id" % index):
-				acc = str(binascii.a2b_base64(get_reg("%d_id" % index)))
+				acc = binascii.a2b_base64(get_reg("%d_id" % index)).decode('utf-8')
 
 				Get("account" + str(i) + "_line1").SetText("Conta: " + acc)
 				Get("account" + str(i) + "_line2").SetText("Tecla de Atalho: [" + self.dictControslDesc[index] + "]")
@@ -595,8 +595,8 @@ class LoginWindow(ui.ScriptWindow):
 		if get_reg("%d_id" % index) == "":
 			return
 
-		account = "%s" % binascii.a2b_base64("%s" % get_reg("%d_id" % index))
-		password = "%s" % binascii.a2b_base64("%s" % get_reg("%d_pwd" % index))
+		account = binascii.a2b_base64("%s" % get_reg("%d_id" % index)).decode('utf-8')
+		password = binascii.a2b_base64("%s" % get_reg("%d_pwd" % index)).decode('utf-8')
 
 		if len(account) < 2:
 			self.PopupNotifyMessage("Contas devem possuir pelo menos 2 caracteres.")
