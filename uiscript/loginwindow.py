@@ -24,11 +24,11 @@ config_width = 800 - 100
 window = {
 	name:'LoginWindow',
 	'sytle':('movable',),
-	'x':0,
-	'y':0,
-	'width':SCREEN_WIDTH,
-	'height':SCREEN_HEIGHT,
-	'children':
+	x:0,
+	y:0,
+	width:SCREEN_WIDTH,
+	height:SCREEN_HEIGHT,
+	children:
 	(
 		{
 			name:'bg',
