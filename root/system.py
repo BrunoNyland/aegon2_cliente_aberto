@@ -97,20 +97,20 @@ def open_modified(filename:str, mode:str='rb', dir:str='find'):
 		if pack.Exist(filename):
 			if not mode in ('r', 'rb'):
 				raise BaseException('system.py:open: Invalid mode: %s' % (mode))
-			dbg.TraceError('Carregando arquivo via pack: %s' % filename)
+			# dbg.TraceError('Carregando arquivo via pack: %s' % filename)
 			return pack_file(filename, mode)
 		else:
-			dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
+			# dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
 			return old_open(filename, mode)
 
 	elif dir == 'pack':
 		if not mode in ('r', 'rb'):
 			raise BaseException('system.py:open: Invalid mode: %s' % (mode))
 		if not pack.Exist(filename):
-			dbg.TraceError('Carregando arquivo via pack: %s' % filename)
+			# dbg.TraceError('Carregando arquivo via pack: %s' % filename)
 			return pack_file(filename, mode)
 	else:
-		dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
+		# dbg.TraceError('Carregando arquivo via builtins.open: %s' % filename)
 		return old_open(filename, mode)
 
 builtins.open = open_modified
