@@ -283,7 +283,7 @@ class QuestDialog(ui.ScriptWindow):
 		self.eventCurtain = EventCurtain(idx)
 		event.SetEventHandler(idx, self)
 
-		self.OnCloseEvent = None
+		self.OnCloseEvents = []
 		self.btnAnswer = None
 		self.btnNext = None
 		self.imgLeft = None
@@ -331,21 +331,21 @@ class QuestDialog(ui.ScriptWindow):
 
 	def Destroy(self):
 		self.ClearDictionary()
-		if self.OnCloseEvent:
-			self.OnCloseEvent()
-			self.OnCloseEvent = None
+		for event in self.OnCloseEvents:
+			event()
 
 			if self.needInputString:
 				if self.editLine:
 					text = self.editLine.GetText()
 					net.SendQuestInputStringPacket(text)
 
+		self.OnCloseEvents = []
 		self.imgTitle = None
 		self.images = None
 		self.eventCurtain = None
 		self.board = None
 
-	def OnUpdate(self):	
+	def OnUpdate(self):
 		if self.skin == self.SKIN_CINEMA:
 			event.UpdateEventSet(self.descIndex, 50, -(wndMgr.GetScreenHeight() - 44))
 
@@ -385,16 +385,10 @@ class QuestDialog(ui.ScriptWindow):
 	def RunFunc(self, f:function) -> None: f()
 
 	def AddOnCloseEvent(self, f:function):
-		if self.OnCloseEvent:
-			self.OnCloseEvent = lambda z=[self.OnCloseEvent, f]:map(self.RunFunc, z)
-		else:
-			self.OnCloseEvent = f
+		self.OnCloseEvents.append(f)
 
 	def AddOnDoneEvent(self,f):
 		QuestCurtain.OnDoneEventList.append(f)
-
-	def SetOnCloseEvent(self, f):
-		self.OnCloseEvent = f
 
 	def SetEventSetPosition(self, x, y):
 		self.sx = x
@@ -403,6 +397,9 @@ class QuestDialog(ui.ScriptWindow):
 	def AdjustEventSetPosition(self, x, y):
 		self.sx += x
 		self.sy += y
+
+	def SelectAnswer(self, arg1, arg2):
+		event.SelectAnswer(arg1, arg2)
 
 	def MakeNextButton(self, button_type):
 		if self.SKIN_NONE == self.skin:
@@ -418,13 +415,13 @@ class QuestDialog(ui.ScriptWindow):
 		self.nextButtonType = button_type;
 
 		if event.BUTTON_TYPE_CANCEL == button_type:
-			b.SetEvent(event.SelectAnswer, self.descIndex, 254)
+			b.SetEvent(self.SelectAnswer, self.descIndex, 254)
 			b.SetText(localeinfo.UI_CANCEL)
 		elif event.BUTTON_TYPE_DONE == button_type:
 			b.SetEvent(self.CloseSelf)
 			b.SetText(localeinfo.UI_OK)
 		elif event.BUTTON_TYPE_NEXT == button_type:
-			b.SetEvent(event.SelectAnswer, self.descIndex, 254)
+			b.SetEvent(self.SelectAnswer, self.descIndex, 254)
 			b.SetText(localeinfo.UI_NEXT)
 		b.Show()
 		b.SetTextColor(0xffffffff)
