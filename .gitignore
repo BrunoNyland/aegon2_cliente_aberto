@@ -4,3 +4,5 @@ log_client_GC.txt
 log.txt
 
 lib/__pycache__/
+
+*.cfg
