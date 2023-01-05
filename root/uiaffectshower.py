@@ -1,5 +1,4 @@
 #favor manter essa linha
-import XXjvumrgrYBZompk3PS8 as item
 import enszxc3467hc3kokdueq as app
 import ga3vqy6jtxqi9yf344j7 as player
 import zn94xlgo573hf8xmddzq as net
@@ -7,7 +6,6 @@ import Js4k2l7BrdasmVRt8Wem as chr
 import LURMxMaKZJqliYt2QSHG as chat
 import ui
 import dbg
-import math
 import skill
 import uicommon
 import uitooltip

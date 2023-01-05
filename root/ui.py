@@ -171,14 +171,14 @@ class Window(object):
 	def GetWindowHandle(self):
 		return self.hWnd
 
-	def AddFlag(self, style):
+	def AddFlag(self, style:str) -> None:
 		wndMgr.AddFlag(self.hWnd, style)
 
 	def IsRTL(self):
 		return wndMgr.IsRTL(self.hWnd)
 
-	def SetWindowName(self, Name):
-		wndMgr.SetName(self.hWnd, Name)
+	def SetWindowName(self, name:str) -> None:
+		wndMgr.SetName(self.hWnd, name)
 
 	def GetWindowName(self) -> str:
 		return wndMgr.GetName(self.hWnd)
@@ -202,201 +202,201 @@ class Window(object):
 	def GetParentProxy(self):
 		return self.parentWindow
 
-	def SetPickAlways(self):
+	def SetPickAlways(self) -> None:
 		wndMgr.SetPickAlways(self.hWnd)
 
-	def SetWindowHorizontalAlignLeft(self):
+	def SetWindowHorizontalAlignLeft(self) -> None:
 		wndMgr.SetWindowHorizontalAlign(self.hWnd, wndMgr.HORIZONTAL_ALIGN_LEFT)
 
-	def SetWindowHorizontalAlignCenter(self):
+	def SetWindowHorizontalAlignCenter(self) -> None:
 		wndMgr.SetWindowHorizontalAlign(self.hWnd, wndMgr.HORIZONTAL_ALIGN_CENTER)
 
-	def SetWindowHorizontalAlignRight(self):
+	def SetWindowHorizontalAlignRight(self) -> None:
 		wndMgr.SetWindowHorizontalAlign(self.hWnd, wndMgr.HORIZONTAL_ALIGN_RIGHT)
 
-	def SetWindowVerticalAlignTop(self):
+	def SetWindowVerticalAlignTop(self) -> None:
 		wndMgr.SetWindowVerticalAlign(self.hWnd, wndMgr.VERTICAL_ALIGN_TOP)
 
-	def SetWindowVerticalAlignCenter(self):
+	def SetWindowVerticalAlignCenter(self) -> None:
 		wndMgr.SetWindowVerticalAlign(self.hWnd, wndMgr.VERTICAL_ALIGN_CENTER)
 
-	def SetWindowVerticalAlignBottom(self):
+	def SetWindowVerticalAlignBottom(self) -> None:
 		wndMgr.SetWindowVerticalAlign(self.hWnd, wndMgr.VERTICAL_ALIGN_BOTTOM)
 
-	def SetTop(self):
+	def SetTop(self) -> None:
 		wndMgr.SetTop(self.hWnd)
 
-	def Show(self):
+	def Show(self) -> None:
 		if self.onShowEvent:
 			self.onShowEvent(*self.onShowArgs)
 		wndMgr.Show(self.hWnd)
 
-	def Hide(self):
+	def Hide(self) -> None:
 		if self.onHideEvent:
 			self.onHideEvent(*self.onHideArgs)
 		wndMgr.Hide(self.hWnd)
 
-	def Lock(self):
+	def Lock(self) -> None:
 		wndMgr.Lock(self.hWnd)
 
-	def Unlock(self):
+	def Unlock(self) -> None:
 		wndMgr.Unlock(self.hWnd)
 
 	def IsShow(self):
 		return wndMgr.IsShow(self.hWnd)
 
-	def UpdateRect(self):
+	def UpdateRect(self) -> None:
 		wndMgr.UpdateRect(self.hWnd)
 
-	def SetSize(self, width, height):
+	def SetSize(self, width, height) -> None:
 		wndMgr.SetWindowSize(self.hWnd, int(width), int(height))
 
-	def GetWidth(self):
+	def GetWidth(self) -> int:
 		return wndMgr.GetWindowWidth(self.hWnd)
 
-	def GetHeight(self):
+	def GetHeight(self) -> int:
 		return wndMgr.GetWindowHeight(self.hWnd)
 
-	def GetLocalPosition(self):
+	def GetLocalPosition(self) -> int:
 		return wndMgr.GetWindowLocalPosition(self.hWnd)
 
-	def GetGlobalPosition(self):
+	def GetGlobalPosition(self) -> int:
 		return wndMgr.GetWindowGlobalPosition(self.hWnd)
 
-	def GetMouseLocalPosition(self):
+	def GetMouseLocalPosition(self) -> int:
 		return wndMgr.GetMouseLocalPosition(self.hWnd)
 
-	def GetRect(self):
+	def GetRect(self) -> int:
 		return wndMgr.GetWindowRect(self.hWnd)
 
-	def GetLeft(self):
+	def GetLeft(self) -> int:
 		x, y = self.GetLocalPosition()
 		return x
 
-	def GetGlobalLeft(self):
+	def GetGlobalLeft(self) -> int:
 		x, y = self.GetGlobalPosition()
 		return x
 
-	def GetTop(self):
+	def GetTop(self) -> int:
 		x, y = self.GetLocalPosition()
 		return y
 
-	def GetGlobalTop(self):
+	def GetGlobalTop(self) -> int:
 		x, y = self.GetGlobalPosition()
 		return y
 
-	def GetRight(self):
+	def GetRight(self) -> int:
 		return self.GetLeft() + self.GetWidth()
 
-	def GetBottom(self):
+	def GetBottom(self) -> int:
 		return self.GetTop() + self.GetHeight()
 
-	def SetLeft(self, x):
+	def SetLeft(self, x) -> None:
 		wndMgr.SetWindowPosition(self.hWnd, int(x), self.GetTop())
 
-	def SavePosition(self):
+	def SavePosition(self) -> None:
 		self.baseX = self.GetLeft()
 		self.baseY = self.GetTop()
 
-	def UpdatePositionByScale(self, scale):
-		self.SetPosition(self.baseX * scale, self.baseY * scale)
+	def UpdatePositionByScale(self, scale) -> None:
+		self.SetPosition(int(self.baseX * scale), int(self.baseY * scale))
 
-	def IsInPosition(self):
+	def IsInPosition(self) -> bool:
 		xMouse, yMouse = wndMgr.GetMousePosition()
 		x, y = self.GetGlobalPosition()
 		return xMouse >= x and xMouse < x + self.GetWidth() and yMouse >= y and yMouse < y + self.GetHeight()
 
-	def SetMouseLeftButtonDownEvent(self, event, *args):
+	def SetMouseLeftButtonDownEvent(self, event, *args) -> None:
 		self.mouseLeftButtonDownEvent = __mem_func__(event)
 		self.mouseLeftButtonDownArgs = args
 
-	def OnMouseLeftButtonDown(self):
+	def OnMouseLeftButtonDown(self) -> None:
 		if self.mouseLeftButtonDownEvent:
 			self.mouseLeftButtonDownEvent(*self.mouseLeftButtonDownArgs)
 
-	def SetMouseLeftButtonDoubleClickEvent(self, event, *args):
+	def SetMouseLeftButtonDoubleClickEvent(self, event, *args) -> None:
 		self.mouseLeftButtonDoubleClickEvent = __mem_func__(event)
 		self.mouseLeftButtonDoubleClickArgs = args
 
-	def OnMouseLeftButtonDoubleClick(self):
+	def OnMouseLeftButtonDoubleClick(self) -> None:
 		if self.mouseLeftButtonDoubleClickEvent:
 			self.mouseLeftButtonDoubleClickEvent(*self.mouseLeftButtonDoubleClickArgs)
 
-	def SetMouseRightButtonDownEvent(self, event, *args):
+	def SetMouseRightButtonDownEvent(self, event, *args) -> None:
 		self.mouseRightButtonDownEvent = __mem_func__(event)
 		self.mouseRightButtonDownArgs = args
 
-	def OnMouseRightButtonDown(self):
+	def OnMouseRightButtonDown(self) -> None:
 		if self.mouseRightButtonDownEvent:
 			self.mouseRightButtonDownEvent(*self.mouseRightButtonDownArgs)
 
-	def SetMouseLeftButtonUpEvent(self, event, *args):
+	def SetMouseLeftButtonUpEvent(self, event, *args) -> None:
 		self.mouseLeftButtonUpEvent = __mem_func__(event)
 		self.mouseLeftButtonUpArgs = args
 
-	def OnMouseLeftButtonUp(self):
+	def OnMouseLeftButtonUp(self) -> None:
 		if self.mouseLeftButtonUpEvent:
 			self.mouseLeftButtonUpEvent(*self.mouseLeftButtonUpArgs)
 
-	def SetOnRunMouseWheelEvent(self, event):
+	def SetOnRunMouseWheelEvent(self, event) -> None:
 		self.onRunMouseWheelEvent = __mem_func__(event)
 
-	def OnRunMouseWheel(self, nLen):
+	def OnRunMouseWheel(self, nLen) -> bool:
 		if self.onRunMouseWheelEvent:
 			self.onRunMouseWheelEvent(*(bool(nLen < 0), ))
 			return True
 		return False
 
-	def SetShowEvent(self, event, *args):
+	def SetShowEvent(self, event, *args) -> None:
 		self.onShowEvent = __mem_func__(event)
 		self.onShowArgs = args
 
-	def SetHideEvent(self, event, *args):
+	def SetHideEvent(self, event, *args) -> None:
 		self.onHideEvent = __mem_func__(event)
 		self.onHideArgs = args
 
-	def SetMoveWindowEvent(self, event):
+	def SetMoveWindowEvent(self, event) -> None:
 		self.moveWindowEvent = __mem_func__(event)
 
-	def OnMoveWindow(self, x, y):
+	def OnMoveWindow(self, x, y) -> None:
 		if self.moveWindowEvent:
 			self.moveWindowEvent(x, y)
 
-	def SetOverInEvent(self, func, *args):
+	def SetOverInEvent(self, func, *args) -> None:
 		self.overInEvent = __mem_func__(func)
 		self.overInArgs = args
 
-	def SetOverOutEvent(self, func, *args):
+	def SetOverOutEvent(self, func, *args) -> None:
 		self.overOutEvent = __mem_func__(func)
 		self.overOutArgs = args
 
-	def OnMouseOverIn(self):
+	def OnMouseOverIn(self) -> None:
 		if self.overInEvent:
 			self.overInEvent(*self.overInArgs)
 
-	def OnMouseOverOut(self):
+	def OnMouseOverOut(self) -> None:
 		if self.overOutEvent:
 			self.overOutEvent(*self.overOutArgs)
 
-	def SetRenderEvent(self, event, *args):
+	def SetRenderEvent(self, event, *args) -> None:
 		self.renderEvent = __mem_func__(event)
 		self.renderArgs = args
 
-	def OnRender(self):
+	def OnRender(self) -> None:
 		if self.renderEvent:
 			self.renderEvent(*self.renderArgs)
 
-	def SetVisible(self, is_show):
+	def SetVisible(self, is_show) -> None:
 		if is_show:
 			self.Show()
 		else:
 			self.Hide()
 
-	def SetPosition(self, x, y):
+	def SetPosition(self, x, y) -> None:
 		wndMgr.SetWindowPosition(self.hWnd, int(x), int(y))
 
-	def SetCenterPosition(self, x = 0, y = 0):
-		self.SetPosition((wndMgr.GetScreenWidth() - self.GetWidth()) / 2 + x, (wndMgr.GetScreenHeight() - self.GetHeight()) / 2 + y)
+	def SetCenterPosition(self, x:int = 0, y:int = 0) -> None:
+		self.SetPosition(int((wndMgr.GetScreenWidth() - self.GetWidth()) / 2) + x, int((wndMgr.GetScreenHeight() - self.GetHeight()) / 2) + y)
 
 	def IsFocus(self):
 		return wndMgr.IsFocus(self.hWnd)

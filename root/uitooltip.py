@@ -153,7 +153,8 @@ class ToolTip(ui.ThinBoard):
 		textLine.Show()
 
 		if centerAlign:
-			textLine.SetPosition(self.toolTipWidth/2, self.toolTipHeight)
+			textLine.SetPosition(0, self.toolTipHeight)
+			textLine.SetWindowHorizontalAlignCenter()
 			textLine.SetHorizontalAlignCenter()
 		else:
 			textLine.SetPosition(10, self.toolTipHeight)
@@ -198,7 +199,8 @@ class ToolTip(ui.ThinBoard):
 			self.toolTipWidth = textWidth + 30
 
 		if centerAlign:
-			textLine.SetPosition((self.toolTipWidth/2) -1, self.toolTipHeight)
+			textLine.SetPosition(0, self.toolTipHeight)
+			textLine.SetWindowHorizontalAlignCenter()
 			textLine.SetHorizontalAlignCenter()
 		else:
 			textLine.SetPosition(10, self.toolTipHeight)
@@ -976,9 +978,9 @@ class ItemToolTip(ToolTip):
 
 		if itemVnum in [28887, 28888]:
 			if metinSlot[1] == 0:
-				self.AppendTextLine(("Sem experi?ncia"), self.NEGATIVE_COLOR)
+				self.AppendTextLine(("Sem experiência"), self.NEGATIVE_COLOR)
 			else:
-				self.AppendTextLine("Experiencia disponivel:", self.SPECIAL_TITLE_COLOR)
+				self.AppendTextLine("Experiência disponível:", self.SPECIAL_TITLE_COLOR)
 				self.AppendTextLine(str(metinSlot[1]), self.SPECIAL_TITLE_COLOR)
 
 	def __IsAttr(self, attrSlot):
