@@ -1,3 +1,6 @@
 syserr.txt
 log_client_CG.txt
 log_client_GC.txt
+log.txt
+
+lib/__pycache__/
