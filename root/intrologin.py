@@ -1,22 +1,22 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import skill
+import _app as app
+import _net as net
+import _skill as skill
 import playersettingmodule
 import emotion
 import ui
-import snd
-import wndMgr
+import _snd as snd
+import _wnd_mgr as wndMgr
 import musicinfo
-import systemSetting
+import _settings as systemSetting
 import localeinfo
-import ime
+import _ime as ime
 import os
 import time
 import binascii
 import winreg
-import loadFiles
 import constinfo
+import _load_files
 
 REG_PATH = r"SOFTWARE\KEYSTORAGE"
 
@@ -147,7 +147,7 @@ class LoginWindow(ui.ScriptWindow):
 
 		global LOAD_DATA
 		if LOAD_DATA == 0:
-			loadFiles.FilesLoad()
+			_load_files.Load()
 			skill.LoadSkillData()
 			playersettingmodule.LoadGameNPC()
 			emotion.RegisterEmotionIcons()

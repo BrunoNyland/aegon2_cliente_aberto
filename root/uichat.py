@@ -1,14 +1,14 @@
 #favor manter essa linha
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
+import _chat as chat
+import _player as player
+import _net as net
+import _app as app
 import ui
-import grp
-import wndMgr
-import ime
+import _grp as grp
+import _wnd_mgr as wndMgr
+import _ime as ime
 import localeinfo
-import systemSetting
+import _settings as systemSetting
 import re
 import exception
 
@@ -437,7 +437,7 @@ class ChatLine(ui.EditLine):
 			self.eventEscape()
 
 	def BindInterface(self, interface):
-		from _weakref import proxy
+		from weakref import proxy
 		self.interface = proxy(interface)
 
 	def OnMouseLeftButtonDown(self):
@@ -1364,7 +1364,7 @@ class ChatLogWindow(ui.Window):
 		return True
 
 	def BindInterface(self, interface):
-		from _weakref import proxy
+		from weakref import proxy
 		self.interface = proxy(interface)
 
 	def OnMouseLeftButtonDown(self):

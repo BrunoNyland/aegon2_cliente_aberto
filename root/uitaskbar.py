@@ -1,17 +1,17 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import XXjvumrgrYBZompk3PS8 as item
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
+import _net as net
+import _item as item
+import _player as player
+import _app as app
 import ui
-import skill
+import _skill as skill
 import localeinfo
-import wndMgr
+import _wnd_mgr as wndMgr
 import constinfo
 import mousemodule
 import os
 
-from _weakref import proxy
+from weakref import proxy
 
 MOUSE_SETTINGS = [0, 0]
 
@@ -437,7 +437,7 @@ class TaskBar(ui.ScriptWindow):
 
 					skillType = skill.GetSkillType(skillIndex)
 					if skill.SKILL_TYPE_GUILD == skillType:
-						import guild
+						import _guild as guild
 						skillGrade = 0
 						skillLevel = guild.GetSkillLevel(Position)
 
@@ -571,7 +571,7 @@ class TaskBar(ui.ScriptWindow):
 			skillType = skill.GetSkillType(skillIndex)
 
 			if skill.SKILL_TYPE_GUILD == skillType:
-				import guild
+				import _guild as guild
 				skillGrade = 0
 				skillLevel = guild.GetSkillLevel(Position)
 			else:

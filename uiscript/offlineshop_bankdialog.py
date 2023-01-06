@@ -1,13 +1,13 @@
 #favor manter essa linha
 import uiscriptlocale
-import enszxc3467hc3kokdueq as app
+import _app as app
 
 width = 250
 height = 210
 
 LINE = "interface/controls/common/horizontal_bar/center.tga"
 
-import grp
+import _grp as grp
 box_color = grp.GenerateColor(0.602362, 0.177165, 0.177165, 1.0)
 normal_color = grp.GenerateColor(0.0, 0.0, 0.0, 0.8)
 

@@ -1,10 +1,10 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
+import _app as app
+import _net as net
 import ui
-import grp
-import guild
-import messenger
+import _grp as grp
+import _guild as guild
+import _messenger as messenger
 import localeinfo
 import uitooltip
 import exception

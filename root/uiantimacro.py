@@ -1,11 +1,11 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import L0E5ajNEGIFdtCIFglqo as chrmgr
+import _app as app
+import _chr_mgr as chrmgr
+import _grp as grp
+import _snd as snd
+import _background as background
 import ui
-import grp
-import snd
 import wait
-import background
 
 COLOR_NAGATIVE = grp.GenerateColor(1.0, 0.0, 0.0, 0.2)
 COLOR_POSITIVE = grp.GenerateColor(0.0, 1.0, 0.0, 0.2)
@@ -75,7 +75,7 @@ class Anti_Robotics_Window(ui.ScriptWindow):
 			chrmgr.SetBlockPlayer(0)
 
 	def SetTimeManager(self, wnd):
-		from _weakref import proxy
+		from weakref import proxy
 		self.TimeManager = proxy(wnd)
 
 	def Destroy(self):
@@ -114,7 +114,7 @@ class TimeManager(ui.ScriptWindow):
 			self.Window.Show()
 
 	def SetWindow(self, wnd):
-		from _weakref import proxy
+		from weakref import proxy
 		self.Window = proxy(wnd)
 
 	def __Close(self):

@@ -1,24 +1,28 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import enszxc3467hc3kokdueq as app
-# import player, item, chat, net
-import ui
+
+### from client binary
+import _player as player
+import _item as item
+import _net as net
+import _chat as chat
+import _app as app
+import _snd as snd
+import _dbg as dbg
+import _wnd_mgr as wndMgr
+import _ime as ime
+import _grp as grp
+
+### from python3
 import os
-import snd
-import dbg
-import ime
-import grp
-import wndMgr
+
+### from root
+import ui
 import uicommon
 import mousemodule
 import constinfo
 
 from uitooltip import ItemToolTip
-
-from _weakref import proxy
+from weakref import proxy
 
 WEAR_NAMES = ItemToolTip.WEAR_NAMES
 AFFECT_DICT = ItemToolTip.AFFECT_DICT

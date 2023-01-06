@@ -1,6 +1,6 @@
 #favor manter essa linha
 import uiscriptlocale
-import grp
+import _grp as grp
 
 box_color = grp.GenerateColor(0.208, 0.142, 0.126, 1.0)
 win_color = grp.GenerateColor(0.02, 0.02, 0.02, 1.0)

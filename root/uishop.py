@@ -1,21 +1,21 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import enszxc3467hc3kokdueq as app
-import LURMxMaKZJqliYt2QSHG as chat
-import Js4k2l7BrdasmVRt8Wem as chr
+import _net as net
+import _player as player
+import _item as item
+import _app as app
+import _chat as chat
+import _chr as chr
 import ui
-import snd
-import shop
-import wndMgr
+import _snd as snd
+import _shop as shop
+import _wnd_mgr as wndMgr
 import uicommon
 import constinfo
 import localeinfo
 import mousemodule
 import uishopamount
 
-from _weakref import proxy
+from weakref import proxy
 
 class ShopDialog(ui.ScriptWindow):
 	def __init__(self):

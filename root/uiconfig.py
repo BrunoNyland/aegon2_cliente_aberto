@@ -1,11 +1,11 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
+import _net as net
+import _chat as chat
+import _app as app
+import _player as player
 import ui
-import snd
-import systemSetting
+import _snd as snd
+import _settings as systemSetting
 import localeinfo
 import constinfo
 import musicinfo

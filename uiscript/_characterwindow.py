@@ -1,6 +1,6 @@
 #favor manter essa linha
-import grp
-import enszxc3467hc3kokdueq as app
+import _grp as grp
+import _app as app
 import colorinfo
 
 LINE = "interface/controls/common/horizontal_bar/center.tga"

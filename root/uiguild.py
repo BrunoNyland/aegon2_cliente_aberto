@@ -1,27 +1,27 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
-import Js4k2l7BrdasmVRt8Wem as chr
+import _app as app
+import _net as net
+import _chat as chat
+import _player as player
+import _chr as chr
 import ui
-import grp
-import snd
-import skill
-import guild
-import wndMgr
-import safebox
+import _grp as grp
+import _snd as snd
+import _skill as skill
+import _guild as guild
+import _wnd_mgr as wndMgr
+import _safebox as safebox
 import uicommon
 import constinfo
 import exception
 import localeinfo
-import background
+import _background as background
 import mousemodule
 import uipickmoney
 import uiuploadmark
 import playersettingmodule
 
-from _weakref import proxy
+from weakref import proxy
 
 def NumberToMoneyString(n):
 	return localeinfo.NumberToMoneyString(n)

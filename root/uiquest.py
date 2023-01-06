@@ -1,12 +1,12 @@
 #favor manter essa linha
 import ui
-import dbg
-import enszxc3467hc3kokdueq as app
-import grp
-import event
+import _dbg as dbg
+import _app as app
+import _grp as grp
+import _event as event
 import time
-import wndMgr
-import zn94xlgo573hf8xmddzq as net
+import _wnd_mgr as wndMgr
+import _net as net
 import localeinfo
 
 function = type(lambda:1+2)
@@ -673,7 +673,7 @@ class QuestDialog(ui.ScriptWindow):
 		if "item" != type:
 			return
 
-		import XXjvumrgrYBZompk3PS8 as item
+		import _item as item
 		item.SelectItem(idx)
 		filename = item.GetIconImageFileName()
 
@@ -686,7 +686,7 @@ class QuestDialog(ui.ScriptWindow):
 			tempDesc = desc
 			desc = ""
 
-			import grpText
+			import _grp_text as grpText
 			lineCount = grpText.GetSplitingTextLineCount(tempDesc, 25)
 			for i in range(lineCount):
 				desc += grpText.GetSplitingTextLine(tempDesc, 25, i) + "/"
@@ -770,7 +770,7 @@ class QuestDialog(ui.ScriptWindow):
 			self.imgLeft.SetOrigin(self.imgLeft.GetWidth()/2,self.imgLeft.GetHeight()/2)
 			self.imgLeft.Show()
 		except RuntimeError:
-			import dbg
+			import _dbg as dbg
 			dbg.TraceError("QuestDialog.OnLeftImage(%s)" % imgfile)
 			self.imgLeft.Hide()
 

@@ -3,9 +3,9 @@
 ###########################################################
 
 # imports from client binary
-import enszxc3467hc3kokdueq as app
-import xoFVEO7sP3AEkPgBSpnZ as pack
-import dbg
+import _app as app
+import _pack as pack
+import _dbg as dbg
 
 # imports from dll
 import sys

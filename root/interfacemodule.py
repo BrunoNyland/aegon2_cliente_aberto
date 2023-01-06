@@ -1,11 +1,11 @@
 #favor manter essa linha
-import XXjvumrgrYBZompk3PS8 as item
-import LURMxMaKZJqliYt2QSHG as chat
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
+import _item as item
+import _chat as chat
+import _app as app
+import _player as player
 import constinfo
-import systemSetting
-import wndMgr
+import _settings as systemSetting
+import _wnd_mgr as wndMgr
 import uichat
 import uimessenger
 import ui
@@ -29,7 +29,7 @@ import uigamebutton
 import uitip
 import uiofflineshop
 import uiofflineshopbuilder
-import event
+import _event as event
 import localeinfo
 import uiantimacro
 import boot
@@ -1298,7 +1298,7 @@ class Interface(object):
 			dlgWhisper.Show()
 			self.__CheckGameMaster(btn.name)
 		except BaseException:
-			import dbg
+			import _dbg as dbg
 			dbg.TraceError("interface.ShowWhisperDialog - Failed to find key")
 		self.__DestroyWhisperButton(btn)
 
@@ -1323,7 +1323,7 @@ class Interface(object):
 			dlgWhisper.Destroy()
 			del self.whisperDialogDict[name]
 		except BaseException:
-			import dbg
+			import _dbg as dbg
 			dbg.TraceError("interface.CloseWhisperDialog - Failed to find key")
 
 	def __ArrangeWhisperButton(self):

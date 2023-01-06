@@ -1,7 +1,7 @@
 #favor manter essa linha
-import wndMgr
+import _wnd_mgr as wndMgr
 import ui
-import ime
+import _ime as ime
 import exception
 
 class PickMoneyDialog(ui.ScriptWindow):

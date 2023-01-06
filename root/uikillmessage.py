@@ -1,6 +1,6 @@
 #favor manter essa linha
 import ui
-import wndMgr
+import _wnd_mgr as wndMgr
 import playersettingmodule
 
 # temp = []

@@ -1,26 +1,26 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
-import L0E5ajNEGIFdtCIFglqo as chrmgr
-import Js4k2l7BrdasmVRt8Wem as chr
+import _app as app
+import _net as net
+import _chat as chat
+import _player as player
+import _chr_mgr as chrmgr
+import _chr as chr
 import playersettingmodule
-import dbg
+import _dbg as dbg
 import ui
 import mousemodule
-import wndMgr
-import skill
-import quest
+import _wnd_mgr as wndMgr
+import _skill as skill
+import _quest as quest
 import localeinfo
 import uitooltip
 import emotion
 import colorinfo
 import exception
-import event
-import grp
+import _event as event
+import _grp as grp
 
-from _weakref import proxy
+from weakref import proxy
 
 if app.ENABLE_SKILL_COLOR_SYSTEM:
 	import uiskillcolor

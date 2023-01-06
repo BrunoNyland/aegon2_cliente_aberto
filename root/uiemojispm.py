@@ -1,7 +1,7 @@
 #favor manter essa linha
 import ui
 import os
-import ime
+import _ime as ime
 
 EMOJI_FILE_NAME = "miles/emoji.cfg"
 

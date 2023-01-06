@@ -1,9 +1,9 @@
 #favor manter essa linha
-import wait
-import ga3vqy6jtxqi9yf344j7 as player
-import LURMxMaKZJqliYt2QSHG as chat
-import zn94xlgo573hf8xmddzq as net
+import _player as player
+import _chat as chat
+import _net as net
 import ui
+import wait
 import constinfo
 
 class Potador(ui.ScriptWindow):

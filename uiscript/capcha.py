@@ -1,6 +1,6 @@
 #favor manter essa linha
 import uiscriptlocale
-import grp
+import _grp as grp
 
 width = 400 -12
 height = 150 -12

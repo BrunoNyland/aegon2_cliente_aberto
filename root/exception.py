@@ -22,12 +22,12 @@ def GetExceptionString(excTitle):
 	return excText
 
 def Abort(excTitle):
-	import dbg
+	import _dbg as dbg
 	excText = GetExceptionString(excTitle)
 
 	dbg.TraceError(excText)
 
-	import enszxc3467hc3kokdueq as app
+	import _app as app
 	app.Abort()
 
 	import sys

@@ -1,21 +1,21 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import exchange
-import zn94xlgo573hf8xmddzq as net
+import _player as player
+import _trade as exchange
+import _net as net
+import _chat as chat
+import _item as item
+import _wnd_mgr as wndMgr
+import _snd as snd
+import _app as app
 import localeinfo
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
 import constinfo
-import ui
 import mousemodule
+import ui
 import uipickmoney
-import wndMgr
-import snd
-import enszxc3467hc3kokdueq as app
 import uicommon
 import playersettingmodule
 
-from _weakref import proxy
+from weakref import proxy
 
 class ExchangeDialog(ui.ScriptWindow):
 

@@ -1,7 +1,7 @@
 #favor manter essa linha
 import localeinfo
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
+import _player as player
+import _app as app
 
 EMOTION_CLAP			= 1
 EMOTION_CONGRATULATION	= 2

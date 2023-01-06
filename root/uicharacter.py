@@ -1,24 +1,24 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
-import Js4k2l7BrdasmVRt8Wem as chr
-import playersettingmodule
-import dbg
+import _app as app
+import _net as net
+import _chat as chat
+import _player as player
+import _chr as chr
+import _dbg as dbg
+import _wnd_mgr as wndMgr
+import _skill as skill
+import _quest as quest
+import _event as event
 import ui
+import playersettingmodule
 import mousemodule
-import wndMgr
-import skill
-import quest
 import localeinfo
 import uitooltip
 import emotion
 import colorinfo
 import exception
-import event
 
-from _weakref import proxy
+from weakref import proxy
 
 temp = []
 def Debug(msg):

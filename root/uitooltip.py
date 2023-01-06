@@ -1,23 +1,23 @@
 #favor manter essa linha
-import dbg
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import enszxc3467hc3kokdueq as app
-import Js4k2l7BrdasmVRt8Wem as chr
-import grp
-import wndMgr
-import skill
-import shop
-import exchange
-import safebox
+import _dbg as dbg
+import _player as player
+import _item as item
+import _app as app
+import _chr as chr
+import _grp as grp
+import _wnd_mgr as wndMgr
+import _skill as skill
+import _shop as shop
+import _trade as exchange
+import _safebox as safebox
 import localeinfo
-import background
-import nonplayer
+import _background as background
+import _non_player as nonplayer
 import ui
 import constinfo
 
 if app.RENDER_TARGET:
-	import renderTarget
+	import _render_target
 
 WARP_SCROLLS = [22011, 22000, 22010]
 
@@ -518,23 +518,23 @@ class ItemToolTip(ToolTip):
 				self.ModelPreview.SetSize(190, 190)
 				self.ModelPreview.SetPosition(-185, 10)
 				self.ModelPreview.SetRenderTarget(1)
-				renderTarget.SetBackground(1, "interface/controls/special/decoration/image.tga")
+				_render_target.SetBackground(1, "interface/controls/special/decoration/image.tga")
 
-			renderTarget.SelectModel(1, model)
+			_render_target.SelectModel(1, model)
 
 			if model < 8:
 				if type == 1:
-					renderTarget.SetWeapon(1, player.GetItemIndex(204))
-					renderTarget.SetArmor(1, player.GetItemIndex(200))
-					renderTarget.SetHair(1, vnum)
+					_render_target.SetWeapon(1, player.GetItemIndex(204))
+					_render_target.SetArmor(1, player.GetItemIndex(200))
+					_render_target.SetHair(1, vnum)
 				elif type == 2:
-					renderTarget.SetWeapon(1, player.GetItemIndex(204))
-					renderTarget.SetHair(1, chr.GetHair())
-					renderTarget.SetArmor(1, vnum)
+					_render_target.SetWeapon(1, player.GetItemIndex(204))
+					_render_target.SetHair(1, chr.GetHair())
+					_render_target.SetArmor(1, vnum)
 				elif type == 3:
-					renderTarget.SetArmor(1, player.GetItemIndex(200))
-					renderTarget.SetHair(1, chr.GetHair())
-					renderTarget.SetWeapon(1, vnum)
+					_render_target.SetArmor(1, player.GetItemIndex(200))
+					_render_target.SetHair(1, chr.GetHair())
+					_render_target.SetWeapon(1, vnum)
 
 			self.ModelPreview.Show()
 

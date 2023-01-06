@@ -1,6 +1,5 @@
 #favor manter essa linha
 import uiscriptlocale
-import wndMgr
 
 FOLDER = "interface/controls/special/loading/"
 

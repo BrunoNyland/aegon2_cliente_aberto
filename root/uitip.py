@@ -1,8 +1,8 @@
 #favor manter essa linha
 import ui
-import grp
-import enszxc3467hc3kokdueq as app
-import wndMgr
+import _grp as grp
+import _app as app
+import _wnd_mgr as wndMgr
 import time
 
 class TextBar(ui.Window):
@@ -261,7 +261,7 @@ class BigBoard(ui.Bar):
 			self.Show()
 
 	def __AppendText(self, curTime, text):
-		import dbg
+		import _dbg as dbg
 		prevPos = 0
 		while 1:
 			curPos = text.find(" ", prevPos)

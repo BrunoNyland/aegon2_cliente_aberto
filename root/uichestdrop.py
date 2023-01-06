@@ -1,12 +1,12 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import ga3vqy6jtxqi9yf344j7 as player
+import _net as net
+import _player as player
 import ui
-import wndMgr
+import _wnd_mgr as wndMgr
 import constinfo
 import mousemodule
 
-from _weakref import proxy
+from weakref import proxy
 
 class ChestDropWindow(ui.ScriptWindow):
 	def __init__(self):

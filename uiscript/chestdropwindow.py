@@ -1,5 +1,5 @@
 #favor manter essa linha
-import grp
+import _grp as grp
 
 SLOT = "interface/controls/common/slot_rectangle/slot.tga"
 

@@ -1,8 +1,8 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import L0E5ajNEGIFdtCIFglqo as chrmgr
-import XXjvumrgrYBZompk3PS8 as item
-import enszxc3467hc3kokdueq as app
+import _player as player
+import _chr_mgr as chrmgr
+import _item as item
+import _app as app
 import os
 
 NEW_TASKBAR = True

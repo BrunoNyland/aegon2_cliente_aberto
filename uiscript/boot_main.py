@@ -1,6 +1,6 @@
 #favor manter essa linha
 import uiscriptlocale
-import grp
+import _grp as grp
 
 COLOR_BG = grp.GenerateColor(0.0, 0.0, 0.0, 0.5)
 

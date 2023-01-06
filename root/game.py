@@ -1,27 +1,27 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import XXjvumrgrYBZompk3PS8 as item
-import ga3vqy6jtxqi9yf344j7 as player
-import LURMxMaKZJqliYt2QSHG as chat
-import zn94xlgo573hf8xmddzq as net
-import Js4k2l7BrdasmVRt8Wem as chr
-import L0E5ajNEGIFdtCIFglqo as chrmgr
+import _app as app
+import _item as item
+import _player as player
+import _chat as chat
+import _net as net
+import _chr as chr
+import _chr_mgr as chrmgr
 import os
-import dbg
-import grp
-import background
-import textTail
-import snd
-import wndMgr
-import systemSetting
-import quest
-import guild
-import skill
-import messenger
+import _dbg as dbg
+import _grp as grp
+import _background as background
+import _text_tail as textTail
+import _snd as snd
+import _wnd_mgr as wndMgr
+import _settings as systemSetting
+import _quest as quest
+import _guild as guild
+import _skill as skill
+import _messenger as messenger
 import localeinfo
 import constinfo
-import exchange
-import ime
+import _trade as exchange
+import _ime as ime
 import ui
 import uicommon
 import uiphasecurtain
@@ -37,7 +37,7 @@ import interfacemodule
 import musicinfo
 import debuginfo
 import stringcommander
-import event
+import _event as event
 import exception
 import uipopup
 import uiscriptlocale

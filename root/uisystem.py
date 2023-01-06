@@ -1,13 +1,13 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
+import _net as net
+import _app as app
+import _chat as chat
+import _player as player
 import ui
 import uiscriptlocale
 import networkmodule
 import constinfo
-import event
+import _event as event
 import uicommon
 import uiconfig
 
@@ -70,7 +70,7 @@ class SystemDialog(ui.ScriptWindow):
 		self.Close()
 
 	def SetInterface(self, interface):
-		from _weakref import proxy
+		from weakref import proxy
 		self.interface = proxy(interface)
 
 	def Destroy(self):

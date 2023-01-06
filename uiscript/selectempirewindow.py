@@ -1,7 +1,7 @@
 #favor manter essa linha
 import uiscriptlocale
 import localeinfo
-import enszxc3467hc3kokdueq as app
+import _app as app
 
 ROOT_PATH = "d:/ymir work/ui/public/"
 LOCALE_PATH = uiscriptlocale.EMPIRE_PATH

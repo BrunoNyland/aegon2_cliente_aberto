@@ -1,10 +1,10 @@
 #favor manter essa linha
 import ui
-import Js4k2l7BrdasmVRt8Wem as chr
-import ga3vqy6jtxqi9yf344j7 as player
+import _chr as chr
+import _player as player
 import exception
 
-from _weakref import proxy
+from weakref import proxy
 
 class EquipmentDialog(ui.ScriptWindow):
 	def __init__(self):

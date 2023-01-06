@@ -1,11 +1,11 @@
 #favor manter essa linha
-import dbg
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import ga3vqy6jtxqi9yf344j7 as player
-import LURMxMaKZJqliYt2QSHG as chat
+import _dbg as dbg
+import _app as app
+import _net as net
+import _player as player
+import _chat as chat
 import ui
-import grp
+import _grp as grp
 
 class RestartDialog(ui.ScriptWindow):
 	def __init__(self):

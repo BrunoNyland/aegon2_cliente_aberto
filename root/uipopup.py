@@ -1,7 +1,7 @@
 #favor manter essa linha
 import ui
-import wndMgr
-import grp
+import _wnd_mgr as wndMgr
+import _grp as grp
 import component
 import wait
 

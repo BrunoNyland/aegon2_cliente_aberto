@@ -1,8 +1,8 @@
 #favor manter essa linha
 import ui
-import ga3vqy6jtxqi9yf344j7 as player
-import Js4k2l7BrdasmVRt8Wem as chr
-import textTail
+import _player as player
+import _chr as chr
+import _text_tail as textTail
 
 class PlayerGauge(ui.Gauge):
 	def __init__(self, parent):

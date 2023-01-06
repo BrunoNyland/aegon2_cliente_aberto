@@ -1,15 +1,18 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
-import Js4k2l7BrdasmVRt8Wem as chr
+import _player as player
+import _app as app
+import _net as net
+import _chat as chat
+import _item as item
+import _chr as chr
+import _snd as snd
+import _shop as shop
+import _wnd_mgr as wndMgr
 
-import snd, shop, wndMgr, ui, uicommon, uitooltip, mousemodule, localeinfo, constinfo
+import ui, uicommon, uitooltip, mousemodule, localeinfo, constinfo
 import exception
 
-from _weakref import proxy
+from weakref import proxy
 
 g_isEditingOfflineShop = False
 

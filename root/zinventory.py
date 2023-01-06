@@ -1,13 +1,13 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
-import XXjvumrgrYBZompk3PS8 as item
-import LURMxMaKZJqliYt2QSHG as chat
-import Js4k2l7BrdasmVRt8Wem as chr
+import _player as player
+import _net as net
+import _app as app
+import _item as item
+import _chat as chat
+import _chr as chr
 
-import snd
-import ime
+import _snd as snd
+import _ime as ime
 import exception
 import mousemodule
 
@@ -23,7 +23,7 @@ import uiofflineshopbuilder
 import uiprivateshopbuilder
 import wait
 
-from _weakref import proxy
+from weakref import proxy
 
 ITEM_FLAG_APPLICABLE = 1 << 13
 

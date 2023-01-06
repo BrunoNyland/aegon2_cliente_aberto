@@ -1,16 +1,16 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import XXjvumrgrYBZompk3PS8 as item
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
-import LURMxMaKZJqliYt2QSHG as chat
+import _net as net
+import _item as item
+import _player as player
+import _app as app
+import _chat as chat
 import ui
-import skill
+import _skill as skill
 import localeinfo
-import wndMgr
+import _wnd_mgr as wndMgr
 import constinfo
 import mousemodule
-import guild
+import _guild as guild
 import os
 
 MOUSE_SETTINGS = [0, 0]

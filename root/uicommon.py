@@ -1,14 +1,14 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
+import _app as app
+import _chat as chat
+import _item as item
 import ui
-import ime
+import _ime as ime
 import localeinfo
 import constinfo
 import uitooltip
-import ga3vqy6jtxqi9yf344j7 as player
-import shop
+import _player as player
+import _shop as shop
 
 class PopupDialog(ui.ScriptWindow):
 

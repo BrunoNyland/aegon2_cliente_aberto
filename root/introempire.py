@@ -1,15 +1,15 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
+import _app as app
+import _net as net
 import ui
-import snd
-import event
-import wndMgr
+import _snd as snd
+import _event as event
+import _wnd_mgr as wndMgr
 import _weakref
 import localeinfo
 import uiscriptlocale
 import musicinfo
-import systemSetting
+import _settings as systemSetting
 import uitooltip
 
 class SelectEmpireWindow(ui.ScriptWindow):

@@ -3,7 +3,7 @@ LINE = "interface/controls/common/horizontal_bar/center.tga"
 HAIR = "interface/controls/special/select/hair/"
 SHAPE = "interface/controls/special/select/shape/"
 
-import grp
+import _grp as grp
 text_color = grp.GenerateColor(0.602362, 0.177165, 0.177165, 1.0)
 box_color = grp.GenerateColor(0.0, 0.0, 0.0, 1.0)
 

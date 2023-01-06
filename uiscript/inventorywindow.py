@@ -1,5 +1,5 @@
 import uiscriptlocale
-import XXjvumrgrYBZompk3PS8 as item
+import _item as item
 
 EQUIPMENT_START_INDEX = 90
 

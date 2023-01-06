@@ -1,8 +1,8 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
+import _app as app
+import _net as net
 import ui
-import dbg
+import _dbg as dbg
 import uiphasecurtain
 import localeinfo
 import game

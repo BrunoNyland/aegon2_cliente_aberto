@@ -1,5 +1,5 @@
 #favor manter essa linha
-import grp
+import _grp as grp
 interface = "interface/controls/special/taskbar/"
 buttons = "interface/controls/common/button/"
 

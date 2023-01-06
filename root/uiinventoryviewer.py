@@ -1,12 +1,12 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
-import Js4k2l7BrdasmVRt8Wem as chr
+import _player as player
+import _app as app
+import _chr as chr
 import ui
 import exception
 import constinfo
 
-from _weakref import proxy
+from weakref import proxy
 
 PAGE_EQUIPMENT = 1
 PAGE_INVENTORY = 2

@@ -1,7 +1,7 @@
 #favor manter essa linha
 import ui
-import ga3vqy6jtxqi9yf344j7 as player
-import zn94xlgo573hf8xmddzq as net
+import _player as player
+import _net as net
 import localeinfo
 
 class GameButtonWindow(ui.ScriptWindow):

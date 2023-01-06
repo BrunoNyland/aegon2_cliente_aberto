@@ -1,5 +1,5 @@
 #favor manter essa linha
-import grp
+import _grp as grp
 import colorinfo
 from _uiscript_helper import *
 

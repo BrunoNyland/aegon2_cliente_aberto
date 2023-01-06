@@ -1,19 +1,19 @@
 #favor manter essa linha
 import ui
-import snd
-import shop
+import _snd as snd
+import _shop as shop
 import mousemodule
-import ga3vqy6jtxqi9yf344j7 as player
-import Js4k2l7BrdasmVRt8Wem as chr
-import zn94xlgo573hf8xmddzq as net
+import _player as player
+import _chr as chr
+import _net as net
 import uicommon
 import localeinfo
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
-import systemSetting
-import ga3vqy6jtxqi9yf344j7 as player
+import _chat as chat
+import _item as item
+import _settings as systemSetting
+import _player as player
 
-from _weakref import proxy
+from weakref import proxy
 
 g_isBuildingPrivateShop = False
 g_itemPriceDict={}
@@ -401,5 +401,5 @@ class PrivateShopBuilder(ui.ScriptWindow):
 			self.interface.RefreshMarkInventoryBag()
 
 	def SetInven(self, wndInventory):
-		from _weakref import proxy
+		from weakref import proxy
 		self.wndInventory = proxy(wndInventory)

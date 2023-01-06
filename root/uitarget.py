@@ -1,18 +1,18 @@
 #favor manter essa linha
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
-import LURMxMaKZJqliYt2QSHG as chat
+import _player as player
+import _item as item
+import _net as net
+import _app as app
+import _chat as chat
 import ui
-import wndMgr
-import messenger
-import guild
-import Js4k2l7BrdasmVRt8Wem as chr
-import nonplayer
+import _wnd_mgr as wndMgr
+import _messenger as messenger
+import _guild as guild
+import _chr as chr
+import _non_player as nonplayer
 import localeinfo
 import constinfo
-import background
+import _background as background
 import uicommon
 import uitooltip
 

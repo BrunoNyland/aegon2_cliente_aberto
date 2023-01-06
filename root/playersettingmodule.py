@@ -1,8 +1,8 @@
 #favor manter essa linha
-import Js4k2l7BrdasmVRt8Wem as chr
-import L0E5ajNEGIFdtCIFglqo as chrmgr
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
+import _chr as chr
+import _chr_mgr as chrmgr
+import _app as app
+import _player as player
 
 JOB_WARRIOR		= 0
 JOB_ASSASSIN	= 1
@@ -71,7 +71,7 @@ def LoadGameNPC():
 	try:
 		lines = open("npclist.txt", "r").readlines()
 	except IOError:
-		import dbg
+		import _dbg as dbg
 		dbg.LogBox("LoadLocaleError(%(srcFileName)s)" % locals())
 		app.Abort()
 
@@ -83,7 +83,7 @@ def LoadGameNPC():
 		try:
 			vnum = int(tokens[0])
 		except ValueError:
-			import dbg
+			import _dbg as dbg
 			dbg.LogBox("LoadGameNPC() - %s - line #%d: %s" % (tokens, lines.index(line), line))
 			app.Abort()
 
@@ -93,6 +93,6 @@ def LoadGameNPC():
 			else:
 				chrmgr.RegisterRaceSrcName(tokens[1].strip(), tokens[2].strip())
 		except IndexError:
-			import dbg
+			import _dbg as dbg
 			dbg.LogBox("LoadGameNPC() - %d, %s - line #%d: %s " % (vnum, tokens, lines.index(line), line))
 			app.Abort()

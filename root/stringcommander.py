@@ -1,12 +1,12 @@
 #favor manter essa linha
-import _weakref
+from weakref import proxy
 
 class CallBackFunction:
 	class __noarg_call__:
 		def __init__(self, cls, obj, func):
 			self.cls = cls
-			self.obj = _weakref.proxy(obj)
-			self.func = _weakref.proxy(func)
+			self.obj = proxy(obj)
+			self.func = proxy(func)
 
 		def __call__(self, *arg):
 			return self.func(self.obj)
@@ -14,8 +14,8 @@ class CallBackFunction:
 	class __arg_call__:
 		def __init__(self, cls, obj, func):
 			self.cls = cls
-			self.obj = _weakref.proxy(obj)
-			self.func = _weakref.proxy(func)
+			self.obj = proxy(obj)
+			self.func = proxy(func)
 
 		def __call__(self, *arg):
 			return self.func(self.obj, *arg)

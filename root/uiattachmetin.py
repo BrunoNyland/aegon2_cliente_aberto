@@ -1,14 +1,14 @@
 #favor manter essa linha
-import dbg
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import zn94xlgo573hf8xmddzq as net
-import snd
+import _dbg as dbg
+import _player as player
+import _item as item
+import _net as net
+import _snd as snd
 import ui
 import uitooltip
-import wndMgr
+import _wnd_mgr as wndMgr
 
-from _weakref import proxy
+from weakref import proxy
 
 class AttachMetinDialog(ui.ScriptWindow):
 	def __init__(self, wndInventory):

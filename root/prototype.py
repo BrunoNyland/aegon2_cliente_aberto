@@ -1,8 +1,8 @@
 #favor manter essa linha
-import dbg
-import enszxc3467hc3kokdueq as app
-import wndMgr
-import systemSetting
+import _dbg as dbg
+import _app as app
+import _wnd_mgr as wndMgr
+import _settings as systemSetting
 import mousemodule
 import networkmodule
 import constinfo

@@ -1,7 +1,7 @@
 #favor manter essa linha
 import ui
-import grp
-import wndMgr
+import _grp as grp
+import _wnd_mgr as wndMgr
 
 class PhaseCurtain(ui.Bar):
 	def __init__(self):

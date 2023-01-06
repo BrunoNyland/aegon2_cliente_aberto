@@ -1,15 +1,15 @@
 #favor manter essa linha
 import ui
 import mousemodule
-import ga3vqy6jtxqi9yf344j7 as player
-import zn94xlgo573hf8xmddzq as net
-import snd
-import safebox
-import LURMxMaKZJqliYt2QSHG as chat
-import enszxc3467hc3kokdueq as app
+import _player as player
+import _net as net
+import _snd as snd
+import _safebox as safebox
+import _chat as chat
+import _app as app
 import localeinfo
 
-from _weakref import proxy
+from weakref import proxy
 
 class PasswordDialog(ui.ScriptWindow):
 	def __init__(self):

@@ -1,14 +1,14 @@
 #favor manter essa linha
 import ui
 import uiscriptlocale
-import wndMgr
-import ga3vqy6jtxqi9yf344j7 as player
-import miniMap
+import _wnd_mgr as wndMgr
+import _player as player
+import _mini_map as miniMap
 import localeinfo
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
+import _net as net
+import _app as app
 import constinfo
-import background
+import _background as background
 import exception
 
 class MapTextToolTip(ui.ScriptWindow):

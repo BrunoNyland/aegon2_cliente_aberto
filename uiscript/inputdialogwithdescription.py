@@ -3,7 +3,7 @@ import uiscriptlocale
 width = 190
 height = 150
 
-import grp
+import _grp as grp
 box_color = grp.GenerateColor(0.181, 0.204, 0.204, 1.0)
 normal_color = grp.GenerateColor(0.0, 0.0, 0.0, 0.8)
 

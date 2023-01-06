@@ -1,7 +1,7 @@
 #favor manter essa linha
 import uiscriptlocale
 import Js4k2l7BrdasmVRt8Wem as chr
-import enszxc3467hc3kokdueq as app
+import _app as app
 
 whisper = "interface/controls/special/whisper/"
 

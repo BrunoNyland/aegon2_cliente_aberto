@@ -1,12 +1,12 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import XXjvumrgrYBZompk3PS8 as item
-import ga3vqy6jtxqi9yf344j7 as player
-import systemSetting
-import grpImage
-import wndMgr
-import skill
-import dbg
+import _app as app
+import _item as item
+import _player as player
+import _settings as systemSetting
+import _grp_image as grpImage
+import _wnd_mgr as wndMgr
+import _skill as skill
+import _dbg as dbg
 import ui
 
 class CursorImage(object):

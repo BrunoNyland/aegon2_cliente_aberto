@@ -1,13 +1,13 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
+import _net as net
+import _player as player
+import _item as item
 import ui
 import uitooltip
 import localeinfo
 import uicommon
 import wait
-import grp
+import _grp as grp
 
 class RefineDialogNew(ui.ScriptWindow):
 
@@ -491,7 +491,7 @@ class RefineDialogNew(ui.ScriptWindow):
 				self.wndInventory.wndItem.SetCantMouseEventSlot(localSlotPos)
 
 	def SetInven(self, wndInventory):
-		from _weakref import proxy
+		from weakref import proxy
 		self.wndInventory = proxy(wndInventory)
 
 	def RefreshLockedSlot(self):

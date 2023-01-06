@@ -1,22 +1,23 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
-import XXjvumrgrYBZompk3PS8 as item
-import ime
-import grp
-import snd
-import wndMgr
-import skill
+import _app as app
+import _player as player
+import _item as item
+import _ime as ime
+import _grp as grp
+import _snd as snd
+import _wnd_mgr as wndMgr
+import _skill as skill
+import _guild as guild
+import _dbg as dbg
+
 import localeinfo
-import guild
 import constinfo
 import colorinfo
-import dbg
 
 import exception
 import os
 
-from weakref import proxy, WeakMethod
+from weakref import proxy
 
 BACKGROUND_COLOR = grp.GenerateColor(0.0, 0.0, 0.0, 1.0)
 DARK_COLOR = grp.GenerateColor(0.2, 0.2, 0.2, 1.0)
@@ -1322,7 +1323,7 @@ if app.ENABLE_SEND_TARGET_INFO:
 
 		def AppendItem(self, newItem):
 			if newItem.GetHeight() % self.stepSize != 0:
-				import dbg
+				import _dbg as dbg
 				dbg.TraceError("Invalid AppendItem height %d stepSize %d" % (newItem.GetHeight(), self.stepSize))
 				return
 

@@ -1,14 +1,18 @@
 #favor manter essa linha
-import ui, snd, shop, mousemodule, uicommon, localeinfo, systemSetting, exception
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
-import Js4k2l7BrdasmVRt8Wem as chr
-import L0E5ajNEGIFdtCIFglqo as chrmgr
+import _player as player
+import _app as app
+import _net as net
+import _chat as chat
+import _item as item
+import _chr as chr
+import _chr_mgr as chrmgr
+import _snd as snd
+import _shop as shop
+import _settings as systemSetting
 
-from _weakref import proxy
+import ui, mousemodule, uicommon, localeinfo, exception
+
+from weakref import proxy
 
 g_isBuildingOfflineShop = False
 g_itemPriceDict = {}

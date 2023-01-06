@@ -1,11 +1,11 @@
 #favor manter essa linha
 import ui
-import grp
-import LURMxMaKZJqliYt2QSHG as chat
-import XXjvumrgrYBZompk3PS8 as item
-import ga3vqy6jtxqi9yf344j7 as player
+import _grp as grp
+import _chat as chat
+import _item as item
+import _player as player
 import uitooltip
-import zn94xlgo573hf8xmddzq as net
+import _net as net
 import localeinfo
 import mousemodule
 import wait

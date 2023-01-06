@@ -1,6 +1,6 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
-import enszxc3467hc3kokdueq as app
+import _net as net
+import _app as app
 import ui
 import constinfo
 

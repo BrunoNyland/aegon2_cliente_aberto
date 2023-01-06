@@ -1,5 +1,5 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
+import _app as app
 
 MAP_TRENT02 = "MAP_TRENT02"
 MAP_WL = "MAP_WL"
@@ -40,7 +40,7 @@ def LoadLocaleFile(srcFileName, localeDict):
 	try:
 		lines = open(srcFileName, "r").readlines()
 	except IOError:
-		import dbg
+		import _dbg as dbg
 		dbg.LogBox("LoadLocaleError(%(srcFileName)s)" % locals())
 		app.Abort()
 
@@ -60,7 +60,7 @@ def LoadLocaleFile(srcFileName, localeDict):
 
 			lineIndex += 1
 		except BaseException:
-			import dbg
+			import _dbg as dbg
 			dbg.LogBox("%s: line(%d): %s" % (srcFileName, lineIndex, line), "Error")
 			raise
 

@@ -1,7 +1,7 @@
 #favor manter essa linha
-import zn94xlgo573hf8xmddzq as net
+import _net as net
 import ui
-import background
+import _background as background
 
 class SiegeWarScore(ui.ScriptWindow):
 

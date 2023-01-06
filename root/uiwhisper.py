@@ -1,14 +1,14 @@
 #favor manter essa linha
 import ui
-import zn94xlgo573hf8xmddzq as net
-import LURMxMaKZJqliYt2QSHG as chat
-import ga3vqy6jtxqi9yf344j7 as player
-import enszxc3467hc3kokdueq as app
+import _net as net
+import _chat as chat
+import _player as player
+import _app as app
 import localeinfo
-import ime
+import _ime as ime
 import constinfo
 
-from _weakref import proxy
+from weakref import proxy
 
 if app.ENABLE_EMOJI_SYSTEM:
 	import uiemojispm

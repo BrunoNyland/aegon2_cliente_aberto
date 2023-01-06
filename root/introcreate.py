@@ -1,15 +1,15 @@
 #favor manter essa linha
-import Js4k2l7BrdasmVRt8Wem as chr
-import enszxc3467hc3kokdueq as app
-import zn94xlgo573hf8xmddzq as net
+import _chr as chr
+import _app as app
+import _net as net
 import playersettingmodule
-import systemSetting
+import _settings as systemSetting
 import localeinfo
 import musicinfo
 import uitooltip
-import wndMgr
-import grp
-import snd
+import _wnd_mgr as wndMgr
+import _grp as grp
+import _snd as snd
 import ui
 
 MAN			= 0

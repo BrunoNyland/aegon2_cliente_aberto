@@ -1,12 +1,12 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
-import zn94xlgo573hf8xmddzq as net
-import Js4k2l7BrdasmVRt8Wem as chr
-import LURMxMaKZJqliYt2QSHG as chat
+import _app as app
+import _player as player
+import _net as net
+import _chr as chr
+import _chat as chat
+import _dbg as dbg
+import _skill as skill
 import ui
-import dbg
-import skill
 import uicommon
 import uitooltip
 import localeinfo
@@ -325,7 +325,7 @@ class AffectShower(ui.Window):
 			chr.AFFECT_GWIGEOM: (localeinfo.SKILL_GWIGEOM, "icon/affectshower/lamina_sombria_p.tga",),
 			chr.AFFECT_GONGPO: (localeinfo.SKILL_GONGPO, "icon/affectshower/medo_p.tga",),
 			chr.AFFECT_JUMAGAP: (localeinfo.SKILL_JUMAGAP, "icon/affectshower/aura_p.tga"),
-			chr.AFFECT_HEUKSIN: (localeinfo.SKILL_HEUKSIN, "icon/affectshower/proteção_p.tga",),
+			chr.AFFECT_HEUKSIN: (localeinfo.SKILL_HEUKSIN, "icon/affectshower/protecao_p.tga",),
 			chr.AFFECT_MUYEONG: (localeinfo.SKILL_MUYEONG, "icon/affectshower/evocar_p.tga",),
 			chr.AFFECT_PABEOP: (localeinfo.SKILL_PABEOP, "icon/affectshower/discipar_p.tga",),
 			chr.AFFECT_GYEONGGONG: (localeinfo.SKILL_GYEONGGONG, "icon/affectshower/passos_p.tga",),

@@ -1,14 +1,14 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
-import ga3vqy6jtxqi9yf344j7 as player
-import LURMxMaKZJqliYt2QSHG as chat
+import _app as app
+import _player as player
+import _chat as chat
 import ui
 import uicommon
-import grp
-import wndMgr
+import _grp as grp
+import _wnd_mgr as wndMgr
 import localeinfo
 import uitooltip
-import skill
+import _skill as skill
 import sys
 import os
 

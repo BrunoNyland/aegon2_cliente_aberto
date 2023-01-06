@@ -1,15 +1,10 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
+import _app as app
 
 CODEPAGE = str(app.GetDefaultCodePage())
 
 def LoadLocaleFile(srcFileName, localeDict):
-	try:
-		lines = open(srcFileName, "r").readlines()
-	except IOError:
-		import dbg
-		dbg.LogBox("Load uiscript/LocaleError(%(srcFileName)s)" % locals())
-		app.Abort()
+	lines = open(srcFileName, "r").readlines()
 
 	for line in lines:
 		tokens = line[:-1].split("\t")

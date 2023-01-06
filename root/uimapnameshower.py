@@ -1,5 +1,5 @@
 #favor manter essa linha
-import enszxc3467hc3kokdueq as app
+import _app as app
 import ui
 import uiscriptlocale
 
