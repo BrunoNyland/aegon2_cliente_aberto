@@ -6,3 +6,5 @@ log.txt
 lib/__pycache__/
 
 *.cfg
+miles/*.cfg
+miles/*.inf
