@@ -300,7 +300,7 @@ class WhisperDialog(ui.ScriptWindow):
 	def SetChatLineMax(self, max):
 		self.chatLine.SetMax(max)
 
-		from grpText import GetSplitingTextLine
+		from _grp_text import GetSplitingTextLine
 
 		text = self.chatLine.GetText()
 		if text:

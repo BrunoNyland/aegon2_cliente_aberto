@@ -29,7 +29,9 @@ def GetMouseButtonSettings():
 
 def SaveMouseButtonSettings():
 	global MOUSE_SETTINGS
-	open("miles/mouse.cfg", "w", "folder").write("%s\t%s" % tuple(MOUSE_SETTINGS))
+	f = open("miles/mouse.cfg", "w", "folder")
+	f.write("%s\t%s" % tuple(MOUSE_SETTINGS))
+	f.close()
 
 def LoadMouseButtonSettings():
 	global MOUSE_SETTINGS
@@ -37,15 +39,21 @@ def LoadMouseButtonSettings():
 	if not os.path.exists("miles/mouse.cfg"):
 		MOUSE_SETTINGS[0] = int(5)
 		MOUSE_SETTINGS[1] = int(3)
-		open("miles/mouse.cfg", "w", "folder").write("5\t3")
+		f = open("miles/mouse.cfg", "w", "folder")
+		f.write("5\t3")
+		f.close()
 		return
 
-	tokens = open("miles/mouse.cfg", "r", "folder").read().split()
+	f = open("miles/mouse.cfg", "r", "folder")
+	tokens = f.read().split()
+	f.close()
 
 	if len(tokens) != 2:
 		MOUSE_SETTINGS[0] = int(5)
 		MOUSE_SETTINGS[1] = int(3)
-		open("miles/mouse.cfg", "w", "folder").write("5\t3")
+		f = open("miles/mouse.cfg", "w", "folder")
+		f.write("5\t3")
+		f.close()
 		return
 
 	MOUSE_SETTINGS[0] = int(tokens[0])
