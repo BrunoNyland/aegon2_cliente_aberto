@@ -8,3 +8,5 @@ lib/__pycache__/
 *.cfg
 miles/*.cfg
 miles/*.inf
+*.cfg
+miles/metin2.cfg
