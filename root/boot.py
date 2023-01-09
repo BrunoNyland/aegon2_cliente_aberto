@@ -1320,7 +1320,9 @@ class Bot(ui.ScriptWindow):
 	def ReturnConfigs(self):
 		if not os.path.exists("miles/boot.cfg"):
 			self.MakeConfigs()
-		lines = open("miles/boot.cfg", "r", "folder").readlines()
+		f = open("miles/boot.cfg", "r", "folder")
+		lines = f.readlines()
+		f.close()
 		if len(lines) != int(4):
 			self.MakeConfigs()
 		return lines
