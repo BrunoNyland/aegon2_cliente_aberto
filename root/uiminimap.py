@@ -275,6 +275,7 @@ class MiniMap(ui.ScriptWindow):
 			if self.MiniMapWindow.IsIn():
 				(mouseX, mouseY) = wndMgr.GetMousePosition()
 				(bFind, sName, iPosX, iPosY, dwTextColor) = miniMap.GetInfo(mouseX, mouseY)
+
 				if bFind == 0:
 					self.tooltipInfo.Hide()
 				elif not self.canSeeInfo:
