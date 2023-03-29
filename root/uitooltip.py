@@ -947,9 +947,9 @@ class ItemToolTip(ToolTip):
 		return 0
 
 	def __SetPolymorphItemTitle(self, monsterVnum):
-		itemName =nonplayer.GetMonsterName(monsterVnum)
-		itemName+=" "
-		itemName+=item.GetItemName()
+		itemName = nonplayer.GetMonsterName(monsterVnum)
+		itemName += " "
+		itemName += item.GetItemName()
 		self.SetTitle(itemName)
 
 	def __SetNormalItemTitle(self):

@@ -197,7 +197,9 @@ def ReturnSavedOptions():
 		file.write("")
 		file.close()
 
-	lines = open("miles/bonus.cfg", "r", "folder").readlines()
+	f = open("miles/bonus.cfg", "r", "folder")
+	lines = f.readlines()
+	f.close()
 	return lines
 
 def RemoveLine(line_to_remove):

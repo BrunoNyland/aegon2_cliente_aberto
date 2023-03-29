@@ -1947,7 +1947,7 @@ class GameWindow(ui.ScriptWindow):
 
 	def __ViewEquipRequestDenied(self, vid):
 		vid = int(vid)
-		self.PopupMessage("Pedido negado pelo usuÃ¡rio " + chr.GetNameByVID(vid) + ".")
+		self.PopupMessage("Pedido negado pelo usuário " + chr.GetNameByVID(vid) + ".")
 
 	#Amigos System
 	def __ShowPopup(self, arg):

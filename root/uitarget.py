@@ -655,16 +655,18 @@ class TargetBoard(ui.ThinBoard):
 		if app.ENABLE_SEND_TARGET_INFO:
 			vnum = nonplayer.GetRaceNumByVID(vid)
 		name = chr.GetNameByVID(vid)
-		level = nonplayer.GetLevelByVID(vid)
-		grade = nonplayer.GetGradeByVID(vid)
 
-		nameFront = ""
-		if -1 != level:
-			nameFront += "Lv." + str(level) + " "
-		if self.GRADE_NAME.__contains__(grade):
-			nameFront += "(" + self.GRADE_NAME[grade] + ") "
+		# level = int(nonplayer.GetLevelByVID(vid))
+		# grade = int(nonplayer.GetGradeByVID(vid))
 
-		self.SetTargetName(nameFront + name)
+		# name_front = ''
+		# if level > 0:
+		# 	name_front = 'Lv. %d ' % level
+		# if grade in self.GRADE_NAME:
+		# 	name_front = '%s %s' % (name_front, self.GRADE_NAME[grade])
+
+		chat.AppendChat(0, name)
+		self.SetTargetName(name)
 
 		if app.ENABLE_SEND_TARGET_INFO:
 			(textWidth, textHeight) = self.name.GetTextSize()

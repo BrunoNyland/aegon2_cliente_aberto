@@ -1815,7 +1815,10 @@ class EmojisListBoard(ui.Window):
 		self.ScrollBar.SetPos(0)
 
 		if (categoria == 0):
-			lines = open(EMOJI_FILE_NAME, "r", "folder").readlines()
+			f = open(EMOJI_FILE_NAME, "r", "folder")
+			lines = f.readlines()
+			f.close()
+
 			for line in lines:
 				tokens = line[:-1].split("\t")
 				if len(tokens) == 2:
