@@ -985,9 +985,6 @@ class ItemTabBar(ui.ScriptWindow):
 		def IsActive_rare(self):
 			return self.boni_rare_active == 1
 
-		def SetParentProxy(self, parent):
-			ui.ScriptWindow.SetParentProxy(self, parent)
-
 		def Select(self):
 			self.parentWindow.UnSelectAll()
 			self.bonusSelector.Show()
@@ -1788,7 +1785,7 @@ class DropDown(ui.Window):
 		self.GetText = ui.__mem_func__(self.act.GetText)
 
 		self.Drop = ui.Bar("TOP_MOST")
-		self.Drop.SetParent(self.GetParentProxy().GetParentProxy())
+		self.Drop.SetParent(self.GetParent().GetParent())
 		self.Drop.SetPosition(self.GetGlobalLeft(), self.GetGlobalTop() + self.GetHeight())
 		self.Drop.SetSize(150, 0)
 		self.Drop.SetColor(0xff0a0a0a)

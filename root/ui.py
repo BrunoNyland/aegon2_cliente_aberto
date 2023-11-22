@@ -10,14 +10,16 @@ import _skill as skill
 import _guild as guild
 import _dbg as dbg
 
+from weakref import proxy, ProxyType
+from types import FunctionType
+from typing import Self
+
 import localeinfo
 import constinfo
 import colorinfo
-
 import exception
-import os
 
-from weakref import proxy
+from ui_events import UiEvents
 
 BACKGROUND_COLOR = grp.GenerateColor(0.0, 0.0, 0.0, 1.0)
 DARK_COLOR = grp.GenerateColor(0.2, 0.2, 0.2, 1.0)
@@ -26,15 +28,9 @@ SELECT_COLOR = grp.GenerateColor(0.0, 0.0, 0.5, 0.3)
 WHITE_COLOR = grp.GenerateColor(1.0, 1.0, 1.0, 0.5)
 HALF_WHITE_COLOR = grp.GenerateColor(1.0, 1.0, 1.0, 0.2)
 
-OLD_STUFF = False
-
 createToolTipWindowDict = {}
 def RegisterToolTipWindow(type, createToolTipWindow):
 	createToolTipWindowDict[type] = createToolTipWindow
-
-if OLD_STUFF:
-	def RegisterCandidateWindowClass(codePage, candidateWindowClass):
-		EditLine.candidateWindowClassDict[codePage] = candidateWindowClass
 
 app.SetDefaultFontName(localeinfo.UI_DEF_FONT)
 
@@ -44,7 +40,7 @@ app.SetDefaultFontName(localeinfo.UI_DEF_FONT)
 if constinfo.DETECT_LEAKING_WINDOWS:
 	import weakref
 	import sys
-	def trace_calls_and_returns(frame, event, arg): #as the name (somewhat) implies build trace of calls and remove trace on returns
+	def trace_calls_and_returns(frame, event, arg):
 		co = frame.f_code
 		func_name = co.co_name
 		line_no = frame.f_lineno
@@ -58,12 +54,12 @@ if constinfo.DETECT_LEAKING_WINDOWS:
 
 	sys.settrace(trace_calls_and_returns)
 
-	class ExtendedRef(weakref.ref): # extended weakref object to store the backtrace, type of actual object and the parent name, if any
+	class ExtendedRef(weakref.ref):
 		def __init__(self, ob, callback = None):
 			super(ExtendedRef, self).__init__(ob, callback)
 			self.typeStr = str(ob)
 			self.strParent = ""
-			self.traceBack = constinfo.WINDOW_OBJ_TRACE[:] # just deepcopy the current trace
+			self.traceBack = constinfo.WINDOW_OBJ_TRACE[:]
 
 class __mem_func__:
 	class __noarg_call__:
@@ -84,7 +80,7 @@ class __mem_func__:
 		def __call__(self, *arg):
 			return self.func(self.obj, *arg)
 
-	def __init__(self, mfunc):
+	def __init__(self, mfunc:FunctionType):
 		if mfunc.__code__.co_argcount > 1:
 			self.call = __mem_func__.__arg_call__(mfunc.__class__, mfunc.__self__, mfunc.__func__)
 		else:
@@ -94,31 +90,18 @@ class __mem_func__:
 		return self.call(*arg)
 
 class Window(object):
-
-	onHideEvent = None
-	onHideArgs = None
-
-	onShowEvent = None
-	onShowArgs = None
-
-	def __init__(self, layer:str="UI") -> None:
+	def __init__(self, layer:str="UI", name:str="NONAME_Window") -> None:
 		if constinfo.DETECT_LEAKING_WINDOWS:
 			constinfo.WINDOW_TOTAL_OBJ_COUNT += 1
 			if constinfo.WINDOW_COUNT_OBJ:
 				constinfo.WINDOW_OBJ_COUNT += 1
-				constinfo.WINDOW_OBJ_LIST[id(self)] = ExtendedRef(self) # save trace and other data
+				constinfo.WINDOW_OBJ_LIST[id(self)] = ExtendedRef(self)
 
 		self.hWnd = None
-		self.parentWindow = None
+		self.Initialize()
 		self.RegisterWindow(layer)
+		self.SetWindowName(name)
 		self.Hide()
-
-		self.InitializeEvents()
-
-		self.baseX = 0
-		self.baseY = 0
-
-		self.SetWindowName("NONAME_Window")
 
 	def __del__(self) -> None:
 		if constinfo.DETECT_LEAKING_WINDOWS:
@@ -129,45 +112,25 @@ class Window(object):
 
 		wndMgr.Destroy(self.hWnd)
 
+	def Create(self, name:str, parent:'Window', x:int, y:int, height:int, width:int) -> Self:
+		self.SetWindowName(name)
+		self.SetParent(parent)
+		self.SetSize(width, height)
+		self.SetPosition(height, width)
+		self.Show()
+		return self
+
 	def RegisterWindow(self, layer:str) -> None:
 		self.hWnd = wndMgr.Register(self, layer)
 
 	def Destroy(self) -> None:
-		self.InitializeEvents()
+		self.Initialize()
 		self.Hide()
 
-	def InitializeEvents(self) -> None:
-		#Args Provided by C++
-		self.onRunMouseWheelEvent = None
-		self.moveWindowEvent = None
-
-		#Args Provided by Python
-		self.onHideEvent = None
-		self.onHideArgs = None
-
-		self.onShowEvent = None
-		self.onShowArgs = None
-
-		self.mouseLeftButtonDownEvent = None
-		self.mouseLeftButtonDownArgs = None
-
-		self.mouseLeftButtonUpEvent = None
-		self.mouseLeftButtonUpArgs = None
-
-		self.mouseLeftButtonDoubleClickEvent = None
-		self.mouseLeftButtonDoubleClickArgs = None
-
-		self.mouseRightButtonDownEvent = None
-		self.mouseRightButtonDownArgs = None
-
-		self.renderEvent = None
-		self.renderArgs = None
-
-		self.overInEvent = None
-		self.overInArgs = None
-
-		self.overOutEvent = None
-		self.overOutArgs = None
+	def Initialize(self) -> None:
+		self.window_name = ''
+		self.parent = None
+		self.events = UiEvents()
 
 	def GetWindowHandle(self):
 		return self.hWnd
@@ -175,33 +138,35 @@ class Window(object):
 	def AddFlag(self, style:str) -> None:
 		wndMgr.AddFlag(self.hWnd, style)
 
-	def IsRTL(self):
+	def IsRTL(self) -> int:
 		return wndMgr.IsRTL(self.hWnd)
 
 	def SetWindowName(self, name:str) -> None:
+		self.window_name = name
 		wndMgr.SetName(self.hWnd, name)
 
 	def GetWindowName(self) -> str:
-		return wndMgr.GetName(self.hWnd)
+		# return wndMgr.GetName(self.hWnd)
+		return self.window_name
 
 	def SetParent(self, parent) -> None:
-		if parent:
-			if constinfo.DETECT_LEAKING_WINDOWS: # find our window in the saved obj list and save its parent address
-				if constinfo.WINDOW_COUNT_OBJ and id(self) in constinfo.WINDOW_OBJ_LIST:
-					constinfo.WINDOW_OBJ_LIST[id(self)].strParent = str(parent)
-			wndMgr.SetParent(self.hWnd, parent.hWnd)
-		else:
+		if not parent:
 			wndMgr.SetParent(self.hWnd, 0)
+			return
 
-	def SetAttachParent(self, parent) -> None:
-		wndMgr.SetAttachParent(self.hWnd, parent.hWnd)
+		if constinfo.DETECT_LEAKING_WINDOWS:
+			if constinfo.WINDOW_COUNT_OBJ and id(self) in constinfo.WINDOW_OBJ_LIST:
+				constinfo.WINDOW_OBJ_LIST[id(self)].strParent = str(parent)
 
-	def SetParentProxy(self, parent) -> None:
-		self.parentWindow = proxy(parent)
 		wndMgr.SetParent(self.hWnd, parent.hWnd)
 
-	def GetParentProxy(self):
-		return self.parentWindow
+		if isinstance(parent, ProxyType):
+			self.parent = parent
+		else:
+			self.parent = proxy(parent)
+
+	def GetParent(self) -> 'Window':
+		return self.parent
 
 	def SetPickAlways(self) -> None:
 		wndMgr.SetPickAlways(self.hWnd)
@@ -228,13 +193,11 @@ class Window(object):
 		wndMgr.SetTop(self.hWnd)
 
 	def Show(self) -> None:
-		if self.onShowEvent:
-			self.onShowEvent(*self.onShowArgs)
+		self.events.ExecuteEvent('Show')
 		wndMgr.Show(self.hWnd)
 
 	def Hide(self) -> None:
-		if self.onHideEvent:
-			self.onHideEvent(*self.onHideArgs)
+		self.events.ExecuteEvent('Hide')
 		wndMgr.Hide(self.hWnd)
 
 	def Lock(self) -> None:
@@ -243,13 +206,13 @@ class Window(object):
 	def Unlock(self) -> None:
 		wndMgr.Unlock(self.hWnd)
 
-	def IsShow(self):
+	def IsShow(self) -> int:
 		return wndMgr.IsShow(self.hWnd)
 
 	def UpdateRect(self) -> None:
 		wndMgr.UpdateRect(self.hWnd)
 
-	def SetSize(self, width, height) -> None:
+	def SetSize(self, width:int, height:int) -> None:
 		wndMgr.SetWindowSize(self.hWnd, int(width), int(height))
 
 	def GetWidth(self) -> int:
@@ -271,20 +234,16 @@ class Window(object):
 		return wndMgr.GetWindowRect(self.hWnd)
 
 	def GetLeft(self) -> int:
-		x, y = self.GetLocalPosition()
-		return x
+		return self.GetLocalPosition()[0]
 
 	def GetGlobalLeft(self) -> int:
-		x, y = self.GetGlobalPosition()
-		return x
+		return self.GetGlobalPosition()[0]
 
 	def GetTop(self) -> int:
-		x, y = self.GetLocalPosition()
-		return y
+		return self.GetLocalPosition()[1]
 
 	def GetGlobalTop(self) -> int:
-		x, y = self.GetGlobalPosition()
-		return y
+		return self.GetGlobalPosition()[1]
 
 	def GetRight(self) -> int:
 		return self.GetLeft() + self.GetWidth()
@@ -292,15 +251,20 @@ class Window(object):
 	def GetBottom(self) -> int:
 		return self.GetTop() + self.GetHeight()
 
-	def SetLeft(self, x) -> None:
+	def SetLeft(self, x:int) -> None:
 		wndMgr.SetWindowPosition(self.hWnd, int(x), self.GetTop())
 
-	def SavePosition(self) -> None:
-		self.baseX = self.GetLeft()
-		self.baseY = self.GetTop()
+	def SetX(self, x:int) -> None:
+		wndMgr.SetWindowPosition(self.hWnd, int(x), self.GetTop())
 
-	def UpdatePositionByScale(self, scale) -> None:
-		self.SetPosition(int(self.baseX * scale), int(self.baseY * scale))
+	def SetY(self, y:int) -> None:
+		wndMgr.SetWindowPosition(self.hWnd, self.GetLeft(), int(y))
+
+	def GetX(self) -> int:
+		return self.GetLeft()
+
+	def GetY(self) -> int:
+		return self.GetTop()
 
 	def IsInPosition(self) -> bool:
 		xMouse, yMouse = wndMgr.GetMousePosition()
@@ -308,84 +272,114 @@ class Window(object):
 		return xMouse >= x and xMouse < x + self.GetWidth() and yMouse >= y and yMouse < y + self.GetHeight()
 
 	def SetMouseLeftButtonDownEvent(self, event, *args) -> None:
-		self.mouseLeftButtonDownEvent = __mem_func__(event)
-		self.mouseLeftButtonDownArgs = args
+		self.events.SetEvent('OnMouseLeftButtonDown', event, *args)
 
 	def OnMouseLeftButtonDown(self) -> None:
-		if self.mouseLeftButtonDownEvent:
-			self.mouseLeftButtonDownEvent(*self.mouseLeftButtonDownArgs)
+		self.events.ExecuteEvent('OnMouseLeftButtonDown')
 
 	def SetMouseLeftButtonDoubleClickEvent(self, event, *args) -> None:
-		self.mouseLeftButtonDoubleClickEvent = __mem_func__(event)
-		self.mouseLeftButtonDoubleClickArgs = args
+		self.events.SetEvent('OnMouseLeftButtonDoubleClick', event, *args)
 
 	def OnMouseLeftButtonDoubleClick(self) -> None:
-		if self.mouseLeftButtonDoubleClickEvent:
-			self.mouseLeftButtonDoubleClickEvent(*self.mouseLeftButtonDoubleClickArgs)
+		self.events.ExecuteEvent('OnMouseLeftButtonDoubleClick')
 
 	def SetMouseRightButtonDownEvent(self, event, *args) -> None:
-		self.mouseRightButtonDownEvent = __mem_func__(event)
-		self.mouseRightButtonDownArgs = args
+		self.events.SetEvent('OnMouseLeftButtonDoubleClick', event, *args)
 
 	def OnMouseRightButtonDown(self) -> None:
-		if self.mouseRightButtonDownEvent:
-			self.mouseRightButtonDownEvent(*self.mouseRightButtonDownArgs)
+		self.events.ExecuteEvent('OnMouseRightButtonDown')
 
 	def SetMouseLeftButtonUpEvent(self, event, *args) -> None:
-		self.mouseLeftButtonUpEvent = __mem_func__(event)
-		self.mouseLeftButtonUpArgs = args
+		self.events.SetEvent('OnMouseLeftButtonUp', event, *args)
 
 	def OnMouseLeftButtonUp(self) -> None:
-		if self.mouseLeftButtonUpEvent:
-			self.mouseLeftButtonUpEvent(*self.mouseLeftButtonUpArgs)
+		self.events.ExecuteEvent('OnMouseLeftButtonUp')
 
-	def SetOnRunMouseWheelEvent(self, event) -> None:
-		self.onRunMouseWheelEvent = __mem_func__(event)
+	def SetOnMouseMiddleButtonDown(self, event, *args) -> None:
+		self.events.SetEvent('OnMouseMiddleButtonDown', event, *args)
+
+	def OnMouseMiddleButtonDown(self) -> None:
+		self.events.ExecuteEvent('OnMouseMiddleButtonDown')
+
+	def SetOnMouseMiddleButtonUp(self, event, *args) -> None:
+		self.events.SetEvent('OnMouseMiddleButtonUp', event, *args)
+
+	def OnMouseMiddleButtonUp(self) -> None:
+		self.events.ExecuteEvent('OnMouseMiddleButtonUp')
+
+	def SetOnRunMouseWheelEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnRunMouseWheel', event, *args)
 
 	def OnRunMouseWheel(self, nLen) -> bool:
-		if self.onRunMouseWheelEvent:
-			self.onRunMouseWheelEvent(*(bool(nLen < 0), ))
-			return True
+		event = self.events.GetEvent('OnRunMouseWheel')
+		if not event:
 		return False
 
+		event(*(bool(nLen < 0), ))
+		return True
+
 	def SetShowEvent(self, event, *args) -> None:
-		self.onShowEvent = __mem_func__(event)
-		self.onShowArgs = args
+		self.events.SetEvent('Show', event, *args)
 
 	def SetHideEvent(self, event, *args) -> None:
-		self.onHideEvent = __mem_func__(event)
-		self.onHideArgs = args
+		self.events.SetEvent('Hide', event, *args)
 
-	def SetMoveWindowEvent(self, event) -> None:
-		self.moveWindowEvent = __mem_func__(event)
+	def SetMoveWindowEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnMoveWindow', event, *args)
 
 	def OnMoveWindow(self, x, y) -> None:
-		if self.moveWindowEvent:
-			self.moveWindowEvent(x, y)
+		event = self.events.GetEvent('OnMoveWindow')
+		if not event:
+			return
+		event(x, y)
 
-	def SetOverInEvent(self, func, *args) -> None:
-		self.overInEvent = __mem_func__(func)
-		self.overInArgs = args
+	def SetOnMouseDragEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnMouseDrag', event, *args)
 
-	def SetOverOutEvent(self, func, *args) -> None:
-		self.overOutEvent = __mem_func__(func)
-		self.overOutArgs = args
+	def OnMouseDrag(self, x, y) -> None:
+		event = self.events.GetEvent('OnMouseDrag')
+		if not event:
+			return
+		event(x, y)
+
+	def SetOverInEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnMouseOverIn', event, *args)
+
+	def SetOverOutEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnMouseOverOut', event, *args)
 
 	def OnMouseOverIn(self) -> None:
-		if self.overInEvent:
-			self.overInEvent(*self.overInArgs)
+		self.events.ExecuteEvent('OnMouseOverIn')
 
 	def OnMouseOverOut(self) -> None:
-		if self.overOutEvent:
-			self.overOutEvent(*self.overOutArgs)
-
-	def SetRenderEvent(self, event, *args) -> None:
-		self.renderEvent = __mem_func__(event)
-		self.renderArgs = args
+		self.events.ExecuteEvent('OnMouseOverOut')
 
 	def OnRender(self) -> None:
-		if self.renderEvent:
-			self.renderEvent(*self.renderArgs)
+		pass
+
+	def OnUpdate(self) -> None:
+		pass
+
+	def OnMouseOver(self) -> None:
+		pass
+
+	def SetTabEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnIMETab', event, *args)
+
+	def OnIMETab(self) -> bool:
+		self.events.ExecuteEvent('OnIMETab')
+
+	def SetReturnEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnIMEReturn', event, *args)
+
+	def OnIMEReturn(self) -> True:
+		self.events.ExecuteEvent('OnIMEReturn')
+
+	def SetEscapeEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnPressEscapeKey', event, *args)
+
+	def OnPressEscapeKey(self) -> True:
+		self.events.ExecuteEvent('OnPressEscapeKey')
 
 	def SetVisible(self, is_show) -> None:
 		if is_show:
@@ -414,14 +408,56 @@ class Window(object):
 	def IsIn(self):
 		return wndMgr.IsIn(self.hWnd)
 
+	def LoadFromScript(self, value:dict, parentWindow:'Window') -> bool:
+		if 'width' in value and 'height' in value:
+			self.SetSize(int(value["width"]), int(value["height"]))
+
+		loc_x = int(value["x"])
+		loc_y = int(value["y"])
+		if value.__contains__("vertical_align"):
+			if "center" == value["vertical_align"]:
+				self.SetWindowVerticalAlignCenter()
+			elif "bottom" == value["vertical_align"]:
+				self.SetWindowVerticalAlignBottom()
+
+		if parentWindow.IsRTL():
+			loc_x = int(value["x"]) + self.GetWidth()
+			if value.__contains__("horizontal_align"):
+				if "center" == value["horizontal_align"]:
+					self.SetWindowHorizontalAlignCenter()
+					loc_x = - int(value["x"])
+				elif "right" == value["horizontal_align"]:
+					self.SetWindowHorizontalAlignLeft()
+					loc_x = int(value["x"]) - self.GetWidth()
+			else:
+				self.SetWindowHorizontalAlignRight()
+
+			if value.__contains__("all_align"):
+				self.SetWindowVerticalAlignCenter()
+				self.SetWindowHorizontalAlignCenter()
+				loc_x = - int(value["x"])
+		else:
+			if value.__contains__("horizontal_align"):
+				if "center" == value["horizontal_align"]:
+					self.SetWindowHorizontalAlignCenter()
+				elif "right" == value["horizontal_align"]:
+					self.SetWindowHorizontalAlignRight()
+
+		self.SetPosition(loc_x, loc_y)
+		if not value.__contains__("hide"):
+			self.Show()
+		else:
+			if 0 == value["hide"]:
+				self.Show()
+
+		if value.__contains__("istooltip"):
+			parentWindow.SetToolTipWindow(self)
+		return True
+
 class ScriptWindow(Window):
 	def __init__(self, layer:str="UI") -> None:
-		Window.__init__(self, layer)
-		self.Children = []
-		self.ElementDictionary = {}
-
-	def __del__(self) -> None:
-		Window.__del__(self)
+		super().__init__(layer)
+		self.ClearDictionary()
 
 	def ClearDictionary(self) -> None:
 		self.Children = []
@@ -433,10 +469,10 @@ class ScriptWindow(Window):
 	def IsChild(self, name:str) -> bool:
 		return self.ElementDictionary.__contains__(name)
 
-	def GetChild(self, name:str):
+	def GetChild(self, name:str) -> Window:
 		return self.ElementDictionary[name]
 
-	def GetChild2(self, name:str):
+	def GetChild2(self, name:str) -> Window|None:
 		return self.ElementDictionary.get(name, None)
 
 ############################################################################################################################################
@@ -453,9 +489,6 @@ if app.RENDER_TARGET:
 
 			self.number = -1
 
-		def __del__(self) -> None:
-			Window.__del__(self)
-
 		def RegisterWindow(self, layer:str) -> None:
 			self.hWnd = wndMgr.RegisterRenderTarget(self, layer)
 
@@ -467,12 +500,6 @@ if app.RENDER_TARGET:
 ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLASSES ### IMAGE CLAS
 ############################################################################################################################################
 class MarkBox(Window):
-	def __init__(self, layer = "UI"):
-		Window.__init__(self, layer)
-
-	def __del__(self):
-		Window.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterMarkBox(self, layer)
 
@@ -491,12 +518,6 @@ class MarkBox(Window):
 		wndMgr.MarkBox_SetDiffuseColor(self.hWnd, 1.0, 1.0, 1.0, float(alpha))
 
 class ImageBox(Window):
-	def __init__(self, layer = "UI"):
-		Window.__init__(self, layer)
-
-	def __del__(self):
-		Window.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterImageBox(self, layer)
 
@@ -513,13 +534,15 @@ class ImageBox(Window):
 	def GetHeight(self):
 		return wndMgr.GetHeight(self.hWnd)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.LoadImage(value["image"])
+
+		if value.__contains__("alpha"):
+			self.SetAlpha(float(value["alpha"]))
+
+		return super().LoadFromScript(value, parentWindow)
+
 class ExpandedImageBox(ImageBox):
-	def __init__(self, layer = "UI"):
-		ImageBox.__init__(self, layer)
-
-	def __del__(self):
-		ImageBox.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterExpandedImageBox(self, layer)
 
@@ -558,14 +581,39 @@ class ExpandedImageBox(ImageBox):
 		self.SetScale(float(width)/float(wndMgr.GetWidth(self.hWnd)), float(height)/float(wndMgr.GetHeight(self.hWnd)))
 		ImageBox.SetSize(self, width, height)
 		
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.LoadImage(value["image"])
+
+		if value.__contains__("width") and value.__contains__("height"):
+			self.SetSizeFixed(int(value["width"]), int(value["height"]))
+
+		if value.__contains__("x_origin") and value.__contains__("y_origin"):
+			self.SetOrigin(float(value["x_origin"]), float(value["y_origin"]))
+
+		if value.__contains__("x_scale") and value.__contains__("y_scale"):
+			self.SetScale(float(value["x_scale"]), float(value["y_scale"]))
+
+		if value.__contains__("rect"):
+			RenderingRect = value["rect"]
+			self.SetRenderingRect(RenderingRect[0], RenderingRect[1], RenderingRect[2], RenderingRect[3])
+
+		if value.__contains__("mode"):
+			mode = value["mode"]
+			if "MODULATE" == mode:
+				self.SetRenderingMode(wndMgr.RENDERING_MODE_MODULATE)
+
+		if value.__contains__("alpha"):
+			self.SetAlpha(float(value["alpha"]))
+
+		if value.__contains__("rotation"):
+			self.SetRotation(float(value["rotation"]))
+
+		if value.__contains__("percent"):
+			self.SetPercentageNew(float(value["percent"]))
+
+		return Window.LoadFromScript(self, value, parentWindow)
 
 class AniImageBox(Window):
-	def __init__(self, layer = "UI"):
-		Window.__init__(self, layer)
-
-	def __del__(self):
-		Window.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterAniImageBox(self, layer)
 
@@ -574,6 +622,9 @@ class AniImageBox(Window):
 
 	def AppendImage(self, filename):
 		wndMgr.AppendImage(self.hWnd, filename)
+
+	def SetAlpha(self, alpha):
+		wndMgr.SetDiffuseColor(self.hWnd, 1.0, 1.0, 1.0, float(alpha))
 
 	def SetPercentage(self, curValue, maxValue):
 		if curValue > maxValue:
@@ -587,6 +638,21 @@ class AniImageBox(Window):
 	def OnEndFrame(self):
 		pass
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("delay"):
+			self.SetDelay(value["delay"])
+
+		for image in value["images"]:
+			self.AppendImage(image)
+
+		if value.__contains__("alpha"):
+			self.SetAlpha(float(value["alpha"]))
+
+		if value.__contains__("percent"):
+			self.SetPercentageNew(float(value["percent"]))
+
+		return super().LoadFromScript(value, parentWindow)
+
 ############################################################################################################################################
 ### IMAGE CLASSES END ### IMAGE CLASSES END ### IMAGE CLASSES END ### IMAGE CLASSES END ### IMAGE CLASSES END ### IMAGE CLASSES END ########
 ############################################################################################################################################
@@ -595,8 +661,8 @@ class AniImageBox(Window):
 ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ### TEXT CLASSES ####
 ############################################################################################################################################
 class TextLine(Window):
-	def __init__(self, font = None):
-		Window.__init__(self)
+	def __init__(self, font:str=''):
+		super().__init__()
 		self.max = 0
 		if font:
 			self.SetFontName(font)
@@ -604,9 +670,6 @@ class TextLine(Window):
 		else:
 			self.SetFontName('Verdana:12b')
 			self.SetPackedFontColor(colorinfo.COR_TEXTO_PADRAO)
-
-	def __del__(self):
-		Window.__del__(self)
 
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterTextLine(self, layer)
@@ -697,97 +760,94 @@ class TextLine(Window):
 				(ix, iy) = self.GetTextSize()
 				i = i + 1
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("fontsize"):
+			fontSize = value["fontsize"]
+
+			if "LARGE" == fontSize:
+				self.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
+
+		elif value.__contains__("fontname"):
+			fontName = value["fontname"]
+			self.SetFontName(fontName)
+
+		if value.__contains__("text_horizontal_align"):
+			if "left" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignLeft()
+			elif "center" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignCenter()
+			elif "right" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignRight()
+
+		if value.__contains__("text_vertical_align"):
+			if "top" == value["text_vertical_align"]:
+				self.SetVerticalAlignTop()
+			elif "center" == value["text_vertical_align"]:
+				self.SetVerticalAlignCenter()
+			elif "bottom" == value["text_vertical_align"]:
+				self.SetVerticalAlignBottom()
+
+		if value.__contains__("limit_width"):
+			self.SetLimitWidth(value["limit_width"])
+
+		if value.__contains__("multi_line"):
+			if value["multi_line"]:
+				self.SetMultiLine()
+
+		if value.__contains__("all_align"):
+			self.SetHorizontalAlignCenter()
+			self.SetVerticalAlignCenter()
+			self.SetWindowHorizontalAlignCenter()
+			self.SetWindowVerticalAlignCenter()
+
+		if value.__contains__("r") and value.__contains__("g") and value.__contains__("b"):
+			self.SetFontColor(float(value["r"]), float(value["g"]), float(value["b"]))
+		elif value.__contains__("color"):
+			self.SetPackedFontColor(value["color"])
+		else:
+			self.SetPackedFontColor(colorinfo.COR_TEXTO_PADRAO)
+
+		if value.__contains__("outline"):
+			if value["outline"]:
+				self.SetOutline()
+		if value.__contains__("text"):
+			if value.__contains__("text_limited"):
+				self.SetTextLimited(value["text"], int(value["text_limited"]))
+			else:
+				self.SetText(value["text"])
+		return super().LoadFromScript(value, parentWindow)
+
 class EditLine(TextLine):
-	if OLD_STUFF:
-		candidateWindowClassDict = {}
-
-	def __init__(self):
-		TextLine.__init__(self)
-
-		self.eventReturn = None
-		self.eventReturnArgs = None
-
-		self.eventEscape = None
-		self.eventEscapeArgs = None
-
-		self.eventTab = None
-		self.eventTabArgs = None
-
-		self.eventIMEUpdate = None
-		self.eventIMEUpdateArgs = None
-
-		self.eventFocus = None
-		self.eventKillFocus = None
+	def Initialize(self) -> None:
 		self.numberMode = False
 		self.moneyMode = False
-		self.useIME = True
-		self.bCodePage = False
-		self.CanClick = None
+		return super().Initialize()
 
-		if OLD_STUFF:
-			self.candidateWindowClass = None
-			self.candidateWindow = None
-			self.SetCodePage(app.GetDefaultCodePage())
-			self.readingWnd = ReadingWnd()
-			self.readingWnd.Hide()
-
-	def __del__(self):
-		TextLine.__del__(self)
-
-	if OLD_STUFF:
-		def SetCodePage(self, codePage):
-			candidateWindowClass=EditLine.candidateWindowClassDict.get(codePage, EmptyCandidateWindow)
-			self.__SetCandidateClass(candidateWindowClass)
-
-		def __SetCandidateClass(self, candidateWindowClass):
-			if self.candidateWindowClass==candidateWindowClass:
-				return
-
-			self.candidateWindowClass = candidateWindowClass
-			self.candidateWindow = self.candidateWindowClass()
-			self.candidateWindow.Load()
-			self.candidateWindow.Hide()
-
-	def RegisterWindow(self, layer):
+	def RegisterWindow(self, layer) -> None:
 		self.hWnd = wndMgr.RegisterTextLine(self, layer)
 
-	def SetReturnEvent(self, event, *args):
-		self.eventReturn = __mem_func__(event)
-		self.eventReturnArgs = args
-
-	def SetEscapeEvent(self, event, *args):
-		self.eventEscape = __mem_func__(event)
-		self.eventEscapeArgs = args
-
-	def SetTabEvent(self, event, *args):
-		self.eventTab = __mem_func__(event)
-		self.eventTabArgs = args
-
-	def SetMax(self, max):
+	def SetMax(self, max:int) -> None:
 		self.max = max
 		wndMgr.SetMax(self.hWnd, self.max)
 		ime.SetMax(self.max)
 		self.SetUserMax(self.max)
 
-	def SetUserMax(self, max):
+	def SetUserMax(self, max:int) -> None:
 		self.userMax = max
 		ime.SetUserMax(self.userMax)
 
-	def SetNumberMode(self):
+	def SetNumberMode(self) -> None:
 		self.numberMode = True
 
-	def SetMoneyMode(self):
+	def SetMoneyMode(self) -> None:
 		self.numberMode = False
 		self.moneyMode = True
 
-	def SetIMEFlag(self, flag):
-		self.useIME = flag
-
 	if app.ENABLE_EMOJI_SYSTEM:
-		def SetTextEmoji(self, text):
+		def SetTextEmoji(self, text:str):
 			wndMgr.SetText(self.hWnd, text)
 
-	def GetText(self):
+	def GetText(self) -> str:
 		if self.moneyMode:
 			return wndMgr.GetText(self.hWnd).replace(".", "")
 		return wndMgr.GetText(self.hWnd)
@@ -813,14 +873,8 @@ class EditLine(TextLine):
 	def SetEndPosition(self):
 		ime.MoveEnd()
 
-	def CanEdit(self, flag):
-		self.CanClick = flag
-
-	def SetFocusEvent(self, event):
-		self.eventFocus = event
-
-	def SetKillFocusEvent(self, event):
-		self.eventKillFocus = event
+	def SetFocusEvent(self, event, *args):
+		self.events.SetEvent('OnSetFocus', event, *args)
 
 	def OnSetFocus(self):
 		Text = self.GetText()
@@ -836,76 +890,27 @@ class EditLine(TextLine):
 
 		ime.EnableCaptureInput()
 
-		if self.useIME:
-			ime.EnableIME()
-		else:
-			ime.DisableIME()
-
-		if self.eventFocus:
-			self.eventFocus()
+		self.events.ExecuteEvent('OnSetFocus')
 
 		wndMgr.ShowCursor(self.hWnd, True)
 
+	def SetKillFocusEvent(self, event, *args):
+		self.events.SetEvent('OnKillFocus', event, *args)
+
 	def OnKillFocus(self):
-		if self.eventKillFocus:
-			self.eventKillFocus()
+		self.events.ExecuteEvent('OnKillFocus')
 
-		self.SetText(ime.GetText(self.bCodePage))
+		# self.SetText(ime.GetText())
 
-		if OLD_STUFF:
-			self.OnIMECloseCandidateList()
-			self.OnIMECloseReadingWnd()
-
-		ime.DisableIME()
 		ime.DisableCaptureInput()
 		wndMgr.HideCursor(self.hWnd)
 
-	if OLD_STUFF:
-		def OnIMEChangeCodePage(self):
-			self.SetCodePage(ime.GetCodePage())
-
-		def OnIMEOpenCandidateList(self):
-			self.candidateWindow.Show()
-			self.candidateWindow.Clear()
-			self.candidateWindow.Refresh()
-
-			gx, gy = self.GetGlobalPosition()
-			self.candidateWindow.SetCandidatePosition(gx, gy, len(self.GetText()))
-			return True
-
-		def OnIMECloseCandidateList(self):
-			self.candidateWindow.Hide()
-			return True
-
-		def OnIMEOpenReadingWnd(self):
-			gx, gy = self.GetGlobalPosition()
-			textlen = len(self.GetText())-2
-			reading = ime.GetReading()
-			readinglen = len(reading)
-			self.readingWnd.SetReadingPosition( gx + textlen*6-24-readinglen*6, gy )
-			self.readingWnd.SetText(reading)
-			if ime.GetReadingError() == 0:
-				self.readingWnd.SetTextColor(0xffffffff)
-			else:
-				self.readingWnd.SetTextColor(0xffff0000)
-			self.readingWnd.SetSize(readinglen * 6 + 4, 19)
-			self.readingWnd.Show()
-			return True
-
-		def OnIMECloseReadingWnd(self):
-			self.readingWnd.Hide()
-			return True
-
 	def SetIMEUpdateEvent(self, event, *args):
-		self.eventIMEUpdate = __mem_func__(event)
-		self.eventIMEUpdateArgs = args
+		self.events.SetEvent('OnIMEUpdate', event, *args)
 
 	def OnIMEUpdate(self):
-		self.SetText(ime.GetText(self.bCodePage))
-		if self.eventIMEUpdate:
-			self.eventIMEUpdate(*self.eventIMEUpdateArgs)
-			return True
-		return False
+		self.SetText(ime.GetText())
+		return self.events.ExecuteEvent('OnIMEUpdate')
 
 	def FormatToMoneyString(self, text:str) -> str:
 		if text in ["k", "K"]:
@@ -936,20 +941,25 @@ class EditLine(TextLine):
 
 		return localeinfo.NumberToMoneyString(int(text))
 
-	def OnIMETab(self) -> bool:
-		if self.eventTab:
-			self.eventTab(*self.eventTabArgs)
-			return True
-		return False
+	def SetTabEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnIMETab', event, *args)
 
-	def OnIMEReturn(self) -> True:
-		if self.eventReturn:
-			self.eventReturn(*self.eventReturnArgs)
+	def OnIMETab(self) -> bool:
+		self.events.ExecuteEvent('OnIMETab')
+			return True
+
+	def SetReturnEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnIMEReturn', event, *args)
+
+	def OnIMEReturn(self) -> bool:
+		self.events.ExecuteEvent('OnIMEReturn')
 		return True
 
-	def OnPressEscapeKey(self) -> True:
-		if self.eventEscape:
-			self.eventEscape(*self.eventEscapeArgs)
+	def SetEscapeEvent(self, event, *args) -> None:
+		self.events.SetEvent('OnPressEscapeKey', event, *args)
+
+	def OnPressEscapeKey(self) -> bool:
+		self.events.ExecuteEvent('OnPressEscapeKey')
 		return True
 
 	def OnKeyDown(self, key) -> bool:
@@ -1004,38 +1014,81 @@ class EditLine(TextLine):
 			return True
 		if app.VK_DELETE == key:
 			ime.Delete()
-			TextLine.SetText(self, ime.GetText(self.bCodePage))
+			TextLine.SetText(self, ime.GetText())
 			return True
 		return True
 
 	def OnMouseLeftButtonDown(self):
-		if False == self.IsIn():
+		if not self.IsIn():
 			return False
-
-		if False == self.CanClick:
-			return
 
 		self.SetFocus()
 		PixelPosition = wndMgr.GetCursorPosition(self.hWnd)
 		ime.SetCursorPosition(PixelPosition)
+		return True
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("secret_flag"):
+			self.SetSecret(value["secret_flag"])
+
+		if value.__contains__("r") and value.__contains__("g") and value.__contains__("b"):
+			self.SetFontColor(float(value["r"]), float(value["g"]), float(value["b"]))
+		elif value.__contains__("color"):
+			self.SetPackedFontColor(value["color"])
+		else:
+			self.SetFontColor(0.8549, 0.8549, 0.8549)
+
+		if value.__contains__("only_number"):
+			if value["only_number"]:
+				self.SetNumberMode()
+
+		if value.__contains__("money_mode"):
+			if value["money_mode"]:
+				self.SetMoneyMode()
+
+		if value.__contains__("limit_width"):
+			self.SetLimitWidth(value["limit_width"])
+
+		if value.__contains__("multi_line"):
+			if value["multi_line"]:
+				self.SetMultiLine()
+
+		if value.__contains__("text_horizontal_align"):
+			if "left" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignLeft()
+			elif "center" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignCenter()
+			elif "right" == value["text_horizontal_align"]:
+				self.SetHorizontalAlignRight()
+
+		if value.__contains__("text_vertical_align"):
+			if "top" == value["text_vertical_align"]:
+				self.SetVerticalAlignTop()
+			elif "center" == value["text_vertical_align"]:
+				self.SetVerticalAlignCenter()
+			elif "bottom" == value["text_vertical_align"]:
+				self.SetVerticalAlignBottom()
+
+		if value.__contains__("fontname"):
+			fontName = value["fontname"]
+			self.SetFontName(fontName)
+
+		if value.__contains__("all_align"):
+			self.SetHorizontalAlignCenter()
+			self.SetVerticalAlignCenter()
+			self.SetWindowHorizontalAlignCenter()
+			self.SetWindowVerticalAlignCenter()
+
+		self.SetMax(int(value["input_limit"]))
+		return super().LoadFromScript(value, parentWindow)
 
 class ListBoxEx(Window):
 	class Item(Window):
-		def __init__(self):
-			Window.__init__(self)
-
-		def __del__(self):
-			Window.__del__(self)
-
-		def SetParent(self, parent):
-			Window.SetParent(self, parent)
-			self.parent = proxy(parent)
-
 		def OnMouseLeftButtonDown(self):
-			self.parent.SelectItem(self)
+			self.GetParent().SelectItem(self)
 
 		def OnRender(self):
-			if self.parent.GetSelectedItem() == self:
+			if self.GetParent().GetSelectedItem() == self:
 				self.OnSelectedRender()
 
 		def OnSelectedRender(self):
@@ -1057,9 +1110,6 @@ class ListBoxEx(Window):
 
 		self.scrollBar = None
 		self.__UpdateSize()
-
-	def __del__(self):
-		Window.__del__(self)
 
 	def __UpdateSize(self):
 		height = self.itemStep * self.__GetViewItemCount()
@@ -1176,6 +1226,18 @@ class ListBoxEx(Window):
 			return 0
 		return 1
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetSize(value["width"], value["height"])
+		if value.__contains__("itemsize_x") and value.__contains__("itemsize_y"):
+			self.SetItemSize(int(value["itemsize_x"]), int(value["itemsize_y"]))
+
+		if value.__contains__("itemstep"):
+			self.SetItemStep(int(value["itemstep"]))
+
+		if value.__contains__("viewcount"):
+			self.SetViewItemCount(int(value["viewcount"]))
+		return super().LoadFromScript(value, parentWindow)
+
 if app.ENABLE_SEND_TARGET_INFO:
 	class ListBoxExNew(Window):
 		class Item(Window):
@@ -1189,13 +1251,6 @@ if app.ENABLE_SEND_TARGET_INFO:
 				self.removeBottom = 0
 
 				self.SetWindowName("NONAME_ListBoxExNew_Item")
-
-			def __del__(self):
-				Window.__del__(self)
-
-			def SetParent(self, parent):
-				Window.SetParent(self, parent)
-				self.parent = proxy(parent)
 
 			def SetSize(self, width, height):
 				self.realWidth = width
@@ -1241,9 +1296,6 @@ if app.ENABLE_SEND_TARGET_INFO:
 			self.scrollBar = None
 
 			self.SetWindowName("NONAME_ListBoxEx")
-
-		def __del__(self):
-			Window.__del__(self)
 
 		def IsEmpty(self):
 			if len(self.itemList) == 0:
@@ -1361,19 +1413,13 @@ if app.ENABLE_SEND_TARGET_INFO:
 ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ### NATIVE UI ###
 #############################################################################################################################################################
 class Button(Window):
-	def __init__(self, layer = "UI"):
-		Window.__init__(self, layer)
-
+	def Initialize(self) -> None:
 		self.eventFunc = None
 		self.eventArgs = None
 
 		self.ButtonText = None
 		self.ToolTipText = None
-
-	def __del__(self):
-		self.eventFunc = None
-		self.eventArgs = None
-		Window.__del__(self)
+		return super().Initialize()
 
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterButton(self, layer)
@@ -1463,9 +1509,9 @@ class Button(Window):
 			self.ToolTipText = toolTip
 		self.ToolTipText.SetText(text)
 
-	def SetToolTipWindow(self, toolTip):
+	def SetToolTipWindow(self, toolTip:Window):
 		self.ToolTipText = toolTip
-		self.ToolTipText.SetParentProxy(self)
+		self.ToolTipText.SetParent(self)
 
 	def SetToolTipText(self, text, x = 0, y = -19):
 		self.SetFormToolTipText("TEXT", text, x, y)
@@ -1479,7 +1525,7 @@ class Button(Window):
 			self.eventArgs = None
 
 	def CallEvent(self):
-		snd.PlaySound("sound/ui/click.wav")
+		# snd.PlaySound("sound/ui/click.wav")
 
 		if self.eventFunc:
 			self.eventFunc(*self.eventArgs)
@@ -1527,34 +1573,51 @@ class Button(Window):
 
 			self.ButtonText.SetText(text)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("default_image"):
+			self.SetUpVisual(value["default_image"])
+		if value.__contains__("over_image"):
+			self.SetOverVisual(value["over_image"])
+		if value.__contains__("down_image"):
+			self.SetDownVisual(value["down_image"])
+		if value.__contains__("disable_image"):
+			self.SetDisableVisual(value["disable_image"])
+
+		if value.__contains__("text"):
+			if value.__contains__("text_height"):
+				self.SetText(value["text"], value["text_height"])
+			else:
+				self.SetText(value["text"])
+
+			if value.__contains__("text_color"):
+				self.SetTextColor(value["text_color"])
+
+		if value.__contains__("tooltip_text"):
+			if value.__contains__("tooltip_x") and value.__contains__("tooltip_y"):
+				self.SetToolTipText(value["tooltip_text"], int(value["tooltip_x"]), int(value["tooltip_y"]))
+			else:
+				self.SetToolTipText(value["tooltip_text"])
+
+		return super().LoadFromScript(value, parentWindow)
+
 class RadioButton(Button):
-	def __init__(self):
-		Button.__init__(self)
-
-	def __del__(self):
-		Button.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterRadioButton(self, layer)
 
 class ToggleButton(Button):
-	def __init__(self):
-		Button.__init__(self)
+	def Initialize(self) -> None:
+		self.eventFunc = None
+		self.eventArgs = None
+
+		self.ButtonText = None
+		self.ToolTipText = None
 
 		self.eventUp = None
 		self.eventUpArgs = None
 
 		self.eventDown = None
 		self.eventDownArgs = None
-
-	def __del__(self):
-		self.eventUp = None
-		self.eventUpArgs = None
-
-		self.eventDown = None
-		self.eventDownArgs = None
-
-		Button.__del__(self)
+		return super().Initialize()
 
 	def SetToggleUpEvent(self, event, *args):
 		if event:
@@ -1616,9 +1679,6 @@ class DragButton(Button):
 				self.eventMove()
 
 class NumberLine(Window):
-	def __init__(self, layer = "UI"):
-		Window.__init__(self, layer)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterNumberLine(self, layer)
 
@@ -1641,6 +1701,11 @@ class Box(Window):
 	def SetColor(self, color):
 		wndMgr.SetColor(self.hWnd, color)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+		return super().LoadFromScript(value, parentWindow)
+
 class Bar(Window):
 	color = None
 
@@ -1654,6 +1719,12 @@ class Bar(Window):
 	def GetColor(self):
 		return self.color
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+
+		return super().LoadFromScript(value, parentWindow)
+
 class Line(Window):
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterLine(self, layer)
@@ -1661,18 +1732,20 @@ class Line(Window):
 	def SetColor(self, color):
 		wndMgr.SetColor(self.hWnd, color)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+
+		return super().LoadFromScript(value, parentWindow)
+
 class SlotBar(Window):
-
-	def __init__(self):
-		Window.__init__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterBar3D(self, layer)
 
-class Bar3D(Window):
-	def __init__(self):
-		Window.__init__(self)
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		return super().LoadFromScript(value, parentWindow)
 
+class Bar3D(Window):
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterBar3D(self, layer)
 
@@ -1680,9 +1753,7 @@ class Bar3D(Window):
 		wndMgr.SetColor(self.hWnd, left, right, center)
 
 class SlotWindow(Window):
-	def __init__(self):
-		Window.__init__(self)
-
+	def InicializeEvents(self) -> None:
 		self.StartIndex = 0
 
 		self.eventSelectEmptySlot = None
@@ -1708,9 +1779,7 @@ class SlotWindow(Window):
 
 		self.eventPressedSlotButton = None
 		self.eventPressedSlotArgs = None
-
-	def __del__(self):
-		Window.__del__(self)
+		return super().Initialize()
 
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterSlotWindow(self, layer)
@@ -2009,14 +2078,27 @@ class SlotWindow(Window):
 	def GetStartIndex(self):
 		return 0
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("image"):
+			r, g, b, a = 1.0, 1.0, 1.0, 1.0
+
+			keys = ["image_r", "image_g", "image_b", "image_a"]
+			if all(key in value for key in keys):
+				r, g, b, a = map(float, (value[key] for key in keys))
+
+			wndMgr.SetSlotBaseImage(self.hWnd, value["image"], r, g, b, a)
+
+		if value["type"] == 'slot':
+			for slot in value["slot"]:
+				wndMgr.AppendSlot(self.hWnd, int(slot["index"]), int(slot["x"]), int(slot["y"]), int(slot["width"]), int(slot["height"]))
+
+		return super().LoadFromScript(value, parentWindow)
+
 class GridSlotWindow(SlotWindow):
 	def __init__(self):
 		SlotWindow.__init__(self)
 
 		self.startIndex = 0
-
-	def __del__(self):
-		SlotWindow.__del__(self)
 
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterGridSlotWindow(self, layer)
@@ -2029,6 +2111,23 @@ class GridSlotWindow(SlotWindow):
 
 	def GetStartIndex(self):
 		return self.startIndex
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		xBlank = 0
+		yBlank = 0
+
+		if value.__contains__("x_blank"):
+			xBlank = int(value["x_blank"])
+		if value.__contains__("y_blank"):
+			yBlank = int(value["y_blank"])
+
+		self.ArrangeSlot(int(value["start_index"]), int(value["x_count"]), int(value["y_count"]), int(value["x_step"]), int(value["y_step"]), xBlank, yBlank)
+
+		if value.__contains__("style"):
+			if "select" == value["style"]:
+				wndMgr.SetSlotStyle(self.hWnd, wndMgr.SLOT_STYLE_SELECT)
+
+		return super().LoadFromScript(value, parentWindow)
 
 class Gauge(Window):
 	SLOT_WIDTH = 16
@@ -2133,6 +2232,10 @@ class Gauge(Window):
 			self.ToolTipText = toolTip
 
 		self.ToolTipText.SetText(text)
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.MakeGauge(value["width"], value["color"])
+		return super().LoadFromScript(value, parentWindow)
 
 #################################################################################################################################
 ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ###
@@ -2314,6 +2417,13 @@ class ScrollBar(Window):
 	def UnlockScroll(self):
 		self.lockFlag = False
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetScrollBarSize(value["size"])
+
+		if value.__contains__("midle_size"):
+			self.SetMiddleBarSize(value["midle_size"])
+		return super().LoadFromScript(value, parentWindow)
+
 class ThinScrollBar(ScrollBar):
 	def CreateScrollBar(self):
 		middleBar = self.MiddleBar()
@@ -2408,9 +2518,6 @@ class TitleBar(Window):
 		Window.__init__(self)
 		self.AddFlag("attach")
 
-	def __del__(self):
-		Window.__del__(self)
-
 	def MakeTitleBar(self, width):
 		width = max(64, width)
 
@@ -2481,20 +2588,21 @@ class TitleBar(Window):
 	def SetCloseEvent(self, event, args = None):
 		self.btnClose.SetEvent(event, args)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.MakeTitleBar(int(value["width"]))
+		return super().LoadFromScript(value, parentWindow)
+
+
 class HorizontalBar(Window):
 
 	BLOCK_WIDTH = 32
 	BLOCK_HEIGHT = 17
 
-	def __init__(self):
-		Window.__init__(self)
+	def __init__(self, layer:str="UI") -> None:
+		super().__init__(layer)
 		self.AddFlag("attach")
 
-	def __del__(self):
-		Window.__del__(self)
-
-	def Create(self, width):
-
+	def Create(self, width:int) -> None:
 		width = max(96, width)
 
 		imgLeft = ImageBox()
@@ -2525,6 +2633,10 @@ class HorizontalBar(Window):
 		self.imgCenter.SetPosition(self.BLOCK_WIDTH, 0)
 		self.imgRight.SetPosition(width - self.BLOCK_WIDTH, 0)
 		self.SetSize(width, self.BLOCK_HEIGHT)
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.Create(int(value["width"]))
+		return super().LoadFromScript(value, parentWindow)
 
 class Board(Window):
 
@@ -2609,6 +2721,9 @@ class Board(Window):
 		if self.Base:
 			self.Base.SetRenderingRect(0, 0, horizontalShowingPercentage, verticalShowingPercentage)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		return super().LoadFromScript(value, parentWindow)
+
 class BoardWithTitleBar(Board):
 	def __init__(self):
 		Board.__init__(self)
@@ -2635,6 +2750,10 @@ class BoardWithTitleBar(Board):
 
 	def SetCloseEvent(self, event, args = None):
 		self.titleBar.SetCloseEvent(event, args)
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetTitleName(value["title"])
+		return super().LoadFromScript(value, parentWindow)
 
 class ThinBoard(Window):
 
@@ -2693,9 +2812,6 @@ class ThinBoard(Window):
 		self.Lines[self.L].SetPosition(0, self.CORNER_HEIGHT)
 		self.Lines[self.T].SetPosition(self.CORNER_WIDTH, 0)
 
-	def __del__(self):
-		Window.__del__(self)
-
 	def SetSize(self, width, height):
 
 		width = max(self.CORNER_WIDTH*2, width)
@@ -2723,6 +2839,9 @@ class ThinBoard(Window):
 		for wnd in self.Corners:
 			wnd.Hide()
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		return super().LoadFromScript(value, parentWindow)
+
 class SliderBar(Window):
 	def __init__(self):
 		Window.__init__(self)
@@ -2733,9 +2852,6 @@ class SliderBar(Window):
 
 		self.__CreateBackGroundImage()
 		self.__CreateCursor()
-
-	def __del__(self):
-		Window.__del__(self)
 
 	def __CreateBackGroundImage(self):
 		img = ImageBox()
@@ -2781,6 +2897,9 @@ class SliderBar(Window):
 
 	def Disable(self):
 		self.cursor.Hide()
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		return super().LoadFromScript(value, parentWindow)
 
 class ListBox(Window):
 	TEMPORARY_PLACE = 3
@@ -2942,6 +3061,12 @@ class ListBox(Window):
 					grp.SetColor(SELECT_COLOR)
 					grp.RenderBar(xRender + 2, yRender + (self.selectedLine-self.basePos)*self.stepSize + 4, self.width - 3, self.stepSize)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("item_align"):
+			self.SetTextCenterAlign(value["item_align"])
+
+		return super().LoadFromScript(value, parentWindow)
+
 class ListBox2(ListBox):
 	def __init__(self, *args, **kwargs):
 		ListBox.__init__(self, *args, **kwargs)
@@ -3029,48 +3154,14 @@ class ListBox2(ListBox):
 		else:
 			self.barWidth = self.width
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetRowCount(value.get("row_count", 10))
+		return super().LoadFromScript(value, parentWindow)
+
 #################################################################################################################################
 ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT ####
 #################################################################################################################################
 '''
-class CandidateListBox(ListBoxEx):
-
-	HORIZONTAL_MODE = 0
-	VERTICAL_MODE = 1
-
-	class Item(ListBoxEx.Item):
-		def __init__(self, text):
-			ListBoxEx.Item.__init__(self)
-
-			self.textBox=TextLine()
-			self.textBox.SetParent(self)
-			self.textBox.SetText(text)
-			self.textBox.Show()
-
-		def __del__(self):
-			ListBoxEx.Item.__del__(self)
-
-	def __init__(self, mode = HORIZONTAL_MODE):
-		ListBoxEx.__init__(self)
-		self.itemWidth=32
-		self.itemHeight=32
-		self.mode = mode
-
-	def __del__(self):
-		ListBoxEx.__del__(self)
-
-	def SetMode(self, mode):
-		self.mode = mode
-
-	def AppendItem(self, newItem):
-		ListBoxEx.AppendItem(self, newItem)
-
-	def GetItemViewCoord(self, pos):
-		if self.mode == self.HORIZONTAL_MODE:
-			return ((pos-self.basePos)*self.itemStep, 0)
-		elif self.mode == self.VERTICAL_MODE:
-			return (0, (pos-self.basePos)*self.itemStep)
-
 class RadioButtonGroup:
 	def __init__(self):
 		self.buttonGroup = []
@@ -3300,9 +3391,6 @@ class TextLink(Window):
 		self.underline.SetColor(self.NORMAL_COLOR)
 		self.underline.Hide()
 
-	def __del__(self):
-		Window.__del__(self)
-
 	def SetText(self, text):
 		self.text.SetText(text)
 		self.SetSize(self.text.GetTextSize()[0], self.text.GetTextSize()[1])
@@ -3331,6 +3419,21 @@ class TextLink(Window):
 	def SetEvent(self, event, *args):
 		self.eventFunc = __mem_func__(event)
 		self.eventArgs = args
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("all_align"):
+			window.SetHorizontalAlignCenter()
+			window.SetVerticalAlignCenter()
+			window.SetWindowHorizontalAlignCenter()
+			window.SetWindowVerticalAlignCenter()
+
+		if value.__contains__("outline"):
+			if value["outline"]:
+				window.SetOutline()
+		if value.__contains__("text"):
+			window.SetText(value["text"])
+
+		return self.LoadFromScript(value, parentWindow)
 
 class CoolButton(Window):
 	BACKGROUND_COLOR = grp.GenerateColor(0.0, 0.0, 0.0, 1.0)
@@ -3465,7 +3568,7 @@ class CoolButton(Window):
 #################################################################################################################################
 ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ###
 #################################################################################################################################
-class _ButtonState(object):
+class _ButtonState:
 	NORMAL = 0
 	HOVER = 1
 	ACTIVE = 2
@@ -3645,7 +3748,7 @@ class _BaseButton(Window):
 
 	def SetToolTipWindow(self, toolTip):
 		self.ToolTipText = toolTip
-		self.ToolTipText.SetParentProxy(self)
+		self.ToolTipText.SetParent(self)
 
 	def SetToolTipText(self, text, x = 0, y = -19):
 		self.SetFormToolTipText("TEXT", text, x, y)
@@ -3667,7 +3770,7 @@ class _BaseButton(Window):
 			self.eventArgs = None
 
 	def CallEvent(self):
-		snd.PlaySound("sound/ui/click.wav")
+		# snd.PlaySound("sound/ui/click.wav")
 
 		if self.eventFunc:
 			self.eventFunc(*self.eventArgs)
@@ -3694,6 +3797,24 @@ class _BaseButton(Window):
 			return
 		self.SetState(1)
 		self.CallEvent()
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("width"):
+			self.SetWidth(int(value["width"]))
+
+		if value.__contains__("text"):
+			if value.__contains__("text_height"):
+				self.SetText(value["text"], value["text_height"])
+			else:
+				self.SetText(value["text"])
+
+		if value.__contains__("tooltip_text"):
+			if value.__contains__("tooltip_x") and value.__contains__("tooltip_y"):
+				self.SetToolTipText(value["tooltip_text"], int(value["tooltip_x"]), int(value["tooltip_y"]))
+			else:
+				self.SetToolTipText(value["tooltip_text"])
+
+		return super().LoadFromScript(value, parentWindow)
 
 class RedButton(_BaseButton):
 	BASE_PATH = "interface/controls/common/button"
@@ -3760,9 +3881,6 @@ class Slider(Window):
 		self.pageSize = 1.0
 		self.eventChange = None
 		self.__CreateUI()
-
-	def __del__(self):
-		Window.__del__(self)
 
 	def __CreateUI(self):
 		self.__dictImages = {
@@ -3841,6 +3959,10 @@ class Slider(Window):
 	def Disable(self):
 		self.__btnSlider.Hide()
 		self.__imgRange.Hide()
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetWidth(int(value["width"]))
+		return super().LoadFromScript(value, parentWindow)
 
 #################################################################################################################################
 ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ### THINBOARD ###
@@ -4234,9 +4356,6 @@ class SlotElipseWindow(Window):
 		self.eventPressedSlotButton = None
 		self.eventPressedSlotArgs = None
 
-	def __del__(self):
-		Window.__del__(self)
-
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterSlotWindow(self, layer)
 
@@ -4267,9 +4386,6 @@ class SlotElipseWindow(Window):
 
 	def ShowSlotButton(self, slotNumber):
 		wndMgr.ShowSlotButton(self.hWnd, slotNumber)
-
-	def HideSlotButton(self, slotNumber):
-		wndMgr.HideSlotButton(self.hWnd, slotNumber)
 
 	def HideAllSlotButton(self):
 		wndMgr.HideAllSlotButton(self.hWnd)
@@ -4502,14 +4618,28 @@ class SlotElipseWindow(Window):
 	def GetStartIndex(self):
 		return 0
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("image"):
+			r, g, b, a = 1.0, 1.0, 1.0, 1.0
+
+			keys = ["image_r", "image_g", "image_b", "image_a"]
+			if all(key in value for key in keys):
+				r, g, b, a = map(float, (value[key] for key in keys))
+
+			wndMgr.SetSlotBaseImage(self.hWnd, value["image"], r, g, b, a)
+
+		if value["type"] == 'slot_elipse':
+			for slot in value["slot"]:
+				wndMgr.AppendSlot(self.hWnd, int(slot["index"]), int(slot["x"]), int(slot["y"]), int(slot["width"]), int(slot["height"]))
+
+		wndMgr.SetSlotType(self.hWnd, 1)
+		return super().LoadFromScript(value, parentWindow)
+
 class GridSlotElipseWindow(SlotElipseWindow):
 	def __init__(self):
 		SlotElipseWindow.__init__(self)
 
 		self.startIndex = 0
-
-	def __del__(self):
-		SlotElipseWindow.__del__(self)
 
 	def RegisterWindow(self, layer):
 		self.hWnd = wndMgr.RegisterGridSlotWindow(self, layer)
@@ -4522,6 +4652,23 @@ class GridSlotElipseWindow(SlotElipseWindow):
 
 	def GetStartIndex(self):
 		return self.startIndex
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		xBlank = 0
+		yBlank = 0
+
+		if value.__contains__("x_blank"):
+			xBlank = int(value["x_blank"])
+		if value.__contains__("y_blank"):
+			yBlank = int(value["y_blank"])
+
+		self.ArrangeSlot(int(value["start_index"]), int(value["x_count"]), int(value["y_count"]), int(value["x_step"]), int(value["y_step"]), xBlank, yBlank)
+
+		if value.__contains__("style"):
+			if "select" == value["style"]:
+				wndMgr.SetSlotStyle(self.hWnd, wndMgr.SLOT_STYLE_SELECT)
+
+		return super().LoadFromScript(value, parentWindow)
 
 class NewRadioButton(Button):
 	interface = "interface/controls/common/radio/"
@@ -4607,6 +4754,11 @@ class NewRadioButton(Button):
 		if self.eventFunc:
 			self.eventFunc(*self.eventArgs)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("set_type"):
+			self.SetType(value["set_type"])
+		super().LoadFromScript(value, parentWindow)
+
 class Ballon(Window):
 	BASE_PATH = "interface/controls/common/Ballon"
 
@@ -4632,9 +4784,6 @@ class Ballon(Window):
 		self.__CreateUI()
 		self.SetWidth(0)
 		self.Hide()
-
-	def __del__(self):
-		Window.__del__(self)
 
 	def __CreateUI(self):
 		self.ANIMATED = False
@@ -4723,43 +4872,52 @@ class Ballon(Window):
 		elif self.ALPHA <= 0.0 and not self.SHOWED:
 			self.Hide()
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("width"):
+			self.SetWidth(int(value["width"]))
+		if value.__contains__("text"):
+			self.SetText(value["text"])
+		return super().LoadFromScript(value, parentWindow)
+
 class HorizontalSeparator(ExpandedImageBox):
 	def __init__(self):
-		ExpandedImageBox.__init__(self)
+		super().__init__()
 		self.AddFlag("not_pick")
 		self.__CreateUI()
 		self.SetWidth(1)
 
-	def __del__(self):
-		ExpandedImageBox.__del__(self)
-
 	def __CreateUI(self):
 		self.LoadImage("interface/controls/common/board_separator/horizontal.tga")
 
-	def SetWidth(self, width):
+	def SetWidth(self, width:int):
 		if width < 1:
 			return
 
 		self.SetScale(float(width), 1.0)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetWidth(int(value["width"]))
+		return Window.LoadFromScript(self, value, parentWindow)
+
 class VerticalSeparator(ExpandedImageBox):
 	def __init__(self):
-		ExpandedImageBox.__init__(self)
+		super().__init__()
 		self.AddFlag("not_pick")
 		self.__CreateUI()
 		self.SetHeight(1)
 
-	def __del__(self):
-		ExpandedImageBox.__del__(self)
-
 	def __CreateUI(self):
 		self.LoadImage("interface/controls/common/board_separator/vertical.tga")
 
-	def SetHeight(self, height):
+	def SetHeight(self, height:int):
 		if height < 1:
 			return
 
 		self.SetScale(1.0, float(height))
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		self.SetHeight(int(value["height"]))
+		return Window.LoadFromScript(self, value, parentWindow)
 
 class BarWithBox(Bar):
 	flash_color = None
@@ -4808,6 +4966,19 @@ class BarWithBox(Bar):
 	def SetOverOutEvent(self, func, *args):
 		self.overOutEvent = __mem_func__(func)
 		self.overOutArgs = args
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+
+		if value.__contains__("box_color"):
+			self.SetBoxColor(value["box_color"])
+
+		if value.__contains__("flash_color"):
+			self.SetFlashColor(value["flash_color"])
+
+		self.SetSize(int(value["width"]), int(value["height"]))
+		return super().LoadFromScript(value, parentWindow)
 
 class InputBar(Bar):
 	flash_color = None
@@ -4936,7 +5107,7 @@ class EditBoard(InputBar):
 		self.GetTextSize = self.EditLine.GetTextSize
 		self.SetMax = self.EditLine.SetMax
 		self.SetMouseLeftButtonDownEvent(self.SetFocus)
-		self.EditLine.SetKillFocusEvent(self.OnKillFocus)
+		self.EditLine.SetKillFocusEvent(self.ShowTextInfo)
 		self.EditLine.SetFocusEvent(self.TextInfo.Hide)
 		self.EditLine.SetIMEUpdateEvent(self.OnInput)
 		self.KillFocus = self.EditLine.KillFocus
@@ -4962,7 +5133,7 @@ class EditBoard(InputBar):
 		if self.EditLine.GetTextSize()[0] > (self.GetWidth() - 15):
 			self.SetText(self.GetText()[:-1])
 
-	def OnKillFocus(self):
+	def ShowTextInfo(self):
 		if len(self.GetText()) < 1:
 			self.TextInfo.Show()
 
@@ -4970,11 +5141,59 @@ class EditBoard(InputBar):
 		InputBar.SetSize(self, width, height)
 		self.EditLine.SetSize(width, height)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+		if value.__contains__("box_color"):
+			self.SetBoxColor(value["box_color"])
+		if value.__contains__("flash_color"):
+			self.SetFlashColor(value["flash_color"])
+
+		if value.__contains__("fontsize"):
+			fontSize = value["fontsize"]
+			if "LARGE" == fontSize:
+				self.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
+
+		elif value.__contains__("fontname"):
+			fontName = value["fontname"]
+			self.SetFontName(fontName)
+
+		if value.__contains__("infosize"):
+			fontSize = value["infosize"]
+			if "LARGE" == fontSize:
+				self.SetInfoFontName(localeinfo.UI_DEF_FONT_LARGE)
+
+		if value.__contains__("info_color"):
+			self.SetInfoFontColor(value["info_color"])
+		if value.__contains__("info_font"):
+			self.SetInfoFontName(value["info_font"])
+		if value.__contains__("info"):
+			self.SetInfo(value["info"])
+
+		if value.__contains__("secret_flag"):
+			self.SetSecret(value["secret_flag"])
+		if value.__contains__("only_number"):
+			if value["only_number"]:
+				self.SetNumberMode()
+		if value.__contains__("text_color"):
+			self.SetPackedFontColor(value["text_color"])
+		if value.__contains__("text"):
+			self.SetText(value["text"])
+
+		if value.__contains__("input_limit"):
+			self.SetMax(int(value["input_limit"]))
+
+		if value.__contains__("height"):
+			self.SetSize(int(value["width"]), int(value["height"]))
+		else:
+			self.SetSize(int(value["width"]), 28)
+
+		return super().LoadFromScript(value, parentWindow)
+
 class EditBoardFake(InputBar):
 	COLOR_BOX = grp.GenerateColor(0.602362, 0.177165, 0.177165, 1.0)
 	COLOR_INSIDE = grp.GenerateColor(0.0, 0.0, 0.0, 0.8)
 	COLOR_OVER_IN = grp.GenerateColor(0.1, 0.1, 0.1, 0.8)
-	# COLOR_TEXT = grp.GenerateColor(1.0, 0.5, 0.5, 1.0)
 	COLOR_TEXT = grp.GenerateColor(1.0, 1.0, 1.0, 1.0)
 
 	def __init__(self):
@@ -5005,6 +5224,37 @@ class EditBoardFake(InputBar):
 
 	def SetSize(self, width, height):
 		InputBar.SetSize(self, width, height)
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+		if value.__contains__("box_color"):
+			self.SetBoxColor(value["box_color"])
+		if value.__contains__("flash_color"):
+			self.SetFlashColor(value["flash_color"])
+
+		if value.__contains__("fontsize"):
+			fontSize = value["fontsize"]
+			if "LARGE" == fontSize:
+				self.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
+
+		elif value.__contains__("fontname"):
+			fontName = value["fontname"]
+			self.SetFontName(fontName)
+
+		if value.__contains__("text_color"):
+			self.SetPackedFontColor(value["text_color"])
+		if value.__contains__("text"):
+			self.SetText(value["text"])
+		if value.__contains__("text_center"):
+			self.SetTextInCenter()
+
+		if value.__contains__("height"):
+			self.SetSize(int(value["width"]), int(value["height"]))
+		else:
+			self.SetSize(int(value["width"]), 28)
+
+		return super().LoadFromScript(value, parentWindow)
 
 class DropDown(InputBar):
 	COLOR_BOX = grp.GenerateColor(0.602362, 0.177165, 0.177165, 1.0)
@@ -5044,9 +5294,6 @@ class DropDown(InputBar):
 			self.textBox.SetPackedFontColor(0xffa08784)
 			self.textBox.Show()
 			self.value = value
-
-		def __del__(self):
-			ListBoxEx.Item.__del__(self)
 
 		def SetSize(self, width, height):
 			wndMgr.SetWindowSize(self.hWnd, width, height)
@@ -5257,6 +5504,35 @@ class DropDown(InputBar):
 				self.Drop.Time += 1
 			else:
 				self.HideDrop()
+
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		if value.__contains__("color"):
+			self.SetColor(value["color"])
+		if value.__contains__("box_color"):
+			self.SetBoxColor(value["box_color"])
+		if value.__contains__("flash_color"):
+			self.SetFlashColor(value["flash_color"])
+
+		if value.__contains__("fontsize"):
+			fontSize = value["fontsize"]
+			if "LARGE" == fontSize:
+				self.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
+
+		if value.__contains__("text_color"):
+			self.SetPackedFontColor(value["text_color"])
+		if value.__contains__("text"):
+			self.SetText(value["text"])
+
+		if value.__contains__("height"):
+			self.SetSize(int(value["width"]), int(value["height"]))
+		else:
+			self.SetSize(int(value["width"]), 28)
+
+		if value.__contains__("itens"):
+			for item in value["itens"]:
+				self.AppendItem(str(item["text"]), item["value"])
+
+		return super().LoadFromScript(value, parentWindow)
 
 class New_TitleBar(Window):
 	BASE_PATH = "interface/controls/common/board"
@@ -5558,9 +5834,6 @@ class ThinBoardNew(Window):
 		self.Base.SetPosition(self.CORNER_WIDTH, self.CORNER_HEIGHT)
 		self.Base.Show()
 
-	def __del__(self):
-		Window.__del__(self)
-
 	def SetSize(self, width, height):
 
 		width = max(self.CORNER_WIDTH*2, width)
@@ -5583,18 +5856,72 @@ class ThinBoardNew(Window):
 		if self.Base:
 			self.Base.SetRenderingRect(0, 0, horizontalShowingPercentage, verticalShowingPercentage)
 
+	def LoadFromScript(self, value:dict, parentWindow:Window) -> bool:
+		return super().LoadFromScript(value, parentWindow)
+
 ##########################################################################################################################
 ### SCRIPTLOADER ### SCRIPTLOADER ### SCRIPTLOADER ### SCRIPTLOADER ### SCRIPTLOADER ### SCRIPTLOADER ### SCRIPTLOADER ###
 ##########################################################################################################################
 class PythonScriptLoader(object):
-	def __init__(self):
+
+	windows_types = {
+		"window":ScriptWindow,
+		"button":Button,
+		"radio_button":RadioButton,
+		"toggle_button":ToggleButton,
+		"mark":MarkBox,
+		"image":ImageBox,
+		"expanded_image":ExpandedImageBox,
+		"ani_image":AniImageBox,
+		"slot":SlotWindow,
+		"grid_table":GridSlotWindow,
+		"text":TextLine,
+		"editline":EditLine,
+		"box":Box,
+		"bar":Bar,
+		"line":Line,
+		"slotbar":SlotBar,
+		"gauge":Gauge,
+		"listbox":ListBox,
+		"listbox2":ListBox2,
+		"listboxex":ListBoxEx,
+		"titlebar":TitleBar,
+		"board":Board,
+		"board_with_titlebar":BoardWithTitleBar,
+		"thinboard":ThinBoard,
+		"horizontalbar":HorizontalBar,
+		"scrollbar":ScrollBar,
+		"small_thin_scrollbar":SmallThinScrollBar,
+		"thin_scrollbar":ThinScrollBar,
+		"sliderbar":SliderBar,
+		"new_board":New_Board,
+		"new_board_with_titlebar":New_BoardWithTitleBar,
+		"new_scrollbar":New_ScrollBar,
+		"new_thin_scrollbar":New_ThinScrollBar,
+		"board_transparent":BoardTransparent,
+		"slider":Slider,
+		"redbutton":RedButton,
+		"verticalseparator":VerticalSeparator,
+		"horizontalseparator":HorizontalSeparator,
+		"ballon":Ballon,
+		"newradio_button":NewRadioButton,
+		"slot_elipse":SlotElipseWindow,
+		"grid_table_elipse":GridSlotElipseWindow,
+		"thinboardnew":ThinBoardNew,
+		"barwithbox":BarWithBox,
+		"editboard":EditBoard,
+		"editboardfake":EditBoardFake,
+		"dropdown":DropDown,
+	}
+
+	def __init__(self) -> None:
 		self.Clear()
 
-	def Clear(self):
+	def Clear(self) -> None:
 		self.ScriptDictionary = { "SCREEN_WIDTH" : wndMgr.GetScreenWidth(), "SCREEN_HEIGHT" : wndMgr.GetScreenHeight() }
 		self.InsertFunction = 0
 
-	def LoadScriptFile(self, window, FileName):
+	def LoadScriptFile(self, window:ScriptWindow, FileName:str) -> None:
 		self.Clear()
 
 		self.ScriptDictionary["PLAYER_NAME_MAX_LEN"] = 24
@@ -5605,7 +5932,7 @@ class PythonScriptLoader(object):
 			def GetModName(filename):
 				return op_splitext(op_basename(filename))[0]
 			def IsInUiPath(filename):
-				def ICmp(s1, s2):
+				def ICmp(s1:str, s2:str):
 					return s1.lower() == s2.lower()
 				return ICmp(op_dirname(filename), "uiscript")
 			modname = GetModName(FileName)
@@ -5652,1069 +5979,43 @@ class PythonScriptLoader(object):
 
 		self.LoadChildren(window, Body)
 
-	def LoadChildren(self, parent, dicChildren):
+	def LoadChildren(self, parent:ScriptWindow, dicChildren:dict) -> None:
 		if dicChildren.__contains__("style"):
 			for style in dicChildren["style"]:
 				parent.AddFlag(style)
 
-		if False == dicChildren.__contains__("children"):
+		if not "children" in dicChildren:
 			return False
-
-		Index = 0
 
 		ChildrenList = dicChildren["children"]
 		parent.Children = []
-		for i in range(len(ChildrenList)):
-			parent.Children.append(None)
 
-		for ElementValue in ChildrenList:
-			if "name" in ElementValue:
-				Name = ElementValue["name"]
+		for index, element_data in enumerate(ChildrenList):
+			if "type" in element_data:
+				Type = element_data["type"]
 			else:
-				Name = ElementValue["name"] = "NONAME"
+				Type = element_data["type"] = "window"
 
-			if "type" in ElementValue:
-				Type = ElementValue["type"]
-			else:
-				Type = ElementValue["type"] = "window"
+			if "name" in element_data:
+				Name = element_data["name"]
+		else:
+				Name = element_data["name"] = f'{element_data["type"]}_{index}'
 
-			if Type == "window":
-				parent.Children[Index] = ScriptWindow()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementWindow(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "button":
-				parent.Children[Index] = Button()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementButton(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "radio_button":
-				parent.Children[Index] = RadioButton()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementButton(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "toggle_button":
-				parent.Children[Index] = ToggleButton()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementButton(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "mark":
-				parent.Children[Index] = MarkBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementMark(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "image":
-				parent.Children[Index] = ImageBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementImage(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "expanded_image":
-				parent.Children[Index] = ExpandedImageBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementExpandedImage(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "ani_image":
-				parent.Children[Index] = AniImageBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementAniImage(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "slot":
-				parent.Children[Index] = SlotWindow()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementSlot(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "grid_table":
-				parent.Children[Index] = GridSlotWindow()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementGridTable(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "text":
-				parent.Children[Index] = TextLine()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementText(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "editline":
-				parent.Children[Index] = EditLine()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementEditLine(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "box":
-				parent.Children[Index] = Box()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBox(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "bar":
-				parent.Children[Index] = Bar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "line":
-				parent.Children[Index] = Line()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementLine(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "slotbar":
-				parent.Children[Index] = SlotBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementSlotBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "gauge":
-				parent.Children[Index] = Gauge()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementGauge(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "listbox":
-				parent.Children[Index] = ListBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementListBox(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "listbox2":
-				parent.Children[Index] = ListBox2()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementListBox2(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "listboxex":
-				parent.Children[Index] = ListBoxEx()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementListBoxEx(parent.Children[Index], ElementValue, parent)
-
-				#################################################################################################################################
-				### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ### OLD INTERFACE ###
-				#################################################################################################################################
-			elif Type == "titlebar":
-				parent.Children[Index] = TitleBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementTitleBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "board":
-				parent.Children[Index] = Board()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBoard(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "board_with_titlebar":
-				parent.Children[Index] = BoardWithTitleBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBoardWithTitleBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "thinboard":
-				parent.Children[Index] = ThinBoard()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementThinBoard(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "horizontalbar":
-				parent.Children[Index] = HorizontalBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementHorizontalBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "scrollbar":
-				parent.Children[Index] = ScrollBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementScrollBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "small_thin_scrollbar":
-				parent.Children[Index] = SmallThinScrollBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementScrollBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "thin_scrollbar":
-				parent.Children[Index] = ThinScrollBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementScrollBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "sliderbar":
-				parent.Children[Index] = SliderBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementSliderBar(parent.Children[Index], ElementValue, parent)
-
-				#################################################################################################################################
-				### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ###
-				#################################################################################################################################
-			elif Type == "new_board":
-				if constinfo.NEW_INTERFACE:
-					parent.Children[Index] = New_Board()
-				else:
-					parent.Children[Index] = Board()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBoard(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "new_board_with_titlebar":
-				if constinfo.NEW_INTERFACE:
-					parent.Children[Index] = New_BoardWithTitleBar()
-				else:
-					parent.Children[Index] = BoardWithTitleBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBoardWithTitleBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "new_scrollbar":
-				parent.Children[Index] = New_ScrollBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementScrollBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "new_thin_scrollbar":
-				parent.Children[Index] = New_ThinScrollBar()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementScrollBar(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "board_transparent":
-				parent.Children[Index] = BoardTransparent()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBoard(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "slider":
-				parent.Children[Index] = Slider()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementSlider(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "redbutton":
-				parent.Children[Index] = RedButton()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBaseButton(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "verticalseparator":
-				parent.Children[Index] = VerticalSeparator()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementVerticalSeparator(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "horizontalseparator":
-				parent.Children[Index] = HorizontalSeparator()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementHorizontalSeparator(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "ballon":
-				parent.Children[Index] = Ballon()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBallon(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "newradio_button":
-				parent.Children[Index] = NewRadioButton()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementButton(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "slot_elipse":
-				parent.Children[Index] = SlotElipseWindow()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementSlotElipse(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "grid_table_elipse":
-				parent.Children[Index] = GridSlotElipseWindow()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementGridTableElipse(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "thinboardnew":
-				parent.Children[Index] = ThinBoardNew()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementThinBoardNew(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "barwithbox":
-				parent.Children[Index] = BarWithBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementBarWithBox(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "editboard":
-				parent.Children[Index] = EditBoard()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementEditBoard(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "editboardfake":
-				parent.Children[Index] = EditBoardFake()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementEditBoardFake(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "dropdown":
-				parent.Children[Index] = DropDown()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementDropDown(parent.Children[Index], ElementValue, parent)
-
-			else:
-				Index += 1
+			if not Type in self.windows_types:
 				continue
 
-#################################################################################################################################
-### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT ####
-#################################################################################################################################
-			'''
-			elif Type == "candidate_list":
-				parent.Children[Index] = CandidateListBox()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementCandidateList(parent.Children[Index], ElementValue, parent)
-
-			elif Type == "textlink":
-				parent.Children[Index] = TextLink()
-				parent.Children[Index].SetParent(parent)
-				self.LoadElementLinkText(parent.Children[Index], ElementValue, parent)
-			'''
-
-			parent.Children[Index].SetWindowName(Name)
+			parent.Children.append(self.windows_types[Type]())
+			parent.Children[index].SetParent(parent)
+			try:
+				parent.Children[index].LoadFromScript(element_data, parent)
+			except KeyError as err:
+				dbg.TracePythonError(err)
+				dbg.TraceError(f"Failed to load window:'{element_data}'")
+			parent.Children[index].SetWindowName(Name)
 			if 0 != self.InsertFunction:
-				self.InsertFunction(Name, parent.Children[Index])
+				self.InsertFunction(Name, parent.Children[index])
 
-			self.LoadChildren(parent.Children[Index], ElementValue)
-			Index += 1
-
-	def LoadDefaultData(self, window, value, parentWindow):
-		loc_x = int(value["x"])
-		loc_y = int(value["y"])
-		if value.__contains__("vertical_align"):
-			if "center" == value["vertical_align"]:
-				window.SetWindowVerticalAlignCenter()
-			elif "bottom" == value["vertical_align"]:
-				window.SetWindowVerticalAlignBottom()
-
-		if parentWindow.IsRTL():
-			loc_x = int(value["x"]) + window.GetWidth()
-			if value.__contains__("horizontal_align"):
-				if "center" == value["horizontal_align"]:
-					window.SetWindowHorizontalAlignCenter()
-					loc_x = - int(value["x"])
-				elif "right" == value["horizontal_align"]:
-					window.SetWindowHorizontalAlignLeft()
-					loc_x = int(value["x"]) - window.GetWidth()
-			else:
-				window.SetWindowHorizontalAlignRight()
-
-			if value.__contains__("all_align"):
-				window.SetWindowVerticalAlignCenter()
-				window.SetWindowHorizontalAlignCenter()
-				loc_x = - int(value["x"])
-		else:
-			if value.__contains__("horizontal_align"):
-				if "center" == value["horizontal_align"]:
-					window.SetWindowHorizontalAlignCenter()
-				elif "right" == value["horizontal_align"]:
-					window.SetWindowHorizontalAlignRight()
-
-		window.SetPosition(loc_x, loc_y)
-		if not value.__contains__("hide"):
-			window.Show()
-		else:
-			if 0 == value["hide"]:
-				window.Show()
-
-		if value.__contains__("istooltip"):
-			parentWindow.SetToolTipWindow(window)
-
-	def LoadElementWindow(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementButton(self, window, value, parentWindow):
-		if value.__contains__("width") and value.__contains__("height"):
-			window.SetSize(int(value["width"]), int(value["height"]))
-
-		if value.__contains__("set_type"):
-			window.SetType(value["set_type"])
-		if value.__contains__("default_image"):
-			window.SetUpVisual(value["default_image"])
-		if value.__contains__("over_image"):
-			window.SetOverVisual(value["over_image"])
-		if value.__contains__("down_image"):
-			window.SetDownVisual(value["down_image"])
-		if value.__contains__("disable_image"):
-			window.SetDisableVisual(value["disable_image"])
-
-		if value.__contains__("text"):
-			if value.__contains__("text_height"):
-				window.SetText(value["text"], value["text_height"])
-			else:
-				window.SetText(value["text"])
-
-			if value.__contains__("text_color"):
-				window.SetTextColor(value["text_color"])
-
-		if value.__contains__("tooltip_text"):
-			if value.__contains__("tooltip_x") and value.__contains__("tooltip_y"):
-				window.SetToolTipText(value["tooltip_text"], int(value["tooltip_x"]), int(value["tooltip_y"]))
-			else:
-				window.SetToolTipText(value["tooltip_text"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementMark(self, window, value, parentWindow):
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementImage(self, window, value, parentWindow):
-		window.LoadImage(value["image"])
-
-		if value.__contains__("alpha"):
-			window.SetAlpha(float(value["alpha"]))
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementAniImage(self, window, value, parentWindow):
-		if value.__contains__("delay"):
-			window.SetDelay(value["delay"])
-
-		for image in value["images"]:
-			window.AppendImage(image)
-
-		if value.__contains__("width") and value.__contains__("height"):
-			window.SetSize(value["width"], value["height"])
-
-		if value.__contains__("alpha"):
-			window.SetAlpha(float(value["alpha"]))
-
-		if value.__contains__("percent"):
-			window.SetPercentageNew(float(value["percent"]))
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementExpandedImage(self, window, value, parentWindow):
-		window.LoadImage(value["image"])
-
-		if value.__contains__("width") and value.__contains__("height"):
-			window.SetSizeFixed(int(value["width"]), int(value["height"]))
-
-		if value.__contains__("x_origin") and value.__contains__("y_origin"):
-			window.SetOrigin(float(value["x_origin"]), float(value["y_origin"]))
-
-		if value.__contains__("x_scale") and value.__contains__("y_scale"):
-			window.SetScale(float(value["x_scale"]), float(value["y_scale"]))
-
-		if value.__contains__("rect"):
-			RenderingRect = value["rect"]
-			window.SetRenderingRect(RenderingRect[0], RenderingRect[1], RenderingRect[2], RenderingRect[3])
-
-		if value.__contains__("mode"):
-			mode = value["mode"]
-			if "MODULATE" == mode:
-				window.SetRenderingMode(wndMgr.RENDERING_MODE_MODULATE)
-
-		if value.__contains__("alpha"):
-			window.SetAlpha(float(value["alpha"]))
-
-		if value.__contains__("rotation"):
-			window.SetRotation(float(value["rotation"]))
-
-		if value.__contains__("percent"):
-			window.SetPercentageNew(float(value["percent"]))
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementSlot(self, window, value, parentWindow):
-		global_x = int(value["x"])
-		global_y = int(value["y"])
-		global_width = int(value["width"])
-		global_height = int(value["height"])
-
-		window.SetPosition(global_x, global_y)
-		window.SetSize(global_width, global_height)
-		window.Show()
-
-		r = 1.0
-		g = 1.0
-		b = 1.0
-		a = 1.0
-
-		if value.__contains__("image_r") and \
-			value.__contains__("image_g") and \
-			value.__contains__("image_b") and \
-			value.__contains__("image_a"):
-			r = float(value["image_r"])
-			g = float(value["image_g"])
-			b = float(value["image_b"])
-			a = float(value["image_a"])
-
-		for slot in value["slot"]:
-			wndMgr.AppendSlot(window.hWnd, int(slot["index"]), int(slot["x"]), int(slot["y"]), int(slot["width"]), int(slot["height"]))
-
-		if value.__contains__("image"):
-			wndMgr.SetSlotBaseImage(window.hWnd, value["image"], r, g, b, a)
-		return True
-
-	def LoadElementGridTable(self, window, value, parentWindow):
-		xBlank = 0
-		yBlank = 0
-
-		if value.__contains__("x_blank"):
-			xBlank = int(value["x_blank"])
-		if value.__contains__("y_blank"):
-			yBlank = int(value["y_blank"])
-
-		window.SetPosition(int(value["x"]), int(value["y"]))
-		window.ArrangeSlot(int(value["start_index"]), int(value["x_count"]), int(value["y_count"]), int(value["x_step"]), int(value["y_step"]), xBlank, yBlank)
-
-		if value.__contains__("image"):
-			r = 1.0
-			g = 1.0
-			b = 1.0
-			a = 1.0
-			if value.__contains__("image_r") and value.__contains__("image_g") and value.__contains__("image_b") and value.__contains__("image_a"):
-				r = float(value["image_r"])
-				g = float(value["image_g"])
-				b = float(value["image_b"])
-				a = float(value["image_a"])
-			wndMgr.SetSlotBaseImage(window.hWnd, value["image"], r, g, b, a)
-
-		if value.__contains__("style"):
-			if "select" == value["style"]:
-				wndMgr.SetSlotStyle(window.hWnd, wndMgr.SLOT_STYLE_SELECT)
-
-		window.Show()
-		return True
-
-	def LoadElementText(self, window, value, parentWindow):
-		if value.__contains__("fontsize"):
-			fontSize = value["fontsize"]
-
-			if "LARGE" == fontSize:
-				window.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
-
-		elif value.__contains__("fontname"):
-			fontName = value["fontname"]
-			window.SetFontName(fontName)
-
-		if value.__contains__("text_horizontal_align"):
-			if "left" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignLeft()
-			elif "center" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignCenter()
-			elif "right" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignRight()
-
-		if value.__contains__("text_vertical_align"):
-			if "top" == value["text_vertical_align"]:
-				window.SetVerticalAlignTop()
-			elif "center" == value["text_vertical_align"]:
-				window.SetVerticalAlignCenter()
-			elif "bottom" == value["text_vertical_align"]:
-				window.SetVerticalAlignBottom()
-
-		if value.__contains__("limit_width"):
-			window.SetLimitWidth(value["limit_width"])
-
-		if value.__contains__("multi_line"):
-			if value["multi_line"]:
-				window.SetMultiLine()
-
-		if value.__contains__("all_align"):
-			window.SetHorizontalAlignCenter()
-			window.SetVerticalAlignCenter()
-			window.SetWindowHorizontalAlignCenter()
-			window.SetWindowVerticalAlignCenter()
-
-		if value.__contains__("r") and value.__contains__("g") and value.__contains__("b"):
-			window.SetFontColor(float(value["r"]), float(value["g"]), float(value["b"]))
-		elif value.__contains__("color"):
-			window.SetPackedFontColor(value["color"])
-		else:
-			window.SetPackedFontColor(colorinfo.COR_TEXTO_PADRAO)
-
-		if value.__contains__("outline"):
-			if value["outline"]:
-				window.SetOutline()
-		if value.__contains__("text"):
-			if value.__contains__("text_limited"):
-				window.SetTextLimited(value["text"], int(value["text_limited"]))
-			else:
-				window.SetText(value["text"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementEditLine(self, window, value, parentWindow):
-		if value.__contains__("secret_flag"):
-			window.SetSecret(value["secret_flag"])
-
-		if value.__contains__("with_codepage"):
-			if value["with_codepage"]:
-				window.bCodePage = True
-
-		if value.__contains__("r") and value.__contains__("g") and value.__contains__("b"):
-			window.SetFontColor(float(value["r"]), float(value["g"]), float(value["b"]))
-		elif value.__contains__("color"):
-			window.SetPackedFontColor(value["color"])
-		else:
-			window.SetFontColor(0.8549, 0.8549, 0.8549)
-
-		if value.__contains__("only_number"):
-			if value["only_number"]:
-				window.SetNumberMode()
-
-		if value.__contains__("money_mode"):
-			if value["money_mode"]:
-				window.SetMoneyMode()
-
-		if value.__contains__("enable_codepage"):
-			window.SetIMEFlag(value["enable_codepage"])
-
-		if value.__contains__("enable_ime"):
-			window.SetIMEFlag(value["enable_ime"])
-
-		if value.__contains__("limit_width"):
-			window.SetLimitWidth(value["limit_width"])
-
-		if value.__contains__("multi_line"):
-			if value["multi_line"]:
-				window.SetMultiLine()
-
-		if value.__contains__("text_horizontal_align"):
-			if "left" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignLeft()
-			elif "center" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignCenter()
-			elif "right" == value["text_horizontal_align"]:
-				window.SetHorizontalAlignRight()
-
-		if value.__contains__("text_vertical_align"):
-			if "top" == value["text_vertical_align"]:
-				window.SetVerticalAlignTop()
-			elif "center" == value["text_vertical_align"]:
-				window.SetVerticalAlignCenter()
-			elif "bottom" == value["text_vertical_align"]:
-				window.SetVerticalAlignBottom()
-
-		if value.__contains__("fontname"):
-			fontName = value["fontname"]
-			window.SetFontName(fontName)
-
-		if value.__contains__("all_align"):
-			window.SetHorizontalAlignCenter()
-			window.SetVerticalAlignCenter()
-			window.SetWindowHorizontalAlignCenter()
-			window.SetWindowVerticalAlignCenter()
-
-		window.SetMax(int(value["input_limit"]))
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadElementText(window, value, parentWindow)
-		return True
-
-	def LoadElementTitleBar(self, window, value, parentWindow):
-		window.MakeTitleBar(int(value["width"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBoard(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBoardWithTitleBar(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		window.SetTitleName(value["title"])
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementThinBoard(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBox(self, window, value, parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBar(self, window, value, parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementLine(self, window, value, parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementSlotBar(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementGauge(self, window, value, parentWindow):
-		window.MakeGauge(value["width"], value["color"])
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementScrollBar(self, window, value, parentWindow):
-		window.SetScrollBarSize(value["size"])
-
-		if value.__contains__("midle_size"):
-			window.SetMiddleBarSize(value["midle_size"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementSliderBar(self, window, value, parentWindow):
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementListBox(self, window, value, parentWindow):
-		if value.__contains__("item_align"):
-			window.SetTextCenterAlign(value["item_align"])
-
-		window.SetSize(value["width"], value["height"])
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementListBox2(self, window, value, parentWindow):
-		window.SetRowCount(value.get("row_count", 10))
-		window.SetSize(value["width"], value["height"])
-		self.LoadDefaultData(window, value, parentWindow)
-
-		if value.__contains__("item_align"):
-			window.SetTextCenterAlign(value["item_align"])
-		return True
-
-	def LoadElementListBoxEx(self, window, value, parentWindow):
-		window.SetSize(value["width"], value["height"])
-		self.LoadDefaultData(window, value, parentWindow)
-
-		if value.__contains__("itemsize_x") and value.__contains__("itemsize_y"):
-			window.SetItemSize(int(value["itemsize_x"]), int(value["itemsize_y"]))
-
-		if value.__contains__("itemstep"):
-			window.SetItemStep(int(value["itemstep"]))
-
-		if value.__contains__("viewcount"):
-			window.SetViewItemCount(int(value["viewcount"]))
-		return True
-
-#################################################################################################################################
-### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ### NEW INTERFACE ###
-#################################################################################################################################
-	def LoadElementThinBoardNew(self, window, value, parentWindow):
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBaseButton(self, window, value, parentWindow):
-		if value.__contains__("width"):
-			window.SetWidth(int(value["width"]))
-
-		if value.__contains__("text"):
-			if value.__contains__("text_height"):
-				window.SetText(value["text"], value["text_height"])
-			else:
-				window.SetText(value["text"])
-
-		if value.__contains__("tooltip_text"):
-			if value.__contains__("tooltip_x") and value.__contains__("tooltip_y"):
-				window.SetToolTipText(value["tooltip_text"], int(value["tooltip_x"]), int(value["tooltip_y"]))
-			else:
-				window.SetToolTipText(value["tooltip_text"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementVerticalSeparator(self, window, value, parentWindow):
-		window.SetHeight(int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBallon(self, window, value, parentWindow):
-		if value.__contains__("width"):
-			window.SetWidth(int(value["width"]))
-		if value.__contains__("text"):
-			window.SetText(value["text"])
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementHorizontalSeparator(self, window, value, parentWindow):
-		window.SetWidth(int(value["width"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementSlotElipse(self, window, value, parentWindow):
-		global_x = int(value["x"])
-		global_y = int(value["y"])
-		global_width = int(value["width"])
-		global_height = int(value["height"])
-
-		window.SetPosition(global_x, global_y)
-		window.SetSize(global_width, global_height)
-		window.Show()
-
-		r = 1.0
-		g = 1.0
-		b = 1.0
-		a = 1.0
-
-		if value.__contains__("image_r") and \
-			value.__contains__("image_g") and \
-			value.__contains__("image_b") and \
-			value.__contains__("image_a"):
-			r = float(value["image_r"])
-			g = float(value["image_g"])
-			b = float(value["image_b"])
-			a = float(value["image_a"])
-
-		for slot in value["slot"]:
-			wndMgr.AppendSlot(window.hWnd, int(slot["index"]), int(slot["x"]), int(slot["y"]), int(slot["width"]), int(slot["height"]))
-
-		if value.__contains__("image"):
-			wndMgr.SetSlotBaseImage(window.hWnd, value["image"], r, g, b, a)
-
-		wndMgr.SetSlotType(window.hWnd, 1)
-
-		return True
-
-	def LoadElementGridTableElipse(self, window, value, parentWindow):
-		xBlank = 0
-		yBlank = 0
-
-		if value.__contains__("x_blank"):
-			xBlank = int(value["x_blank"])
-		if value.__contains__("y_blank"):
-			yBlank = int(value["y_blank"])
-
-		window.SetPosition(int(value["x"]), int(value["y"]))
-		window.ArrangeSlot(int(value["start_index"]), int(value["x_count"]), int(value["y_count"]), int(value["x_step"]), int(value["y_step"]), xBlank, yBlank)
-
-		if value.__contains__("image"):
-			r = 1.0
-			g = 1.0
-			b = 1.0
-			a = 1.0
-			if value.__contains__("image_r") and \
-				value.__contains__("image_g") and \
-				value.__contains__("image_b") and \
-				value.__contains__("image_a"):
-				r = float(value["image_r"])
-				g = float(value["image_g"])
-				b = float(value["image_b"])
-				a = float(value["image_a"])
-			wndMgr.SetSlotBaseImage(window.hWnd, value["image"], r, g, b, a)
-
-		if value.__contains__("style"):
-			if "select" == value["style"]:
-				wndMgr.SetSlotStyle(window.hWnd, wndMgr.SLOT_STYLE_SELECT)
-
-		wndMgr.SetSlotType(window.hWnd, 1)
-
-		window.Show()
-		return True
-
-	def LoadElementSlider(self, window, value, parentWindow):
-		window.SetWidth(int(value["width"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementBarWithBox(self, window, value, parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-
-		if value.__contains__("box_color"):
-			window.SetBoxColor(value["box_color"])
-
-		if value.__contains__("flash_color"):
-			window.SetFlashColor(value["flash_color"])
-
-		window.SetSize(int(value["width"]), int(value["height"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementEditBoard(self, window, value , parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-		if value.__contains__("box_color"):
-			window.SetBoxColor(value["box_color"])
-		if value.__contains__("flash_color"):
-			window.SetFlashColor(value["flash_color"])
-
-		if value.__contains__("fontsize"):
-			fontSize = value["fontsize"]
-			if "LARGE" == fontSize:
-				window.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
-
-		elif value.__contains__("fontname"):
-			fontName = value["fontname"]
-			window.SetFontName(fontName)
-
-		if value.__contains__("infosize"):
-			fontSize = value["infosize"]
-			if "LARGE" == fontSize:
-				window.SetInfoFontName(localeinfo.UI_DEF_FONT_LARGE)
-
-		if value.__contains__("info_color"):
-			window.SetInfoFontColor(value["info_color"])
-		if value.__contains__("info_font"):
-			window.SetInfoFontName(value["info_font"])
-		if value.__contains__("info"):
-			window.SetInfo(value["info"])
-
-		if value.__contains__("secret_flag"):
-			window.SetSecret(value["secret_flag"])
-		if value.__contains__("only_number"):
-			if value["only_number"]:
-				window.SetNumberMode()
-		if value.__contains__("text_color"):
-			window.SetPackedFontColor(value["text_color"])
-		if value.__contains__("text"):
-			window.SetText(value["text"])
-
-		if value.__contains__("input_limit"):
-			window.SetMax(int(value["input_limit"]))
-
-		if value.__contains__("height"):
-			window.SetSize(int(value["width"]), int(value["height"]))
-		else:
-			window.SetSize(int(value["width"]), 28)
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementEditBoardFake(self, window, value , parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-		if value.__contains__("box_color"):
-			window.SetBoxColor(value["box_color"])
-		if value.__contains__("flash_color"):
-			window.SetFlashColor(value["flash_color"])
-
-		if value.__contains__("fontsize"):
-			fontSize = value["fontsize"]
-			if "LARGE" == fontSize:
-				window.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
-
-		elif value.__contains__("fontname"):
-			fontName = value["fontname"]
-			window.SetFontName(fontName)
-
-		if value.__contains__("text_color"):
-			window.SetPackedFontColor(value["text_color"])
-		if value.__contains__("text"):
-			window.SetText(value["text"])
-		if value.__contains__("text_center"):
-			window.SetTextInCenter()
-
-		if value.__contains__("height"):
-			window.SetSize(int(value["width"]), int(value["height"]))
-		else:
-			window.SetSize(int(value["width"]), 28)
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementDropDown(self, window, value , parentWindow):
-		if value.__contains__("color"):
-			window.SetColor(value["color"])
-		if value.__contains__("box_color"):
-			window.SetBoxColor(value["box_color"])
-		if value.__contains__("flash_color"):
-			window.SetFlashColor(value["flash_color"])
-
-		if value.__contains__("fontsize"):
-			fontSize = value["fontsize"]
-			if "LARGE" == fontSize:
-				window.SetFontName(localeinfo.UI_DEF_FONT_LARGE)
-
-		if value.__contains__("text_color"):
-			window.SetPackedFontColor(value["text_color"])
-		if value.__contains__("text"):
-			window.SetText(value["text"])
-
-		if value.__contains__("height"):
-			window.SetSize(int(value["width"]), int(value["height"]))
-		else:
-			window.SetSize(int(value["width"]), 28)
-
-		if value.__contains__("itens"):
-			for item in value["itens"]:
-				window.AppendItem(str(item["text"]), item["value"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementHorizontalBar(self, window, value, parentWindow):
-		window.Create(int(value["width"]))
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-#################################################################################################################################
-### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT USED ### NOT ####
-#################################################################################################################################
-'''
-	def LoadElementLinkText(self, window, value, parentWindow):
-		if value.__contains__("all_align"):
-			window.SetHorizontalAlignCenter()
-			window.SetVerticalAlignCenter()
-			window.SetWindowHorizontalAlignCenter()
-			window.SetWindowVerticalAlignCenter()
-
-		if value.__contains__("outline"):
-			if value["outline"]:
-				window.SetOutline()
-		if value.__contains__("text"):
-			window.SetText(value["text"])
-
-		self.LoadDefaultData(window, value, parentWindow)
-		return True
-
-	def LoadElementCandidateList(self, window, value, parentWindow):
-		window.SetPosition(int(value["x"]), int(value["y"]))
-		window.SetItemSize(int(value["item_xsize"]), int(value["item_ysize"]))
-		window.SetItemStep(int(value["item_step"]))
-		window.Show()
-		return True
-'''
-
-if OLD_STUFF:
-	class ReadingWnd(Bar):
-		def __init__(self):
-			Bar.__init__(self, "TOP_MOST")
-	
-			self.__BuildText()
-			self.SetSize(80, 19)
-			self.Show()
-	
-		def __del__(self):
-			Bar.__del__(self)
-	
-		def __BuildText(self):
-			self.text = TextLine()
-			self.text.SetParent(self)
-			self.text.SetPosition(4, 3)
-			self.text.Show()
-	
-		def SetText(self, text):
-			self.text.SetText(text)
-	
-		def SetReadingPosition(self, x, y):
-			xPos = x + 2
-			yPos = y  - self.GetHeight() - 2
-			self.SetPosition(xPos, yPos)
-	
-		def SetTextColor(self, color):
-			self.text.SetPackedFontColor(color)
-
-	class EmptyCandidateWindow(Window):
-		def __init__(self):
-			Window.__init__(self)
-
-		def __del__(self):
-			Window.__init__(self)
-
-		def Load(self):
-			pass
-
-		def SetCandidatePosition(self, x, y, textCount):
-			pass
-
-		def Clear(self):
-			pass
-
-		def Append(self, text):
-			pass
-
-		def Refresh(self):
-			pass
-
-		def Select(self):
-			pass
+			self.LoadChildren(parent.Children[index], element_data)
 
 def MakeText(parent, textlineText, x, y, color):
 	textline = TextLine()

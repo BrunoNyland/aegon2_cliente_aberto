@@ -77,6 +77,8 @@ class SelectCharacterWindow(ui.ScriptWindow):
 		self.onPressKeyDict[app.DIK_NUMPAD4]		= lambda : self.SelectSlot(3)
 		self.onPressKeyDict[app.DIK_SPACE]			= lambda : self.NewStartGame()
 		self.onPressKeyDict[app.DIK_NUMPADCOMMA]	= lambda : self.NewStartGame()
+		self.onPressKeyDict[app.DIK_RETURN]			= lambda : self.NewStartGame()
+		self.onPressKeyDict[app.DIK_NUMPADENTER]	= lambda : self.NewStartGame()
 		self.onPressKeyDict[app.DIK_COMMA]			= lambda : self.NewStartGame()
 		self.onPressKeyDict[app.DIK_DELETE]			= lambda : self.InputPrivateCode()
 		self.onPressKeyDict[app.DIK_A]				= lambda : self.DecreaseSlotIndex()
@@ -489,16 +491,16 @@ class SelectCharacterWindow(ui.ScriptWindow):
 		self.ExitSelect()
 		return True
 
-	def OnIMEReturn(self):
-		if app.ENABLE_ON_CREATE_SELECT_HAIR_SHAPE:
-			Get = self.dlgBoard.GetChild
-			if Get("board_shape").IsShow():
-				return
-			if Get("board_hair").IsShow():
-				return
+	# def OnIMEReturn(self):
+	# 	if app.ENABLE_ON_CREATE_SELECT_HAIR_SHAPE:
+	# 		Get = self.dlgBoard.GetChild
+	# 		if Get("board_shape").IsShow():
+	# 			return
+	# 		if Get("board_hair").IsShow():
+	# 			return
 
-		self.NewStartGame()
-		return True
+	# 	self.NewStartGame()
+	# 	return True
 
 	def SaveScreen(self):
 		if not os.path.exists(os.getcwd() + os.sep + "screenshot"):

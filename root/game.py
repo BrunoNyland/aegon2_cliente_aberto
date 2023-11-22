@@ -608,9 +608,9 @@ class GameWindow(ui.ScriptWindow):
 		if not guildName:
 			return
 
-		if net.IsInsultIn(guildName):
-			self.PopupMessage(localeinfo.GUILD_CREATE_ERROR_INSULT_NAME)
-			return
+		# if net.IsInsultIn(guildName):
+			# self.PopupMessage(localeinfo.GUILD_CREATE_ERROR_INSULT_NAME)
+			# return
 
 		net.SendAnswerMakeGuildPacket(guildName)
 		self.guildNameBoard.Close()

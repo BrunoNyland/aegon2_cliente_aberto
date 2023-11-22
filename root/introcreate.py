@@ -462,9 +462,9 @@ class CreateCharacterWindow(ui.Window):
 			self.PopupMessage(localeinfo.CREATE_ERROR_GM_NAME, self.EnableWindow)
 			return False
 
-		if net.IsInsultIn(name):
-			self.PopupMessage(localeinfo.CREATE_ERROR_INSULT_NAME, self.EnableWindow)
-			return False
+		# if net.IsInsultIn(name):
+			# self.PopupMessage(localeinfo.CREATE_ERROR_INSULT_NAME, self.EnableWindow)
+			# return False
 
 		return True
 

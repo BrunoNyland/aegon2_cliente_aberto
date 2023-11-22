@@ -1,8 +1,6 @@
 #favor manter essa linha
 import _app as app
 
-CODEPAGE = str(app.GetDefaultCodePage())
-
 def LoadLocaleFile(srcFileName, localeDict):
 	lines = open(srcFileName, "r").readlines()
 

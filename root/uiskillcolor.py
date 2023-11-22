@@ -21,10 +21,8 @@ def ReturnSavedColors():
 		file.write("")
 		file.close()
 
-	open("miles/skill_color.cfg", "r", "folder")
-	lines = f.readlines()
-	f.close()
-	return lines
+	with open("miles/skill_color.cfg", "r", "folder") as file:
+		return file.readlines()
 
 def RemoveLine(line_to_remove):
 	lines = ReturnSavedColors()

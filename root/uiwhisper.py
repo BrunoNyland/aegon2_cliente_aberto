@@ -412,9 +412,9 @@ class WhisperDialog(ui.ScriptWindow):
 		textLength = len(text)
 
 		if textLength > 0:
-			if net.IsInsultIn(text):
-				chat.AppendChat(chat.CHAT_TYPE_INFO, localeinfo.CHAT_INSULT_STRING)
-				return
+			# if net.IsInsultIn(text):
+				# chat.AppendChat(chat.CHAT_TYPE_INFO, localeinfo.CHAT_INSULT_STRING)
+				# return
 
 			links = {}
 			if self.GetLinks(text, links):

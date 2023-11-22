@@ -18,6 +18,9 @@ import winreg
 import constinfo
 import _load_files
 
+import _dbg as dbg
+# dbg.TraceError(f'{ime.GetCodePage()}')
+
 REG_PATH = r"SOFTWARE\KEYSTORAGE"
 
 LOGIN_DELAY_SEC = 20.0
@@ -25,8 +28,8 @@ LOAD_DATA = 0
 ALLOW_LOGIN = 0
 
 def GetServerInfo(name):
-	info = {"IP":"189.127.164.174", "CH1":30011, "AUTH":30001}
-	# info = {"IP":"192.168.56.101", "CH1":30011, "AUTH":30001}
+	# info = {"IP":"189.127.164.174", "CH1":30011, "AUTH":30001}
+	info = {"IP":"192.168.56.101", "CH1":30011, "AUTH":30001}
 	return info[name]
 
 def GetLoginDelay():
@@ -228,10 +231,10 @@ class LoginWindow(ui.ScriptWindow):
 		if musicinfo.loginMusic != "" and musicinfo.selectMusic != "":
 			snd.FadeOutMusic("bgm/"+musicinfo.loginMusic)
 
-		self.idEditLine.SetTabEvent(self.EmptyFunc)
-		self.idEditLine.SetReturnEvent(self.EmptyFunc)
-		self.pwdEditLine.SetReturnEvent(self.EmptyFunc)
-		self.pwdEditLine.SetTabEvent(self.EmptyFunc)
+		self.idEditLine.SetTabEvent(None)
+		self.idEditLine.SetReturnEvent(None)
+		self.pwdEditLine.SetReturnEvent(None)
+		self.pwdEditLine.SetTabEvent(None)
 
 		self.idEditLine = None
 		self.pwdEditLine = None
@@ -344,6 +347,7 @@ class LoginWindow(ui.ScriptWindow):
 			self.pwdEditLine.SetText("")
 			self.pwdEditLine.SetFocus()
 			return
+
 		self.Connect(id, pwd)
 
 ############################################################################################################
@@ -551,10 +555,10 @@ class LoginWindow(ui.ScriptWindow):
 		self.GetChild("SaveAccountBoard").Hide()
 		self.GetChild("SaveAccountID_EditLine").SetText("")
 		self.GetChild("SaveAccountID_EditLine").EditLine.KillFocus()
-		self.GetChild("SaveAccountID_EditLine").OnKillFocus()
+		self.GetChild("SaveAccountID_EditLine").KillFocus()
 		self.GetChild("SaveAccountPassword_EditLine").SetText("")
 		self.GetChild("SaveAccountPassword_EditLine").EditLine.KillFocus()
-		self.GetChild("SaveAccountPassword_EditLine").OnKillFocus()
+		self.GetChild("SaveAccountPassword_EditLine").KillFocus()
 
 	def AddAccountButtonOverIn(self):
 		Get = self.GetChild

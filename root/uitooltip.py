@@ -297,7 +297,7 @@ class ToolTip(ui.ThinBoard):
 		x = min(x + width/2, wndMgr.GetScreenWidth() - width/2) - width/2
 		y = min(y + self.GetHeight(), wndMgr.GetScreenHeight()) - self.GetHeight()
 
-		parentWindow = self.GetParentProxy()
+		parentWindow = self.GetParent()
 		if parentWindow:
 			(gx, gy) = parentWindow.GetGlobalPosition()
 			x -= gx
@@ -2069,7 +2069,7 @@ if app.ENABLE_FLAGS_CHAT:
 			x = min(x + width / 2, wndMgr.GetScreenWidth() - width / 2) - width / 2
 			y = min(y + self.GetHeight(), wndMgr.GetScreenHeight()) - self.GetHeight()
 
-			parentWindow = self.GetParentProxy()
+			parentWindow = self.GetParent()
 			if parentWindow:
 				(gx, gy) = parentWindow.GetGlobalPosition()
 				x -= gx
